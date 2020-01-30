@@ -17,11 +17,12 @@ else:
 data_files = []
 
 setup(
-    name="pystare",
+    name='pystare',
     version='0.1',
     description="",
     long_description=LONG_DESCRIPTION,    
     packages = [],
+    py_modules= ['pystare'],
     ext_modules=[Extension(name='_pystare', 
                            sources=['PySTARE.i', 'PySTARE.cpp'], 
                            swig_opts=['-modern', '-c++'],
@@ -34,6 +35,7 @@ setup(
     
     python_requires=">=3.5",
     install_requires=INSTALL_REQUIRES,
+    
 ) 
 
 
