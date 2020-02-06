@@ -1,4 +1,4 @@
-# STAREPandas
+# PySTARE
 STARE python abstraction
 
 ## Introduction
@@ -39,7 +39,6 @@ If no rights for make install are present, the location of libSTARE.a and STARE.
     import numpy
     import pystare
     
-
     print('Spatial tests')
     lat = numpy.array([30,45,60], dtype=numpy.double)
     lon = numpy.array([45,60,10], dtype=numpy.double)
