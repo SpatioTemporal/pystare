@@ -1,5 +1,5 @@
 import numpy 
-from pystare import pystare 
+import pystare 
 import unittest
 
 class MainTest(unittest.TestCase):

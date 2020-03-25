@@ -1,5 +1,5 @@
 import numpy 
-from pystare import pystare 
+import pystare 
 import unittest
 
 lat = numpy.array([30,45,60], dtype=numpy.double)

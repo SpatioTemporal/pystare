@@ -1,5 +1,5 @@
 import numpy 
-from pystare import pystare 
+import pystare 
 import unittest
 
 datetime = numpy.array(['1970-01-01T00:00:00', 
