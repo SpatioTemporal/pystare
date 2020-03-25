@@ -30,7 +30,9 @@ If no rights for make install are present, the location of libSTARE.a and STARE.
     
 ### Manual built
     
-    python3 setup.py build_ext --inplace    
+    python3 setup.py build_ext --inplace
+    python3 setup.py --build
+    python3 setup.py build --force
     
     
 ## Usage

@@ -355,12 +355,13 @@
   $result = (PyObject*)out$argnum;
 }
 
-# %typemap(argout) 
-# (double* in_array1, int length1, double* in_array2, int length2, int resolution, int64_t* out_array1, int out_length1, int64_t* out_array2, int out_length2)
-# {
-#   $result = (PyObject*)out$argnum;
-# }
-
+/*
+ %typemap(argout) 
+ (double* in_array1, int length1, double* in_array2, int length2, int resolution, int64_t* out_array1, int out_length1, int64_t* out_array2, int out_length2)
+ {
+   $result = (PyObject*)out$argnum;
+ }
+*/
 
 /* Applying the typemaps */
 
@@ -594,11 +595,14 @@ def triangulate(lats,lons):
     return lons,lats,intmat 
 
 def triangulate_indices(indices):
-    """ Prepare data for matplotlib.tri.Triangulate."""
-
-    lons,lats,intmat = triangulate_indices(indices)
-    triang = tri.Triangulation(lons,lats,intmat)
-    plt.triplot(triang,'r-',transform=transform,lw=1,markersize=3)
+    """
+    Prepare data for matplotlib.tri.Triangulate.
+    
+    Usage: 
+     lons,lats,intmat = triangulate_indices(indices)
+     triang = tri.Triangulation(lons,lats,intmat)
+     plt.triplot(triang,'r-',transform=transform,lw=1,markersize=3)    
+    """
     latv,lonv,lat_center,lon_center = to_vertices_latlon(indices)
     lons,lats,intmat = triangulate(latv,lonv)
     return lons,lats,intmat
