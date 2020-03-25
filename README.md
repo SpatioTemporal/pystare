@@ -1,7 +1,7 @@
 # PySTARE
-STARE python abstraction
 
 ## Introduction
+PySTARE exposes the STARE library to python.
 
 
 ## Requirements:
