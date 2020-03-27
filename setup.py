@@ -16,7 +16,11 @@ else:
 
 STARE_LIB_DIRS     = [os.environ.get('STARE_LIB_DIR','/usr/local/lib')]
 STARE_INCLUDE_DIRS = [os.environ.get('STARE_INCLUDE_DIR','/usr/local/include')]
-PYTHON_INCLUDE_DIRS = os.environ.get('PYTHON_INCLUDE_DIRS','/usr/local/include/numpy').split(':')
+
+if os.environ.get('PYTHON_INCLUDE_DIRS') is None:
+    PYTHON_INCLUDE_DIRS = []
+else:
+    PYTHON_INCLUDE_DIRS = os.environ.get('PYTHON_INCLUDE_DIRS').split(':')
 
 INCLUDE_DIRS = STARE_INCLUDE_DIRS + PYTHON_INCLUDE_DIRS
 
