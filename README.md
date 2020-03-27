@@ -30,7 +30,7 @@ export STARE_LIB_DIR=/path/to/directory-containing-stare.a/
 
 ### Or from local copy
 
-    git clone https://github.com/NiklasPhabian/starepandas $pystare
+    git clone https://github.com/SpatioTemporal/starepandas $pystare
     pip3 install --editable $pystare
     
 ### Manual build
