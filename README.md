@@ -18,6 +18,11 @@ If no rights for make install are present, the location of libSTARE.a and STARE.
     library_dirs=[],       # Location of libSTARE.a
     include_dirs=[],       # Location of STARE.h
 
+or by shell environment variables (e.g. in bash):
+
+export STARE_INCLUDE_DIR=/path/to/directory-containing-stare.h/
+export STARE_LIB_DIR=/path/to/directory-containing-stare.a/
+
 ## Installation
 
     mkvirtualenv --python=/usr/bin/python3 $PROJECT_ENV    
@@ -28,12 +33,15 @@ If no rights for make install are present, the location of libSTARE.a and STARE.
     git clone https://github.com/NiklasPhabian/starepandas $pystare
     pip3 install --editable $pystare
     
-### Manual built
+### Manual build
     
     python3 setup.py build_ext --inplace
     python3 setup.py --build
     python3 setup.py build --force
-    
+
+### To test
+
+    python3 setup.py test
     
 ## Usage
 

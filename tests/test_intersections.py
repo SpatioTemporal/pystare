@@ -5,8 +5,6 @@ import unittest
 lat = numpy.array([30,45,60], dtype=numpy.double)
 lon = numpy.array([45,60,10], dtype=numpy.double)
 
-
-
 class MainTest(unittest.TestCase):
     
     def test__intersect(self):        
@@ -57,10 +55,10 @@ class MainTest(unittest.TestCase):
 
         intersectedFalse = pystare.intersect(hull0, hull1, multiresolution=False)
         intersectedTrue  = pystare.intersect(hull0, hull1, multiresolution=True)
-        
-        ## NG: I am not sure what to expect!!!
+
+        # See examples/test_intersect_single_res.py
         self.assertEqual(328, len(intersectedFalse))
-        self.assertEqual(328, len(intersectedTrue))
+        self.assertEqual(172, len(intersectedTrue))
         
     def test_intersect_repetition(self):
         a = [4114022797720682508, 4505997421712506892, 4505997834029367308, 4505997868389105676, 4505998418144919564]

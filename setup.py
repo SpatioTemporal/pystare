@@ -14,6 +14,8 @@ if os.environ.get("READTHEDOCS", False) == "True":
 else:
     INSTALL_REQUIRES = ['numpy>=1.16.2', 'shapely>=1.6', 'geopandas>=0.5']
 
+STARE_LIB_DIRS     = [os.environ.get('STARE_LIB_DIR','/usr/local/lib')]
+STARE_INCLUDE_DIRS = [os.environ.get('STARE_INCLUDE_DIR','/usr/local/include')]
 
 class build_py(_build_py):   
     def run(self):
@@ -27,8 +29,8 @@ pystare = Extension(name='_pystare',
                     swig_opts=['-modern', '-c++'],
                     extra_compile_args=['-std=c++11'],
                     libraries=['STARE'],
-                    library_dirs=[],       # Location of libSTARE.a
-                    include_dirs=[],       # Location of STARE.h
+                    library_dirs=STARE_LIB_DIRS,       # Location of libSTARE.a
+                    include_dirs=STARE_INCLUDE_DIRS,   # Location of STARE.h
                     language='c++')
 
 
