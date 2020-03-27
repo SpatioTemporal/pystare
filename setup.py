@@ -16,12 +16,14 @@ else:
 
 STARE_LIB_DIRS     = [os.environ.get('STARE_LIB_DIR','/usr/local/lib')]
 STARE_INCLUDE_DIRS = [os.environ.get('STARE_INCLUDE_DIR','/usr/local/include')]
+PYTHON_INCLUDE_DIRS = os.environ.get('PYTHON_INCLUDE_DIRS','/usr/local/include/numpy').split(':')
+
+INCLUDE_DIRS = STARE_INCLUDE_DIRS + PYTHON_INCLUDE_DIRS
 
 class build_py(_build_py):   
     def run(self):
         self.run_command("build_ext")
         return super().run()
-    
 
 pystare = Extension(name='_pystare', 
                     sources=['PySTARE.i', 'PySTARE.cpp'], 
@@ -30,7 +32,7 @@ pystare = Extension(name='_pystare',
                     extra_compile_args=['-std=c++11'],
                     libraries=['STARE'],
                     library_dirs=STARE_LIB_DIRS,       # Location of libSTARE.a
-                    include_dirs=STARE_INCLUDE_DIRS,   # Location of STARE.h
+                    include_dirs=INCLUDE_DIRS,   # Location of STARE.h
                     language='c++')
 
 
