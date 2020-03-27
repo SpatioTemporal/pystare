@@ -42,10 +42,19 @@ export STARE_LIB_DIR=/path/to/directory-containing-stare.a/
 ### To test
 
     python3 setup.py test
-    
+
 ## Usage
 
+Once pystare is installed or made available via PYTHONPATH one may use it as described in the following sections.
+
+### Example scripts
+
+Examples are provided in the examples directory and may be run as follows.
+
+$ python test_intersect_single_res.py
+
 ### Spatial
+
     import numpy
     import pystare
     
@@ -68,7 +77,8 @@ export STARE_LIB_DIR=/path/to/directory-containing-stare.a/
     area = pystare.to_area(indices)
     print(area)
 
-### Temporal 
+### Temporal
+
     import numpy
     import pystare
     
