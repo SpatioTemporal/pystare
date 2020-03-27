@@ -26,7 +26,7 @@ export STARE_LIB_DIR=/path/to/directory-containing-stare.a/
 ## Installation
 
     mkvirtualenv --python=/usr/bin/python3 $PROJECT_ENV    
-    pip3 install git+git://github.com/NiklasPhabian/pystare.git
+    pip3 install git+git://github.com/SpatioTemporal/pystare.git
 
 ### Or from local copy
 
