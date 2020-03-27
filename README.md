@@ -23,6 +23,8 @@ or by shell environment variables (e.g. in bash):
 export STARE_INCLUDE_DIR=/path/to/directory-containing-stare.h/
 export STARE_LIB_DIR=/path/to/directory-containing-stare.a/
 
+It may be necessary to set PYTHON_INCLUDE_DIRS, if, for example, numpy headers cannot be found.
+
 ## Installation
 
     mkvirtualenv --python=/usr/bin/python3 $PROJECT_ENV    
