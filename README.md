@@ -53,7 +53,7 @@ Once pystare is installed or made available via PYTHONPATH one may use it as des
 
 Examples are provided in the examples directory and may be run as follows.
 
-    python3 test_intersect_single_res.py
+    python3 examples/test_intersect_single_res.py
 
 ### Spatial
 
