@@ -20,9 +20,8 @@ If no rights for make install are present, the location of libSTARE.a and STARE.
 
 or by shell environment variables (e.g. in bash):
 
-export STARE_INCLUDE_DIR=/path/to/directory-containing-stare.h/
-
-export STARE_LIB_DIR=/path/to/directory-containing-stare.a/
+    export STARE_INCLUDE_DIR=/path/to/directory-containing-stare.h/
+    export STARE_LIB_DIR=/path/to/directory-containing-stare.a/
 
 It may be necessary to set PYTHON_INCLUDE_DIRS, if, for example, numpy headers cannot be found.
 
@@ -54,7 +53,7 @@ Once pystare is installed or made available via PYTHONPATH one may use it as des
 
 Examples are provided in the examples directory and may be run as follows.
 
-$ python test_intersect_single_res.py
+    python3 test_intersect_single_res.py
 
 ### Spatial
 
