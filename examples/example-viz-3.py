@@ -86,8 +86,31 @@ ax = plt.axes(projection=proj,transform=transf)
 ax.set_global()
 ax.coastlines()
 
+box_cover = ps.to_box_cover_from_latlon(np.array([-2,-2,-1,-1],dtype=np.double)
+                                        ,np.array([-2,-1,-1,-2],dtype=np.double)
+                                        ,10)
+latco,lonco,latcco,loncco = ps.to_vertices_latlon(cover)
+lons4,lats4,intmat4 = triangulate1(latco,lonco)
+triang4 = tri.Triangulation(lons4,lats4,intmat4)
+
+
+
+# Set up the projection and transformation
+proj = ccrs.PlateCarree()
+# proj = ccrs.Robinson()
+# proj = ccrs.Geodesic()
+# proj   = ccrs.Mollweide()
+transf = ccrs.Geodetic()
+# transf = ccrs.PlateCarree()
+plt.figure()
+plt.subplot(projection=proj,transform=transf)
+ax = plt.axes(projection=proj,transform=transf)
+ax.set_global()
+ax.coastlines()
+
 plot1(lon0,lat0,lons0,lats0,triang0,c0='r',c1='b',transf=transf)
 plot1(None,None,lons2,lats2,triang2,c0='r',c1='y',transf=transf)
 plot1(None,None,lons1,lats1,triang1,c0='c',c1='r',transf=transf)
 plot1(None,None,lons3,lats3,triang3,c0='c',c1='g',transf=transf)
+plot1(None,None,lons4,lats4,triang4,c0='c',c1='g',transf=transf)
 plt.show()

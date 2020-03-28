@@ -6,7 +6,6 @@ import os
 from setuptools import setup, Extension
 from setuptools.command.build_py import build_py as _build_py
 
-
 LONG_DESCRIPTION = """ """
 
 if os.environ.get("READTHEDOCS", False) == "True":
