@@ -474,11 +474,16 @@ def to_compressed_range(indices):
     return range_indices
     
 def expand_intervals(intervals, resolution, result_size_limit=1000):
-	result      = numpy.full([result_size_limit],-1,dtype=numpy.int64)
-	result_size = numpy.full([1],-1,dtype=numpy.int64)
-	_expand_intervals(intervals,resolution,result,result_size)
-	result = result[:result_size[0]]
-	return result
+    result      = numpy.full([result_size_limit],-1,dtype=numpy.int64)
+    result_size = numpy.full([1],-1,dtype=numpy.int64)
+    _expand_intervals(intervals,resolution,result,result_size)
+    result = result[:result_size[0]]
+    return result
+
+def adapt_resolution_to_proximity(indices):
+    result = numpy.copy(indices)
+    _adapt_resolution_to_proximity(indices,result)
+    return result
     
 def to_hull_range(indices, resolution, range_size_limit=1000):
     out_length = range_size_limit

@@ -169,6 +169,15 @@ void _to_neighbors(int64_t* indices, int len, int64_t* range_indices, int len_ri
 	}
 }
 
+void _adapt_resolution_to_proximity(int64_t* indices, int len, int64_t* range_indices, int len_ri) {
+  // if len != len_ri, throw something...
+  STARE_ArrayIndexSpatialValues sivs(indices, indices+len);  
+  STARE_ArrayIndexSpatialValues result = stare.adaptSpatialResolutionEstimates(sivs);
+  for(int i = 0; i < len; ++i) {
+    range_indices[i] = result[i];
+  }
+}
+
 void _to_circular_cover(double lat, double lon, double radius, int resolution, int64_t* range_indices, int len_ri, int64_t* result_size, int len_rs) {
   STARE_SpatialIntervals result = stare.CoverCircleFromLatLonRadiusDegrees(lat,lon,radius,resolution);
 	if(len_ri < result.size()) {
