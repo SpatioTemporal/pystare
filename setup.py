@@ -3,6 +3,7 @@
 """
 
 import os
+import numpy
 from setuptools import setup, Extension
 from setuptools.command.build_py import build_py as _build_py
 
@@ -21,7 +22,7 @@ if os.environ.get('PYTHON_INCLUDE_DIRS') is None:
 else:
     PYTHON_INCLUDE_DIRS = os.environ.get('PYTHON_INCLUDE_DIRS').split(':')
 
-INCLUDE_DIRS = STARE_INCLUDE_DIRS + PYTHON_INCLUDE_DIRS
+INCLUDE_DIRS = STARE_INCLUDE_DIRS + PYTHON_INCLUDE_DIRS + [numpy.get_include()]
 
 class build_py(_build_py):   
     def run(self):
