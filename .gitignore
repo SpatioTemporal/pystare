@@ -5,3 +5,9 @@ build/*
 PySTARE_wrap.cpp
 pystare.py
 .directory
+/.project
+/.pydevproject
+__init__.cpython-*
+intervals.cpython-*
+*~
+test_*.cpython-*

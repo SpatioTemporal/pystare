@@ -474,11 +474,16 @@ def to_compressed_range(indices):
     return range_indices
     
 def expand_intervals(intervals, resolution, result_size_limit=1000):
-	result      = numpy.full([result_size_limit],-1,dtype=numpy.int64)
-	result_size = numpy.full([1],-1,dtype=numpy.int64)
-	_expand_intervals(intervals,resolution,result,result_size)
-	result = result[:result_size[0]]
-	return result
+    result      = numpy.full([result_size_limit],-1,dtype=numpy.int64)
+    result_size = numpy.full([1],-1,dtype=numpy.int64)
+    _expand_intervals(intervals,resolution,result,result_size)
+    result = result[:result_size[0]]
+    return result
+
+def adapt_resolution_to_proximity(indices):
+    result = numpy.copy(indices)
+    _adapt_resolution_to_proximity(indices,result)
+    return result
     
 def to_hull_range(indices, resolution, range_size_limit=1000):
     out_length = range_size_limit
@@ -509,6 +514,14 @@ def to_circular_cover(lat, lon, radius, resolution):
     out_length = result.get_size_as_intervals()
     range_indices = numpy.zeros([out_length],dtype=numpy.int64)
     result.copy_as_intervals(range_indices);
+    return range_indices
+
+def to_box_cover_from_latlon(lat, lon, resolution, range_size_limit=1000):
+    out_length = range_size_limit
+    range_indices = numpy.full([out_length], -1, dtype=numpy.int64)
+    result_size = numpy.full([1], -1, dtype=numpy.int64)
+    _to_box_cover_from_latlon(lat, lon, resolution, range_indices, result_size)
+    range_indices = range_indices[:result_size[0]]
     return range_indices
       
 def to_vertices_latlon(indices):

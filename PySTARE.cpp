@@ -1,7 +1,7 @@
 /*
  * PySTARE.cpp
  *
- c*  Created on: Jun 13, 2019
+ *  Created on: Jun 13, 2019
  *      Author: mrilee
  *
  *  Copyright (C) 2019 Rilee Systems Technologies LLC
@@ -169,6 +169,15 @@ void _to_neighbors(int64_t* indices, int len, int64_t* range_indices, int len_ri
 	}
 }
 
+void _adapt_resolution_to_proximity(int64_t* indices, int len, int64_t* range_indices, int len_ri) {
+  // if len != len_ri, throw something...
+  STARE_ArrayIndexSpatialValues sivs(indices, indices+len);  
+  STARE_ArrayIndexSpatialValues result = stare.adaptSpatialResolutionEstimates(sivs);
+  for(int i = 0; i < len; ++i) {
+    range_indices[i] = result[i];
+  }
+}
+
 void _to_circular_cover(double lat, double lon, double radius, int resolution, int64_t* range_indices, int len_ri, int64_t* result_size, int len_rs) {
   STARE_SpatialIntervals result = stare.CoverCircleFromLatLonRadiusDegrees(lat,lon,radius,resolution);
 	if(len_ri < result.size()) {
@@ -186,6 +195,24 @@ StareResult _to_circular_cover1(double lat, double lon, double radius, int resol
   StareResult result; 
   result.add_intervals(stare.CoverCircleFromLatLonRadiusDegrees(lat,lon,radius,resolution));
   return result;
+}
+
+void _to_box_cover_from_latlon(double* lat, int len_lat, double* lon, int len_lon, int resolution, int64_t* range_indices, int len_ri, int64_t* result_size, int len_rs) {
+
+	LatLonDegrees64ValueVector points;
+	for(int i=0; i<len_lat; ++i) {
+		points.push_back(LatLonDegrees64(lat[i], lon[i]));
+	}
+
+	// STARE_SpatialIntervals result = stare.ConvexHull(points, resolution);
+	STARE_SpatialIntervals result = stare.CoverBoundingBoxFromLatLonDegrees(points, resolution);
+
+	if(len_ri < result.size()) {
+		cout << dec;
+		cout << "_to_box_cover_from_latlon-warning: range_indices.size = " << len_ri << " too small." << endl << flush;
+		cout << "_to_box_cover_from_latlon-warning: result size        = " << result.size() << "." << endl << flush;
+	}
+
 }
 
 void _to_compressed_range(int64_t* indices, int len, int64_t* range_indices, int len_ri) {
@@ -311,7 +338,7 @@ void from_utc(int64_t *datetime, int len, int64_t *indices_out, int resolution) 
     int type = 2;
     for (int i=0; i<len; i++) {
     	int64_t idt = datetime[i]/1000;
-        indices_out[i] = stare.ValueFromUTC(idt, resolution, type);
+        indices_out[i] = stare.ValueFromUTC((time_t&)idt, resolution, type);
         idt = datetime[i]%1000;
         stare.tIndex.set_millisecond(idt);
         indices_out[i] = stare.getArrayIndexTemporalValue();

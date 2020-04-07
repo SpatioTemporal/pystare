@@ -18,20 +18,28 @@ If no rights for make install are present, the location of libSTARE.a and STARE.
     library_dirs=[],       # Location of libSTARE.a
     include_dirs=[],       # Location of STARE.h
 
+or by shell environment variables (e.g. in bash):
+
+    export STARE_INCLUDE_DIR=/path/to/directory-containing-stare.h/
+    export STARE_LIB_DIR=/path/to/directory-containing-stare.a/
+
+It may be necessary to set PYTHON_INCLUDE_DIRS, if, for example, numpy headers cannot be found.
+
 ## Installation
 
     mkvirtualenv --python=/usr/bin/python3 $PROJECT_ENV    
-    pip3 install git+git://github.com/NiklasPhabian/pystare.git
+    pip3 install git+git://github.com/SpatioTemporal/pystare.git
 
 ### Or from local copy
 
-    git clone https://github.com/NiklasPhabian/starepandas $pystare
+    git clone https://github.com/SpatioTemporal/starepandas $pystare
     pip3 install --editable $pystare
     
-### Manual built
+### Manual build
     
     python3 setup.py build_ext --inplace
     python3 setup.py build --force
+    
     
 ## Tests
     python3 setup.py test
@@ -39,7 +47,16 @@ If no rights for make install are present, the location of libSTARE.a and STARE.
     
 ## Usage
 
+Once pystare is installed or made available via PYTHONPATH one may use it as described in the following sections.
+
+### Example scripts
+
+Examples are provided in the examples directory and may be run as follows.
+
+    python3 examples/test_intersect_single_res.py
+
 ### Spatial
+
     import numpy
     import pystare
     
@@ -62,7 +79,8 @@ If no rights for make install are present, the location of libSTARE.a and STARE.
     area = pystare.to_area(indices)
     print(area)
 
-### Temporal 
+### Temporal
+
     import numpy
     import pystare
     
