@@ -66,4 +66,47 @@ class MainTest(unittest.TestCase):
         for i in range(1, 10000):        
             pystare.intersect(a, b)
         self.assertTrue(True)
+
+    def test_intersect_range_single_res(self):
+        resolution = 6
+        resolution0 = resolution
+        ntri0 = 1000
+        lat0 = numpy.array([ 10, 5, 60,70], dtype=numpy.double)
+        lon0 = numpy.array([-30,-20,60,10], dtype=numpy.double)
+        hull0 = pystare.to_hull_range_from_latlon(lat0, lon0, resolution0, ntri0)
+                                              
+        resolution1 = 6
+        ntri1 = 1000
+        lat1 = numpy.array([10,  20, 30, 20 ], dtype=numpy.double)
+        lon1 = numpy.array([-60, 60, 60, -60], dtype=numpy.double)
+        hull1 = pystare.to_hull_range_from_latlon(lat1, lon1, resolution1, ntri1)
+
+        r0 = pystare.srange()
+        r0.add_intervals(hull0)
+
+        r1 = pystare.srange()
+        r1.add_intervals(hull1)
+
+        r01 = pystare.srange()
+        r01.add_intersect(r0,r1,False)
+        n01 = r01.get_size_as_values()
+
+        self.assertEqual(328, n01)
+        intersected = numpy.zeros([n01],dtype=numpy.int64)
+        r01.copy_values(intersected)
+        # See examples/test_intersect_single_res.py
+        self.assertEqual(328, len(intersected))
+
+        r01.purge()
+        n01 = r01.get_size_as_values()
+        self.assertEqual(0, n01)
+
+        r01.reset()
+        r01.add_intersect(r0,r1,True)
+        n01 = r01.get_size_as_values()
+        self.assertEqual(172, n01)
         
+        intersected = numpy.zeros([n01],dtype=numpy.int64)
+        r01.copy_values(intersected)
+        # See examples/test_intersect_single_res.py
+        self.assertEqual(172, len(intersected))
