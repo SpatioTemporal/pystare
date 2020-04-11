@@ -490,7 +490,8 @@ void srange::add_intervals(int64_t* indices, int len) {
   range.addSpatialIntervals(sis);
 }
 
-bool srange::contains(int64_t siv) {
+// bool srange::contains(int64_t siv) {
+bool srange::contains(long long siv) {
   return range.contains(siv);
 }
 

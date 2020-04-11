@@ -98,7 +98,8 @@ public:
   void add_intervals(int64_t* indices, int len);
   void add_range(const SpatialRange& r) { range.addSpatialRange(r); }
   
-  bool contains(int64_t siv);
+  // bool contains(int64_t siv);
+  bool contains(long long siv);
 
   bool intervals_extracted = false;
   void extract_intervals();

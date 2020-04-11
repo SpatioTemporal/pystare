@@ -1,7 +1,10 @@
 
 # PySTARE Notes
 
-## 2020-04-10 Added srange
+## 2020-04-10 0.3.1 Fixed srange.contains
+We don't have the  numpy.i SWIG mapping for int64_t to Python int working. Using "long long" on C++ and Python int when calling.
+
+## 2020-04-10 0.3.0 Added srange
 pystare.srange exposes SpatialRange functionality to Python. Example usage is shown in tests/test_intersections.py in the test_intersect_range_single_res test.
 
 For example,

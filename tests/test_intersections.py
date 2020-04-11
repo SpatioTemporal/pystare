@@ -110,3 +110,11 @@ class MainTest(unittest.TestCase):
         r01.copy_values(intersected)
         # See examples/test_intersect_single_res.py
         self.assertEqual(172, len(intersected))
+
+        iv = intersected[3]
+        self.assertEqual(True,r01.contains(int(iv)))
+
+        iv_max_plus = 4584664420663164934 + 100000000000000000
+        self.assertEqual(False,r01.contains(int(iv_max_plus)))
+
+        # print('max intersected ',numpy.amax(intersected))
