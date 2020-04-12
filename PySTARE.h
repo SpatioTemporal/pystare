@@ -100,6 +100,7 @@ public:
   
   // bool contains(int64_t siv);
   bool contains(long long siv);
+  void acontains(int64_t* indices1, int len1, int64_t* indices2, int len2, int fill_value = -1 );
 
   bool intervals_extracted = false;
   void extract_intervals();

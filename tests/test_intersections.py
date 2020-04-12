@@ -117,4 +117,16 @@ class MainTest(unittest.TestCase):
         iv_max_plus = 4584664420663164934 + 100000000000000000
         self.assertEqual(False,r01.contains(int(iv_max_plus)))
 
+        for i in range(int(len(intersected)/2)):
+            intersected[int(2*i)] = int(4584664420663164934 + ( 100000000000000000 + 1000000 * i ))
+        intersected1 = numpy.zeros(intersected.shape,dtype=numpy.int64)
+        r0.acontains(intersected,intersected1,-1)
+        for i in range(len(intersected)):
+            # print(i,'i',intersected[i],intersected1[i])
+            if i % 2 == 0:
+                self.assertEqual(-1,intersected1[i])
+            else:
+                self.assertEqual(intersected[i],intersected1[i])
+            
+
         # print('max intersected ',numpy.amax(intersected))

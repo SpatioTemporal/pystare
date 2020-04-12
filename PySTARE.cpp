@@ -495,11 +495,15 @@ bool srange::contains(long long siv) {
   return range.contains(siv);
 }
 
-/*
-bool srange::acontains(int64_t* indices, int len) {
-  return range.contains(siv);
+void srange::acontains(int64_t* indices1, int len1, int64_t* range_indices, int len_ri, int fill_value ) {
+  for( int i=0; i<min(len1,len_ri); ++i ) {
+    if( range.contains(indices1[i]) ) {
+      range_indices[i] = indices1[i];
+    } else {
+      range_indices[i] = fill_value;
+    }
+  }
 }
-*/
 
 void srange::extract_intervals() {
   sis = range.toSpatialIntervals();
