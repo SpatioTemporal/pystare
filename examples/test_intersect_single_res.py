@@ -57,7 +57,7 @@ def test_intersect_single_res(proj,transf):
      # plt.subplot(projection=proj,transform=transf)
      ax=axs[1]
      # ax.set_global()
-     ax.coastlines()     
+     ax.coastlines()
 
      lonsF,latsF,intmatF = pystare.triangulate_indices(intersectedFalse)
      triangF = tri.Triangulation(lonsF,latsF,intmatF)

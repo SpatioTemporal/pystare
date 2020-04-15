@@ -475,3 +475,90 @@ void StareResult::convert() {
   }
   converted = true;
 }
+
+srange::srange() {}
+
+srange::srange(int64_t* indices, int len) {
+  STARE_ArrayIndexSpatialValues sis(indices, indices+len);
+  range.addSpatialIntervals(sis);
+}
+
+srange::~srange() {}
+
+void srange::add_intervals(int64_t* indices, int len) {
+  STARE_SpatialIntervals sis(indices, indices+len);
+  range.addSpatialIntervals(sis);
+}
+
+// bool srange::contains(int64_t siv) {
+bool srange::contains(long long siv) {
+  return range.contains(siv);
+}
+
+void srange::acontains(int64_t* indices1, int len1, int64_t* range_indices, int len_ri, int fill_value ) {
+  for( int i=0; i<min(len1,len_ri); ++i ) {
+    if( range.contains(indices1[i]) ) {
+      range_indices[i] = indices1[i];
+    } else {
+      range_indices[i] = fill_value;
+    }
+  }
+}
+
+void srange::extract_intervals() {
+  sis = range.toSpatialIntervals();
+  intervals_extracted = true;
+}
+
+void srange::extract_values() {
+  if( !intervals_extracted ) {
+    extract_intervals();
+  }
+  sivs = expandIntervals(sis);
+  values_extracted = true;
+}
+
+int srange::get_size_as_intervals() {
+  if( !intervals_extracted ) {
+    extract_intervals();
+  }
+  return sis.size();
+}
+void srange::copy_intervals(int64_t* indices, int len) {
+  int n_sis = get_size_as_intervals();
+  for( int i=0; i<min(len,(int)n_sis); ++i ) {
+    indices[i] = sis[i];
+  }
+}
+
+int srange::get_size_as_values() {
+  if( !values_extracted ) {
+    extract_values();
+  }
+  return sivs.size();
+}
+
+void srange::copy_values(int64_t* indices, int len) {
+  int n_sivs = get_size_as_values();
+  for(  int i=0; i < min(len,n_sivs); ++i ) {
+    indices[i] = sivs[i];
+  }
+}
+
+void srange::reset_extraction() {
+  intervals_extracted = false;
+  values_extracted = false;
+  sis.clear();
+  sivs.clear();
+}
+
+void srange::reset() {
+  reset_extraction();
+  range.reset();
+}
+
+void srange::purge() {
+  reset_extraction();
+  range.purge();
+}
+
