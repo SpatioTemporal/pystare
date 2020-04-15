@@ -7,7 +7,7 @@ PySTARE exposes the STARE library to python.
 ## Requirements:
 pystare requires STARE to be installed i.e. expects libSTARE.a in /usr/local/lib/ and STARE.h in /usr/local/include/
 
-    git clone https://github.com/michaelleerilee/STARE
+    git clone https://github.com/SpatioTemporal/STARE
     cd STARE
     cmake .
     make
