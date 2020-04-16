@@ -38,13 +38,13 @@ It may be necessary to set PYTHON_INCLUDE_DIRS, if, for example, numpy headers c
 ### Manual build
     
     python3 setup.py build_ext --inplace
-    python3 setup.py --build
     python3 setup.py build --force
-
-### To test
-
+    
+    
+## Tests
     python3 setup.py test
-
+    
+    
 ## Usage
 
 Once pystare is installed or made available via PYTHONPATH one may use it as described in the following sections.
