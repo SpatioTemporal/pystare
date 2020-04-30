@@ -596,7 +596,7 @@ def spatial_resolution(km):
 
 def spatial_scale_km(resolution):
     "A rough estimate for the length scale at level."
-	  return 10*(2.0**(10-resolution))
+    return 10*(2.0**(10-resolution))
 	  
 def triangulate(lats,lons):
     "Help prepare data for matplotlib.tri.Triangulate."

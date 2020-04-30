@@ -1,7 +1,7 @@
 
 # PySTARE Notes
 
-## 2020-04-30 0.3.4 Add spatial_scale_km(resolution) to get estimate of length scale at resolution level.
+## 2020-04-30 0.3.5 Add spatial_scale_km(resolution) to get estimate of length scale at resolution level.
 
 ## 2020-04-30 0.3.3 Fixed np -> numpy error in spatial_resolution...
 
