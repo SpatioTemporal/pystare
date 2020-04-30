@@ -592,7 +592,7 @@ def shiftarg_lat(lat):
         return lat
         
 def spatial_resolution(km):
-    return 10-np.log2(km/10)
+    return 10-numpy.log2(km/10)
 
 def triangulate(lats,lons):
     "Help prepare data for matplotlib.tri.Triangulate."

@@ -1,6 +1,8 @@
 
 # PySTARE Notes
 
+## 2020-04-30 0.3.3 Fixed np -> numpy error in spatial_resolution...
+
 ## 2020-04-10 0.3.1 Fixed srange.contains
 We don't have the  numpy.i SWIG mapping for int64_t to Python int working. Using "long long" on C++ and Python int when calling.
 
