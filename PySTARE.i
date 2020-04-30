@@ -694,7 +694,7 @@ def to_trixels(indices):
 
 def spatial_increment_from_level(level):
     if level < 0 or level > 27:
-	raise PyStareError()
+        raise PyStareError()
     return 1 << (59-2*level)
 %}   
    
