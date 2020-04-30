@@ -594,6 +594,10 @@ def shiftarg_lat(lat):
 def spatial_resolution(km):
     return 10-numpy.log2(km/10)
 
+def spatial_scale_km(resolution):
+    "A rough estimate for the length scale at level."
+	  return 10*(2.0**(10-resolution))
+	  
 def triangulate(lats,lons):
     "Help prepare data for matplotlib.tri.Triangulate."
     intmat=[]
