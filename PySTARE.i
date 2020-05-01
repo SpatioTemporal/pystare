@@ -696,10 +696,33 @@ def to_trixels(indices):
         i += 4
     return trixels
 
+spatial_resolution_mask =  31
+spatial_location_mask   = ~31
+
+# TODO Replace hardcoded below with the variables above.
+	  
 def spatial_increment_from_level(level):
     if level < 0 or level > 27:
         raise PyStareError()
     return 1 << (59-2*level)
+
+def spatial_resolution(sid):
+    return sid & 31 # levelMaskSciDB
+
+def spatial_terminator_mask(level):
+    return ((1 << (1+ 58-2*level))-1)
+
+def spatial_terminator(sid):
+    return sid | ((1 << (1+ 58-2*(sid & 31)))-1)
+
+def spatial_coerce_resolution(sid,resolution):
+    return (sid & ~31) | resolution
+
+def spatial_clear_to_resolution(sid):
+    resolution = sid & 31
+    mask =  spatial_terminator_mask(spatial_resolution(sid))
+    return (sid & ~mask) + resolution
+	 
 %}   
    
 %include "PySTARE.h"
