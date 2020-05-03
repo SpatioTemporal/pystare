@@ -516,7 +516,7 @@ def to_circular_cover(lat, lon, radius, resolution):
     result.copy_as_intervals(range_indices);
     return range_indices
 
-def circular_cover_from(index,radius,resolution)
+def circular_cover_from(index,radius,resolution):
     latsv,lonsv,lat_center,lon_center = to_vertices_latlon([index])
     return to_circular_cover(lat_center[0],lon_center[0],radius,resolution)
 
