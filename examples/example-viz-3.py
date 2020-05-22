@@ -46,6 +46,13 @@ def make_hull(lat0,lon0,resolution0,ntri0):
     triang0 = tri.Triangulation(lons0,lats0,intmat0)
     return lats0,lons0,triang0,hull0
 
+def make_nc_hull(lat0,lon0,resolution0):
+    hull0 = ps.to_nonconvex_hull_range_from_latlon(lat0,lon0,resolution0)
+    lath0,lonh0,lathc0,lonhc0 = ps.to_vertices_latlon(hull0)
+    lons0,lats0,intmat0 = triangulate1(lath0,lonh0)
+    triang0 = tri.Triangulation(lons0,lats0,intmat0)
+    return lats0,lons0,triang0,hull0
+
 # resolution = 7
 # resolution = 12
 resolution = 13 # Lost some triangles! Needed to increase ntri0!
@@ -54,7 +61,6 @@ lat0 = np.array([ 0, 0, 1,1], dtype=np.double)
 lon0 = np.array([ 0,1,1,0], dtype=np.double)
 lats0,lons0,triang0,hull0 = make_hull(lat0,lon0,resolution0,ntri0)
 print('hull0: ',len(hull0))
-
 
 idx  = ps.from_latlon(np.array([1.25],dtype=np.double),np.array([1.25],dtype=np.double),10)
 nbrs = ps.to_neighbors(idx)
@@ -93,7 +99,13 @@ latco,lonco,latcco,loncco = ps.to_vertices_latlon(cover)
 lons4,lats4,intmat4 = triangulate1(latco,lonco)
 triang4 = tri.Triangulation(lons4,lats4,intmat4)
 
-
+# resolution = 12
+resolution = 13 # Lost some triangles! Needed to increase ntri0!
+resolution5 = resolution;
+lat5 = np.array([ -2, -2, -1, -1.5, -1], dtype=np.double)
+lon5 = np.array([ 0,1,1,0.5,0], dtype=np.double)
+lats5,lons5,triang5,hull5 = make_nc_hull(lat5,lon5,resolution5)
+# lats5,lons5,triang5,hull5 = make_hull(lat5,lon5,resolution5,ntri0)
 
 # Set up the projection and transformation
 proj = ccrs.PlateCarree()
@@ -113,4 +125,6 @@ plot1(None,None,lons2,lats2,triang2,c0='r',c1='y',transf=transf)
 plot1(None,None,lons1,lats1,triang1,c0='c',c1='r',transf=transf)
 plot1(None,None,lons3,lats3,triang3,c0='c',c1='g',transf=transf)
 plot1(None,None,lons4,lats4,triang4,c0='c',c1='g',transf=transf)
+plot1(lon5,lat5,lons5,lats5,triang5,c0='c',c1='g',transf=transf)
+
 plt.show()

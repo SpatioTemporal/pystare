@@ -32,7 +32,7 @@ It may be necessary to set PYTHON_INCLUDE_DIRS, if, for example, numpy headers c
 
 ### Or from local copy
 
-    git clone https://github.com/SpatioTemporal/starepandas $pystare
+    git clone https://github.com/SpatioTemporal/pystare $pystare
     pip3 install --editable $pystare
     
 ### Manual build

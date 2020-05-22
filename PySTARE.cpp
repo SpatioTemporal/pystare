@@ -266,6 +266,16 @@ void _to_hull_range_from_latlon(double* lat, int len_lat, double* lon, int len_l
 	result_size[0] = result.size();
 }
 
+StareResult _to_nonconvex_hull_range_from_latlon(double* lat, int len_lat, double* lon, int len_lon, int resolution) {
+  StareResult result;
+  LatLonDegrees64ValueVector points;
+  for(int i=0; i<len_lat; ++i) {
+    points.push_back(LatLonDegrees64(lat[i], lon[i]));
+  }
+  result.add_intervals(stare.NonConvexHull(points, resolution));
+  return result;
+}
+
 void _intersect(int64_t* indices1, int len1, int64_t* indices2, int len2, int64_t* intersection, int leni) {
 	STARE_SpatialIntervals si1(indices1, indices1+len1);
     STARE_SpatialIntervals si2(indices2, indices2+len2);

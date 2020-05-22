@@ -501,6 +501,13 @@ def to_hull_range_from_latlon(lat, lon, resolution, range_size_limit=1000):
     range_indices = range_indices[:result_size[0]]
     return range_indices
 
+def to_nonconvex_hull_range_from_latlon(lat, lon, resolution):
+    result        = _to_nonconvex_hull_range_from_latlon(lat,lon,resolution);
+    out_length    = result.get_size_as_intervals()
+    range_indices = numpy.zeros([out_length],dtype=numpy.int64)
+    result.copy_as_intervals(range_indices)
+    return range_indices
+
 # def to_circular_cover(lat, lon, radius, resolution, range_size_limit=1000):
 #     out_length = range_size_limit
 #     range_indices = numpy.full([out_length],-1,dtype=numpy.int64)

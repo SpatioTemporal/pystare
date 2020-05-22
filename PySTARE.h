@@ -85,6 +85,7 @@ class StareResult {
 };
 
 StareResult _to_circular_cover1(double lat, double lon, double radius, int resolution);
+StareResult _to_nonconvex_hull_range_from_latlon(double* lat, int len_lat, double* lon, int len_lon, int resolution);
 
 /**
  * A wrapper for SpatialRange.
