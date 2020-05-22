@@ -1,6 +1,8 @@
 
 # PySTARE Notes
 
+## 2020-05-22 0.4.0 Add non convex hull routine.
+
 ## 2020-05-01 0.3.6 Add spatial_ helper routines.
 
 ## 2020-04-30 0.3.5 Add spatial_scale_km(resolution) to get estimate of length scale at resolution level.
