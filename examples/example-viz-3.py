@@ -102,8 +102,8 @@ triang4 = tri.Triangulation(lons4,lats4,intmat4)
 # resolution = 12
 resolution = 13 # Lost some triangles! Needed to increase ntri0!
 resolution5 = resolution;
-lat5 = np.array([ -2, -2, -1, -1.5, -1], dtype=np.double)
-lon5 = np.array([ 0,1,1,0.5,0], dtype=np.double)
+lat5 = np.array([ -2, -2, -1, -1.5, -1], dtype=np.double)[::-1]
+lon5 = np.array([ 0,1,1,0.5,0], dtype=np.double)[::-1]
 lats5,lons5,triang5,hull5 = make_nc_hull(lat5,lon5,resolution5)
 # lats5,lons5,triang5,hull5 = make_hull(lat5,lon5,resolution5,ntri0)
 

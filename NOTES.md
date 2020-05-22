@@ -1,6 +1,8 @@
 
 # PySTARE Notes
 
+## 2020-05-22 0.4.1 Tweaked a test case.
+
 ## 2020-05-22 0.4.0 Add non convex hull routine.
 
 ## 2020-05-01 0.3.6 Add spatial_ helper routines.
