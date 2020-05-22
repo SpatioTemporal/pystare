@@ -652,23 +652,26 @@ def from_point(point, resolution):
     index_value = from_latlon([lat], [lon], resolution)
     return index_value
 
-def from_polygon(polygon, resolution=-1, range_size_limit=1000):
+def from_polygon(polygon, resolution=-1, range_size_limit=1000, nonconvex=False):
     latlon = polygon.exterior.coords.xy
     lon = latlon[0]
     lat = latlon[1]
-    range_indices = to_hull_range_from_latlon(lat, lon, resolution, range_size_limit)
+    if nonconvex:
+        range_indices = to_nonconvex_hull_range_from_latlon(lat, lon, resolution)
+    else:
+        range_indices = to_hull_range_from_latlon(lat, lon, resolution, range_size_limit)
     return range_indices
     
-def from_multipolygon(multipolygon, resolution=-1, range_size_limit=1000):
+def from_multipolygon(multipolygon, resolution=-1, range_size_limit=1000, nonconvex=False):
     range_indices = []
     for polygon in multipolygon.geoms:
-        range_indices += list(from_polygon(polygon, resolution, range_size_limit))
+        range_indices += list(from_polygon(polygon, resolution, range_size_limit,nonconvex=nonconvex))
     return range_indices
     
 # Geopandas integration
 import geopandas
     
-def from_geopandas(gdf, resolution=-1, range_size_limit=1000):
+def from_geopandas(gdf, resolution=-1, range_size_limit=1000, nonconvex=False):
     # Test if all geometries are Points or Polygons
     if set(gdf.geom_type) == {'Point'}:
         lat = gdf.geometry.y
@@ -678,9 +681,9 @@ def from_geopandas(gdf, resolution=-1, range_size_limit=1000):
         index_values = []
         for polygon in gdf.geometry:
             if polygon.type == 'Polygon':
-                index_values.append(from_polygon(polygon, resolution, range_size_limit))
+                index_values.append(from_polygon(polygon, resolution, range_size_limit,nonconvex=nonconvex))
             else:
-                index_values.append(from_multipolygon(polygon, resolution, range_size_limit))
+                index_values.append(from_multipolygon(polygon, resolution, range_size_limit,nonconvex=nonconvex))
         return index_values        
     else:
         print('inhomogenous geometry types')
