@@ -39,6 +39,13 @@ def plot1(lon,lat,lons,lats,triang,c0='r',c1='b',transf=None,lw=1):
     plt.scatter(lons,lats,s=10,c=c1,transform=transf)
     return
 
+def plot2(sivs,c1='g',transf=None):
+    lath0,lonh0,lathc0,lonhc0 = ps.to_vertices_latlon(sivs)
+    lons0,lats0,intmat0 = triangulate1(lath0,lonh0)
+    triang0 = tri.Triangulation(lons0,lats0,intmat0)
+    ax.triplot(triang0,c1+'-',transform=transf)
+    return
+
 def make_hull(lat0,lon0,resolution0,ntri0):
     hull0 = ps.to_hull_range_from_latlon(lat0,lon0,resolution0,ntri0)
     lath0,lonh0,lathc0,lonhc0 = ps.to_vertices_latlon(hull0)
@@ -48,10 +55,14 @@ def make_hull(lat0,lon0,resolution0,ntri0):
 
 def make_nc_hull(lat0,lon0,resolution0):
     hull0 = ps.to_nonconvex_hull_range_from_latlon(lat0,lon0,resolution0)
+    print('make_nc_hull hull size: ',len(hull0))
     lath0,lonh0,lathc0,lonhc0 = ps.to_vertices_latlon(hull0)
     lons0,lats0,intmat0 = triangulate1(lath0,lonh0)
     triang0 = tri.Triangulation(lons0,lats0,intmat0)
     return lats0,lons0,triang0,hull0
+
+
+# figax = add_coastlines(plt.subplots(subplot_kw={'projection':proj,'transform':transf}))
 
 # resolution = 7
 # resolution = 12
@@ -101,11 +112,14 @@ triang4 = tri.Triangulation(lons4,lats4,intmat4)
 
 # resolution = 12
 resolution = 13 # Lost some triangles! Needed to increase ntri0!
-resolution5 = resolution;
-lat5 = np.array([ -2, -2, -1, -1.5, -1], dtype=np.double)[::-1]
-lon5 = np.array([ 0,1,1,0.5,0], dtype=np.double)[::-1]
-lats5,lons5,triang5,hull5 = make_nc_hull(lat5,lon5,resolution5)
-# lats5,lons5,triang5,hull5 = make_hull(lat5,lon5,resolution5,ntri0)
+
+flag5 = True
+if flag5:
+    resolution5 = resolution;
+    lat5 = np.array([ -2, -2, -1, -1.5, -1], dtype=np.double)[::-1]
+    lon5 = np.array([ 0,1,1,0.5,0], dtype=np.double)[::-1]
+    lats5,lons5,triang5,hull5 = make_nc_hull(lat5,lon5,resolution5)
+    # lats5,lons5,triang5,hull5 = make_hull(lat5,lon5,resolution5,ntri0)
 
 # Set up the projection and transformation
 proj = ccrs.PlateCarree()
@@ -125,6 +139,13 @@ plot1(None,None,lons2,lats2,triang2,c0='r',c1='y',transf=transf)
 plot1(None,None,lons1,lats1,triang1,c0='c',c1='r',transf=transf)
 plot1(None,None,lons3,lats3,triang3,c0='c',c1='g',transf=transf)
 plot1(None,None,lons4,lats4,triang4,c0='c',c1='g',transf=transf)
-plot1(lon5,lat5,lons5,lats5,triang5,c0='c',c1='g',transf=transf)
+if flag5:
+    plot1(lon5,lat5,lons5,lats5,triang5,c0='c',c1='g',transf=transf)
+
+level_zero_increment = ps.spatial_increment_from_level(0)
+sivs = [ siv for siv in range(0,8*level_zero_increment,level_zero_increment) ]
+
+print("Spatial ID",hex(sivs[7]))
+plot2([sivs[7]],transf=transf)
 
 plt.show()
