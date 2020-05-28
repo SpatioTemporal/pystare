@@ -20,19 +20,17 @@ def plot1(lon,lat,lons,lats,triang,c0='r',c1='b',transf=None,lw=1,ax=None):
 def test_intersect_single_res(proj,transf):
      resolution = 6
      resolution0 = resolution
-     ntri0 = 1000
      lat0 = numpy.array([ 10, 5, 60,70], dtype=numpy.double)
      lon0 = numpy.array([-30,-20,60,10], dtype=numpy.double)
-     hull0 = pystare.to_hull_range_from_latlon(lat0, lon0, resolution0, ntri0)
+     hull0 = pystare.to_hull_range_from_latlon(lat0, lon0, resolution0)
 
      lons0,lats0,intmat0 = pystare.triangulate_indices(hull0)
      triang0 = tri.Triangulation(lons0,lats0,intmat0)
      
      resolution1 = 6
-     ntri1 = 1000
      lat1 = numpy.array([10,  20, 30, 20 ], dtype=numpy.double)
      lon1 = numpy.array([-60, 60, 60, -60], dtype=numpy.double)
-     hull1 = pystare.to_hull_range_from_latlon(lat1, lon1, resolution1, ntri1)
+     hull1 = pystare.to_hull_range_from_latlon(lat1, lon1, resolution1)
 
      lons1,lats1,intmat1 = pystare.triangulate_indices(hull1)
      triang1 = tri.Triangulation(lons1,lats1,intmat1)

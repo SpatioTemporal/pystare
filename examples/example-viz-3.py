@@ -46,8 +46,8 @@ def plot2(sivs,c1='g',transf=None):
     ax.triplot(triang0,c1+'-',transform=transf)
     return
 
-def make_hull(lat0,lon0,resolution0,ntri0):
-    hull0 = ps.to_hull_range_from_latlon(lat0,lon0,resolution0,ntri0)
+def make_hull(lat0,lon0,resolution0):
+    hull0 = ps.to_hull_range_from_latlon(lat0,lon0,resolution0)
     lath0,lonh0,lathc0,lonhc0 = ps.to_vertices_latlon(hull0)
     lons0,lats0,intmat0 = triangulate1(lath0,lonh0)
     triang0 = tri.Triangulation(lons0,lats0,intmat0)
@@ -66,11 +66,11 @@ def make_nc_hull(lat0,lon0,resolution0):
 
 # resolution = 7
 # resolution = 12
-resolution = 13 # Lost some triangles! Needed to increase ntri0!
-resolution0 = resolution; ntri0 = 1500
+resolution = 13 
+resolution0 = resolution
 lat0 = np.array([ 0, 0, 1,1], dtype=np.double)
 lon0 = np.array([ 0,1,1,0], dtype=np.double)
-lats0,lons0,triang0,hull0 = make_hull(lat0,lon0,resolution0,ntri0)
+lats0,lons0,triang0,hull0 = make_hull(lat0,lon0,resolution0)
 print('hull0: ',len(hull0))
 
 idx  = ps.from_latlon(np.array([1.25],dtype=np.double),np.array([1.25],dtype=np.double),10)
@@ -111,15 +111,19 @@ lons4,lats4,intmat4 = triangulate1(latco,lonco)
 triang4 = tri.Triangulation(lons4,lats4,intmat4)
 
 # resolution = 12
-resolution = 13 # Lost some triangles! Needed to increase ntri0!
+resolution = 13
 
 flag5 = True
 if flag5:
     resolution5 = resolution;
-    lat5 = np.array([ -2, -2, -1, -1.5, -1], dtype=np.double)[::-1]
-    lon5 = np.array([ 0,1,1,0.5,0], dtype=np.double)[::-1]
+    # CW
+    # lat5 = np.array([ -2, -2, -1, -1.5, -1], dtype=np.double)[::-1]
+    # lon5 = np.array([ 0,1,1,0.5,0], dtype=np.double)[::-1]
+    # cCW
+    lat5 = np.array([ -1, -1.5, -1, -2, -2], dtype=np.double)[::-1]
+    lon5 = np.array([ 0,0.5,1,1,0], dtype=np.double)[::-1]
     lats5,lons5,triang5,hull5 = make_nc_hull(lat5,lon5,resolution5)
-    # lats5,lons5,triang5,hull5 = make_hull(lat5,lon5,resolution5,ntri0)
+    # lats5,lons5,triang5,hull5 = make_hull(lat5,lon5,resolution5)
 
 # Set up the projection and transformation
 proj = ccrs.PlateCarree()

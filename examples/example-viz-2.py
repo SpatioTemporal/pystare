@@ -39,8 +39,8 @@ def plot1(lon,lat,lons,lats,triang,c0='r',c1='b',transf=None,lw=1):
     plt.scatter(lons,lats,s=10,c=c1,transform=transf)
     return
 
-def make_hull(lat0,lon0,resolution0,ntri0):
-    hull0 = ps.to_hull_range_from_latlon(lat0,lon0,resolution0,ntri0)
+def make_hull(lat0,lon0,resolution0):
+    hull0 = ps.to_hull_range_from_latlon(lat0,lon0,resolution0)
     lath0,lonh0,lathc0,lonhc0 = ps.to_vertices_latlon(hull0)
     lons0,lats0,intmat0 = ps.triangulate(lath0,lonh0)
     triang0 = tri.Triangulation(lons0,lats0,intmat0)
@@ -49,16 +49,16 @@ def make_hull(lat0,lon0,resolution0,ntri0):
 resolution = 5
 # resolution = 4
 
-resolution0 = resolution; ntri0 = 1000
+resolution0 = resolution
 lat0 = np.array([ 10, 5, 60,70], dtype=np.double)
 lon0 = np.array([-30,-20,60,10], dtype=np.double)
-lats0,lons0,triang0,hull0 = make_hull(lat0,lon0,resolution0,ntri0)
+lats0,lons0,triang0,hull0 = make_hull(lat0,lon0,resolution0)
 print('hull0: ',len(hull0))
 
-resolution1 = resolution; ntri1 = 1000
+resolution1 = resolution
 lat1 = np.array([10,  20, 30, 20 ], dtype=np.double)
 lon1 = np.array([-60, 60, 60, -60], dtype=np.double)
-lats1,lons1,triang1,hull1 = make_hull(lat1,lon1,resolution1,ntri1)
+lats1,lons1,triang1,hull1 = make_hull(lat1,lon1,resolution1)
 print('hull1: ',len(hull1))
 
 if True:

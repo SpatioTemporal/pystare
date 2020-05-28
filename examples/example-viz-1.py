@@ -120,11 +120,11 @@ test1_lons,test1_lats,test1_intmat = test1(indices)
 plot1(tri.Triangulation(test1_lons,test1_lats,test1_intmat))
 plt.scatter(test1_lons,test1_lats,s=5,c='r',transform=transf)  
 
-# resolution = 2; ntri=20
-resolution = 4; ntri=100
-# resolution = 7; ntri=1000
+# resolution = 2;
+resolution = 4;
+# resolution = 7;
 # hull = ps.to_hull_range(indices,resolution,100)
-hull = ps.to_hull_range_from_latlon(lat,lon,resolution,ntri)
+hull = ps.to_hull_range_from_latlon(lat,lon,resolution)
 print('0 hull len:      ',len(hull))
 
 # print(90)
