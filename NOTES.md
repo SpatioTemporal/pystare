@@ -1,6 +1,17 @@
 
 # PySTARE Notes
 
+## 2020-05-28 0.5.0
+
+Added auto-sizing of results to many returns. Changed default in
+from_polygon to nonconvex=True. Fixed subtle case where trixel was
+dropped because its center, vertices, and mid-edge points were all
+outside the polygon. Added a calculation that checks for intersecting
+edges between the test trixel edges and the polygon edges.
+
+CW polygons now yield the complement of the nonconvex hull. CCW
+returns the interior and boundary.
+
 ## 2020-05-22 0.4.1 Tweaked a test case.
 
 ## 2020-05-22 0.4.0 Add non convex hull routine.

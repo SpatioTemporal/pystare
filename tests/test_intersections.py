@@ -42,16 +42,14 @@ class MainTest(unittest.TestCase):
     def test_intersect_single_res(self):
         resolution = 6
         resolution0 = resolution
-        ntri0 = 1000
         lat0 = numpy.array([ 10, 5, 60,70], dtype=numpy.double)
         lon0 = numpy.array([-30,-20,60,10], dtype=numpy.double)
-        hull0 = pystare.to_hull_range_from_latlon(lat0, lon0, resolution0, ntri0)
+        hull0 = pystare.to_hull_range_from_latlon(lat0, lon0, resolution0)
                                               
         resolution1 = 6
-        ntri1 = 1000
         lat1 = numpy.array([10,  20, 30, 20 ], dtype=numpy.double)
         lon1 = numpy.array([-60, 60, 60, -60], dtype=numpy.double)
-        hull1 = pystare.to_hull_range_from_latlon(lat1, lon1, resolution1, ntri1)
+        hull1 = pystare.to_hull_range_from_latlon(lat1, lon1, resolution1)
 
         intersectedFalse = pystare.intersect(hull0, hull1, multiresolution=False)
         intersectedTrue  = pystare.intersect(hull0, hull1, multiresolution=True)
@@ -70,16 +68,14 @@ class MainTest(unittest.TestCase):
     def test_intersect_range_single_res(self):
         resolution = 6
         resolution0 = resolution
-        ntri0 = 1000
         lat0 = numpy.array([ 10, 5, 60,70], dtype=numpy.double)
         lon0 = numpy.array([-30,-20,60,10], dtype=numpy.double)
-        hull0 = pystare.to_hull_range_from_latlon(lat0, lon0, resolution0, ntri0)
+        hull0 = pystare.to_hull_range_from_latlon(lat0, lon0, resolution0)
                                               
         resolution1 = 6
-        ntri1 = 1000
         lat1 = numpy.array([10,  20, 30, 20 ], dtype=numpy.double)
         lon1 = numpy.array([-60, 60, 60, -60], dtype=numpy.double)
-        hull1 = pystare.to_hull_range_from_latlon(lat1, lon1, resolution1, ntri1)
+        hull1 = pystare.to_hull_range_from_latlon(lat1, lon1, resolution1)
 
         r0 = pystare.srange()
         r0.add_intervals(hull0)

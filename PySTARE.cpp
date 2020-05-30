@@ -137,82 +137,47 @@ void from_intervals(int64_t* intervals, int len, int64_t* indices_starts, int64_
 //	}
 }
 
-void _expand_intervals(int64_t* indices, int len, int resolution, int64_t* range_indices, int len_ri,  int64_t* result_size, int len_rs) {
-	STARE_SpatialIntervals si(indices, indices+len);
-	STARE_ArrayIndexSpatialValues result = expandIntervals(si,resolution);
-	if(len_ri < result.size()) {
-		cout << dec;
-		cout << "_expand_intervals-warning: range_indices.size = " << len_ri << " too small." << endl << flush;
-		cout << "_expand_intervals-warning: result size        = " << result.size() << "." << endl << flush;
-	}
-	for(int i=0; i < (len_ri < result.size() ? len_ri : result.size()); ++i) {
-		range_indices[i] = result[i];
-	}
-	result_size[0] = result.size();
+StareResult _expand_intervals(int64_t* indices, int len, int resolution) {
+  STARE_SpatialIntervals si(indices,indices+len);
+  StareResult result;
+  result.add_indexValues(expandIntervals(si,resolution));
+  return result;
 }
 
-void _to_neighbors(int64_t* indices, int len, int64_t* range_indices, int len_ri) {
-	STARE_ArrayIndexSpatialValues sivs(indices, indices+len);
-	STARE_ArrayIndexSpatialValues neighbors;
-	if(len_ri < 12*len) {
-	  cout << dec
-	       << "pystare _neighbors return array size = " << len_ri
-	       << " too small, need 3*len = " << 3*len
-	       << endl << flush;
-	}
-	for(int i = 0; i < len; ++i )  {
-	  STARE_ArrayIndexSpatialValues n = stare.NeighborsOfValue(indices[i]);
-	  neighbors.insert( neighbors.end(), n.begin(), n.end() );
-	}
-	for(int i = 0; i < len_ri; ++i ) {
-	  range_indices[i] = neighbors[i];
-	}
+StareResult _to_neighbors(int64_t* indices, int len) { 
+  STARE_ArrayIndexSpatialValues sivs(indices, indices+len);
+  StareResult result;
+  STARE_ArrayIndexSpatialValues neighbors;
+  for(int i = 0; i < len; ++i )  {
+    STARE_ArrayIndexSpatialValues n = stare.NeighborsOfValue(indices[i]);
+    neighbors.insert( neighbors.end(), n.begin(), n.end() );
+  }
+  result.add_indexValues(neighbors);
+  return result;
 }
 
 void _adapt_resolution_to_proximity(int64_t* indices, int len, int64_t* range_indices, int len_ri) {
   // if len != len_ri, throw something...
-  STARE_ArrayIndexSpatialValues sivs(indices, indices+len);  
+  STARE_ArrayIndexSpatialValues sivs(indices, indices+len);
   STARE_ArrayIndexSpatialValues result = stare.adaptSpatialResolutionEstimates(sivs);
   for(int i = 0; i < len; ++i) {
     range_indices[i] = result[i];
   }
+  // Consider stare.adaptSpatialResolutionEstimatesInPlace(range_indices); or even indices...
 }
-
-void _to_circular_cover(double lat, double lon, double radius, int resolution, int64_t* range_indices, int len_ri, int64_t* result_size, int len_rs) {
-  STARE_SpatialIntervals result = stare.CoverCircleFromLatLonRadiusDegrees(lat,lon,radius,resolution);
-	if(len_ri < result.size()) {
-		cout << dec;
-		cout << "_to_circular_cover-warning: range_indices.size = " << len_ri << " too small." << endl << flush;
-		cout << "_to_circular_cover-warning: result size        = " << result.size() << "." << endl << flush;
-	}
-	for(int i=0; i < (len_ri < result.size() ? len_ri : result.size()); ++i) {
-		range_indices[i] = result[i];
-	}
-	result_size[0] = result.size();
-}
-
-StareResult _to_circular_cover1(double lat, double lon, double radius, int resolution) {
+StareResult _to_circular_cover(double lat, double lon, double radius, int resolution) {
   StareResult result; 
   result.add_intervals(stare.CoverCircleFromLatLonRadiusDegrees(lat,lon,radius,resolution));
   return result;
 }
-
-void _to_box_cover_from_latlon(double* lat, int len_lat, double* lon, int len_lon, int resolution, int64_t* range_indices, int len_ri, int64_t* result_size, int len_rs) {
-
-	LatLonDegrees64ValueVector points;
-	for(int i=0; i<len_lat; ++i) {
-		points.push_back(LatLonDegrees64(lat[i], lon[i]));
-	}
-
-	// STARE_SpatialIntervals result = stare.ConvexHull(points, resolution);
-	STARE_SpatialIntervals result = stare.CoverBoundingBoxFromLatLonDegrees(points, resolution);
-
-	if(len_ri < result.size()) {
-		cout << dec;
-		cout << "_to_box_cover_from_latlon-warning: range_indices.size = " << len_ri << " too small." << endl << flush;
-		cout << "_to_box_cover_from_latlon-warning: result size        = " << result.size() << "." << endl << flush;
-	}
-
+StareResult _to_box_cover_from_latlon(double* lat, int len_lat, double* lon, int len_lon, int resolution) {
+  StareResult result;
+  LatLonDegrees64ValueVector points;
+  for(int i=0; i<len_lat; ++i) {
+    points.push_back(LatLonDegrees64(lat[i], lon[i]));
+  }
+  result.add_intervals(stare.CoverBoundingBoxFromLatLonDegrees(points, resolution));
+  return result;
 }
 
 void _to_compressed_range(int64_t* indices, int len, int64_t* range_indices, int len_ri) {
@@ -224,46 +189,21 @@ void _to_compressed_range(int64_t* indices, int len, int64_t* range_indices, int
 	}
 }
 
-void _to_hull_range(int64_t* indices, int len, int resolution, int64_t* range_indices, int len_ri, int64_t* result_size, int len_rs) {
-	STARE_ArrayIndexSpatialValues sivs(indices, indices+len);
-	STARE_SpatialIntervals result = stare.ConvexHull(sivs, resolution);
-	if(len_ri < result.size()) {
-		cout << dec;
-		cout << "_to_hull_range-warning: range_indices.size = " << len_ri << " too small." << endl << flush;
-		cout << "_to_hull_range-warning: result size        = " << result.size() << "." << endl << flush;
-	}
-	// int k=10;
-	// cout << "thr ";
-	for(int i=0; i < (len_ri < result.size() ? len_ri : result.size()); ++i) {
-		// if(k-->0) {	cout << "0x" << setw(16) << setfill('0') << hex << result[i] << " "; }
-		range_indices[i] = result[i];
-	}
-	// cout << dec << endl << flush;
-	result_size[0] = result.size();
+StareResult _to_hull_range(int64_t* indices, int len, int resolution) {
+  StareResult result;
+  STARE_ArrayIndexSpatialValues sivs(indices, indices+len);
+  result.add_intervals( stare.ConvexHull(sivs, resolution));
+  return result;
 }
 
-void _to_hull_range_from_latlon(double* lat, int len_lat, double* lon, int len_lon, int resolution, int64_t* range_indices, int len_ri, int64_t* result_size, int len_rs) {
-
-	LatLonDegrees64ValueVector points;
-	for(int i=0; i<len_lat; ++i) {
-		points.push_back(LatLonDegrees64(lat[i], lon[i]));
-	}
-	
-	STARE_SpatialIntervals result = stare.ConvexHull(points, resolution);
-    
-	if(len_ri < result.size()) {
-		cout << dec;
-		cout << "_to_hull_range-warning: range_indices.size = " << len_ri << " too small." << endl << flush;
-		cout << "_to_hull_range-warning: result size        = " << result.size() << "." << endl << flush;
-	}
-	int k=10;
-	// cout << "thr ";
-	for(int i=0; i < (len_ri < result.size() ? len_ri : result.size()); ++i) {
-		// if(k-->0) {	cout << "0x" << setw(16) << setfill('0') << hex << result[i] << " "; }
-		range_indices[i] = result[i];
-	}
-	// cout << dec << endl << flush;
-	result_size[0] = result.size();
+StareResult _to_hull_range_from_latlon(double* lat, int len_lat, double* lon, int len_lon, int resolution) { 
+  StareResult result;
+  LatLonDegrees64ValueVector points;
+  for(int i=0; i<len_lat; ++i) {
+    points.push_back(LatLonDegrees64(lat[i], lon[i]));
+  }
+  result.add_intervals(stare.ConvexHull(points, resolution));
+  return result;
 }
 
 StareResult _to_nonconvex_hull_range_from_latlon(double* lat, int len_lat, double* lon, int len_lon, int resolution) {

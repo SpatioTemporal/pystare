@@ -36,15 +36,8 @@ void to_level(int64_t* indices, int len,  int* levels);
 void _to_vertices_latlon(int64_t* indices, int len, double* triangle_info_lats, int dmy1, double* triangle_info_lons, int dmy2 );
 void to_area(int64_t* indices, int len, double* areas);
 
-void _to_neighbors(int64_t* indices, int len, int64_t* range_indices, int len_ri);
-void _to_compressed_range(int64_t* indices, int len, int64_t* range_indices, int len_ri);
-void _to_hull_range   (int64_t* indices, int len, int resolution, int64_t* range_indices, int len_ri, int64_t* result_size, int len_rs);
-void _expand_intervals(int64_t* indices, int len, int resolution, int64_t* range_indices, int len_ri, int64_t* result_size, int len_rs);
 
-void _to_hull_range_from_latlon(double* lat, int len_lat, double* lon, int len_lon, int resolution, int64_t* range_indices, int len_ri, int64_t* result_size, int len_rs);
-void _adapt_resolution_to_proximity(int64_t* indices, int len, int64_t* range_indices, int len_ri);
-void _to_circular_cover(double lat, double lon, double radius, int resolution, int64_t* range_indices, int len_ri, int64_t* result_size, int len_rs);
-void _to_box_cover_from_latlon(double* lat, int len_lat, double* lon, int len_lon, int resolution, int64_t* range_indices, int len_ri, int64_t* result_size, int len_rs);
+void _to_compressed_range(int64_t* indices, int len, int64_t* range_indices, int len_ri);
 
 void from_intervals(int64_t* intervals, int len, int64_t* indices_starts, int64_t* indices_terminators );
 
@@ -84,8 +77,25 @@ class StareResult {
   StareResultCase               sCase;
 };
 
-StareResult _to_circular_cover1(double lat, double lon, double radius, int resolution);
+// void _to_neighbors(int64_t* indices, int len, int64_t* range_indices, int len_ri);
+StareResult _to_neighbors(int64_t* indices, int len);
+
+StareResult _to_circular_cover(double lat, double lon, double radius, int resolution);
 StareResult _to_nonconvex_hull_range_from_latlon(double* lat, int len_lat, double* lon, int len_lon, int resolution);
+
+// void _expand_intervals(int64_t* indices, int len, int resolution, int64_t* range_indices, int len_ri, int64_t* result_size, int len_rs);
+StareResult _expand_intervals(int64_t* indices, int len, int resolution);
+
+// void _to_box_cover_from_latlon(double* lat, int len_lat, double* lon, int len_lon, int resolution, int64_t* range_indices, int len_ri, int64_t* result_size, int len_rs);
+StareResult _to_box_cover_from_latlon(double* lat, int len_lat, double* lon, int len_lon, int resolution);
+
+// void _to_hull_range   (int64_t* indices, int len, int resolution, int64_t* range_indices, int len_ri, int64_t* result_size, int len_rs);
+StareResult _to_hull_range   (int64_t* indices, int len, int resolution);
+
+// void _to_hull_range_from_latlon(double* lat, int len_lat, double* lon, int len_lon, int resolution, int64_t* range_indices, int len_ri, int64_t* result_size, int len_rs);
+StareResult _to_hull_range_from_latlon(double* lat, int len_lat, double* lon, int len_lon, int resolution); // , int64_t* range_indices, int len_ri, int64_t* result_size, int len_rs);
+
+void _adapt_resolution_to_proximity(int64_t* indices, int len, int64_t* range_indices, int len_ri);
 
 /**
  * A wrapper for SpatialRange.

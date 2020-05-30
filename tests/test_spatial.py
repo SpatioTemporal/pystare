@@ -66,15 +66,15 @@ class MainTest(unittest.TestCase):
 
     def test__tohullrange(self):
         indices = numpy.array([4151504989081014892, 4161865161846704588, 3643626718498217164])
-        hull_indices = numpy.zeros([1000], dtype=numpy.int64)
         result_size = numpy.zeros([1], dtype=numpy.int)
-        pystare._to_hull_range(indices, 8, hull_indices, result_size)
-        hull_indices = hull_indices[0:result_size[0]]
+        result = pystare._to_hull_range(indices, 8)
+        hull_indices = numpy.zeros([result.get_size_as_intervals()], dtype=numpy.int64)
+        result.copy_as_intervals(hull_indices)
         self.assertEqual(hull_indices.size, 901)
         
     def test_tohullrange(self):
         indices = numpy.array([4151504989081014892, 4161865161846704588, 3643626718498217164])
-        hull_indices = pystare.to_hull_range(indices, 8, 2000)
+        hull_indices = pystare.to_hull_range(indices, 8)
         self.assertEqual(hull_indices.size, 901)
     
     def test__cmpspatial(self):
@@ -101,7 +101,9 @@ class MainTest(unittest.TestCase):
         expanded_len       = numpy.zeros([1],dtype=numpy.int64)
         intervals_len = len(src)
         resolution = -1
-        pystare._expand_intervals(src, resolution, expanded, expanded_len)
+        result = pystare._expand_intervals(src, resolution)
+        expanded_len = result.get_size_as_values()
+        result.copy_as_values(expanded)
         self.assertEqual(expanded_len, 74)
         error_found = False
         for i in range(len(expanded)):

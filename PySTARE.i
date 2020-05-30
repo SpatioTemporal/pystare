@@ -451,14 +451,9 @@ class PyStareArrayBoundsExceeded(Exception):
     pass
 
 def to_neighbors(indices):
-    out_length = 12*len(indices)
-    len_ri = 0
-    range_indices = numpy.full([out_length],-1,dtype=numpy.int64)
-    _to_neighbors(indices,range_indices)
-    endarg = 0
-    while ( endarg < out_length ) and (range_indices[endarg] > 0 ) :
-        endarg = endarg + 1
-    range_indices = range_indices[:endarg]
+    result = _to_neighbors(indices)
+    range_indices = numpy.full([result.get_size_as_values()],-1,dtype=numpy.int64)
+    result.copy_as_values(range_indices)
     return range_indices
 
 def to_compressed_range(indices):
@@ -473,32 +468,33 @@ def to_compressed_range(indices):
     range_indices = range_indices[:endarg]
     return range_indices
     
-def expand_intervals(intervals, resolution, result_size_limit=1000):
-    result      = numpy.full([result_size_limit],-1,dtype=numpy.int64)
-    result_size = numpy.full([1],-1,dtype=numpy.int64)
-    _expand_intervals(intervals,resolution,result,result_size)
-    result = result[:result_size[0]]
-    return result
+def expand_intervals(intervals, resolution):
+    result = _expand_intervals(intervals,resolution)
+    expanded_intervals = numpy.zeros([result.get_size_as_intervals()],dtype=numpy.int64)
+    result.copy_as_values(expanded_intervals)
+    return expanded_intervals
+
+#    result      = numpy.full([result_size_limit],-1,dtype=numpy.int64)
+#    result_size = numpy.full([1],-1,dtype=numpy.int64)
+#    _expand_intervals(intervals,resolution,result,result_size)
+#    result = result[:result_size[0]]
+#    return result
 
 def adapt_resolution_to_proximity(indices):
     result = numpy.copy(indices)
     _adapt_resolution_to_proximity(indices,result)
     return result
     
-def to_hull_range(indices, resolution, range_size_limit=1000):
-    out_length = range_size_limit
-    range_indices = numpy.full([out_length], -1, dtype=numpy.int64)
-    result_size = numpy.full([1], -1, dtype=numpy.int64)
-    _to_hull_range(indices, resolution, range_indices,result_size)
-    range_indices = range_indices[:result_size[0]]
+def to_hull_range(indices, resolution):
+    result = _to_hull_range(indices, resolution)
+    range_indices = numpy.full([result.get_size_as_intervals()], -1, dtype=numpy.int64)
+    result.copy_as_intervals(range_indices)
     return range_indices
 
-def to_hull_range_from_latlon(lat, lon, resolution, range_size_limit=1000):
-    out_length = range_size_limit
-    range_indices = numpy.full([out_length], -1, dtype=numpy.int64)
-    result_size = numpy.full([1], -1, dtype=numpy.int64)
-    _to_hull_range_from_latlon(lat, lon, resolution, range_indices, result_size)
-    range_indices = range_indices[:result_size[0]]
+def to_hull_range_from_latlon(lat, lon, resolution):
+    result = _to_hull_range_from_latlon(lat, lon, resolution)
+    range_indices = numpy.full([result.get_size_as_intervals()], -1, dtype=numpy.int64)
+    result.copy_as_intervals(range_indices)
     return range_indices
 
 def to_nonconvex_hull_range_from_latlon(lat, lon, resolution):
@@ -508,16 +504,8 @@ def to_nonconvex_hull_range_from_latlon(lat, lon, resolution):
     result.copy_as_intervals(range_indices)
     return range_indices
 
-# def to_circular_cover(lat, lon, radius, resolution, range_size_limit=1000):
-#     out_length = range_size_limit
-#     range_indices = numpy.full([out_length],-1,dtype=numpy.int64)
-#     result_size = numpy.full([1],-1,dtype=numpy.int64)
-#     _to_circular_cover(lat,lon,radius,resolution,range_indices,result_size)
-#     range_indices = range_indices[:result_size[0]]
-#     return range_indices
-
 def to_circular_cover(lat, lon, radius, resolution):
-    result = _to_circular_cover1(lat, lon, radius, resolution)
+    result = _to_circular_cover(lat, lon, radius, resolution)
     out_length = result.get_size_as_intervals()
     range_indices = numpy.zeros([out_length],dtype=numpy.int64)
     result.copy_as_intervals(range_indices);
@@ -527,12 +515,11 @@ def circular_cover_from(index,radius,resolution):
     latsv,lonsv,lat_center,lon_center = to_vertices_latlon([index])
     return to_circular_cover(lat_center[0],lon_center[0],radius,resolution)
 
-def to_box_cover_from_latlon(lat, lon, resolution, range_size_limit=1000):
-    out_length = range_size_limit
-    range_indices = numpy.full([out_length], -1, dtype=numpy.int64)
-    result_size = numpy.full([1], -1, dtype=numpy.int64)
-    _to_box_cover_from_latlon(lat, lon, resolution, range_indices, result_size)
-    range_indices = range_indices[:result_size[0]]
+def to_box_cover_from_latlon(lat, lon, resolution):
+    "Construct numpy array of intervals covering a 4-corner box specified using lat and lon."
+    result = _to_box_cover_from_latlon(lat, lon, resolution)
+    range_indices = numpy.zeros([result.get_size_as_intervals()],dtype=numpy.int64)
+    result.copy_as_intervals(range_indices)
     return range_indices
       
 def to_vertices_latlon(indices):
@@ -652,7 +639,8 @@ def from_point(point, resolution):
     index_value = from_latlon([lat], [lon], resolution)
     return index_value
 
-def from_polygon(polygon, resolution=-1, range_size_limit=1000, nonconvex=False):
+def from_polygon(polygon, resolution=-1, range_size_limit=1000, nonconvex=True):
+    "Return a range of indices covering the region curcumscribed by the counterclockwise polygon. Traced CW, the range covers just the polygon."
     latlon = polygon.exterior.coords.xy
     lon = latlon[0]
     lat = latlon[1]
@@ -662,7 +650,7 @@ def from_polygon(polygon, resolution=-1, range_size_limit=1000, nonconvex=False)
         range_indices = to_hull_range_from_latlon(lat, lon, resolution, range_size_limit)
     return range_indices
     
-def from_multipolygon(multipolygon, resolution=-1, range_size_limit=1000, nonconvex=False):
+def from_multipolygon(multipolygon, resolution=-1, range_size_limit=1000, nonconvex=True):
     range_indices = []
     for polygon in multipolygon.geoms:
         range_indices += list(from_polygon(polygon, resolution, range_size_limit,nonconvex=nonconvex))
@@ -671,7 +659,7 @@ def from_multipolygon(multipolygon, resolution=-1, range_size_limit=1000, noncon
 # Geopandas integration
 import geopandas
     
-def from_geopandas(gdf, resolution=-1, range_size_limit=1000, nonconvex=False):
+def from_geopandas(gdf, resolution=-1, range_size_limit=1000, nonconvex=True):
     # Test if all geometries are Points or Polygons
     if set(gdf.geom_type) == {'Point'}:
         lat = gdf.geometry.y
