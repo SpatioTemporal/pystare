@@ -53,9 +53,14 @@ def make_hull(lat0,lon0,resolution0):
     triang0 = tri.Triangulation(lons0,lats0,intmat0)
     return lats0,lons0,triang0,hull0
 
-def make_nc_hull(lat0,lon0,resolution0):
+def make_nc_hull(lat0,lon0,resolution0,restrict=None):
     hull0 = ps.to_nonconvex_hull_range_from_latlon(lat0,lon0,resolution0)
     print('make_nc_hull hull size: ',len(hull0))
+    if restrict is not None:
+        try:
+            hull0=hull0[restrict[0]:restrict[1]]
+        except:
+            hull0=hull0[0:1]
     lath0,lonh0,lathc0,lonhc0 = ps.to_vertices_latlon(hull0)
     lons0,lats0,intmat0 = triangulate1(lath0,lonh0)
     triang0 = tri.Triangulation(lons0,lats0,intmat0)
@@ -116,15 +121,29 @@ resolution = 13
 flag5 = True
 if flag5:
     resolution5 = resolution;
-    # CW
-    # lat5 = np.array([ -2, -2, -1, -1.5, -1], dtype=np.double)[::-1]
-    # lon5 = np.array([ 0,1,1,0.5,0], dtype=np.double)[::-1]
-    # cCW
+    # CCW
     lat5 = np.array([ -1, -1.5, -1, -2, -2], dtype=np.double)[::-1]
     lon5 = np.array([ 0,0.5,1,1,0], dtype=np.double)[::-1]
     lats5,lons5,triang5,hull5 = make_nc_hull(lat5,lon5,resolution5)
     # lats5,lons5,triang5,hull5 = make_hull(lat5,lon5,resolution5)
 
+flag6 = True
+if flag6:
+    resolution6 = resolution;
+    # CW
+    # lat6 = np.array([ -2-2, -2-2, -1-2, -1.5-2, -1-2], dtype=np.double)[::-1]
+    # lon6 = np.array([ 0,1,1,0.5,0], dtype=np.double)[::-1]
+    lat6 = np.array([ -1, -1.5, -1, -2, -2], dtype=np.double)-2
+    lon6 = np.array([ 0,0.5,1,1,0], dtype=np.double)
+    lats6,lons6,triang6,hull6 = make_nc_hull(lat6,lon6,resolution6,restrict=None)
+    # lats6,lons6,triang6,hull6 = make_nc_hull(lat6,lon6,resolution6,restrict=[100,101])
+    print('hull6: ',hex(hull6[0]))
+    # lats6a,lons6a,triang6a,hull6a = make_nc_hull(lat6[::-1],lon6[::-1],resolution6,restrict=[0,1001])
+    lats6a,lons6a,triang6a,hull6a = make_nc_hull(lat6[::-1],lon6[::-1],resolution6,restrict=None)
+    print('hull6a: ',hex(hull6a[0]))
+
+# hull6 = np.array([0x3d2b61000000000a],dtype=np.int64)
+    
 # Set up the projection and transformation
 proj = ccrs.PlateCarree()
 # proj = ccrs.Robinson()
@@ -143,9 +162,37 @@ plot1(None,None,lons2,lats2,triang2,c0='r',c1='y',transf=transf)
 plot1(None,None,lons1,lats1,triang1,c0='c',c1='r',transf=transf)
 plot1(None,None,lons3,lats3,triang3,c0='c',c1='g',transf=transf)
 plot1(None,None,lons4,lats4,triang4,c0='c',c1='g',transf=transf)
+
 if flag5:
     plot1(lon5,lat5,lons5,lats5,triang5,c0='c',c1='g',transf=transf)
 
+if flag6:
+    plot1(lon6,lat6,lons6,lats6,triang6,c0='c',c1='g',transf=transf)
+    # plot1(None,None,lons6a,lats6a,triang6a,c0='y',c1='c',transf=transf)
+    # plot1(lon6,lat6,lons6a,lats6a,triang6a,c0='y',c1='c',transf=transf)
+    
+    # plot2([0x3d2b61000000000b],c1='r',transf=transf)
+    # plot2([0x3d2b61200000000b],c1='g',transf=transf)
+    # plot2([0x3d2b61400000000b],c1='b',transf=transf)
+    # plot2([0x3d2b61600000000b],c1='k',transf=transf)
+
+    # plot2([0x3d2b61400000000c],c1='r',transf=transf)
+    # plot2([0x3d2b61480000000c],c1='g',transf=transf)
+    # plot2([0x3d2b61500000000c],c1='b',transf=transf)
+    # plot2([0x3d2b61580000000c],c1='k',transf=transf)
+
+if False:
+    plot2([0x3d2b61400000000d],c1='r',transf=transf)
+    plot2([0x3d2b61420000000d],c1='g',transf=transf)
+    plot2([0x3d2b61440000000d],c1='b',transf=transf)
+    plot2([0x3d2b61460000000d],c1='k',transf=transf)
+    plt.scatter(0.9474437025372493,-2.9981275066380708,s=10,c='c',transform=transf)
+
+test_trixels = [0x3d2b61400000000d,0x3d2b61420000000d,0x3d2b61440000000d,0x3d2b61460000000d]
+    
+    
+    
+    
 level_zero_increment = ps.spatial_increment_from_level(0)
 sivs = [ siv for siv in range(0,8*level_zero_increment,level_zero_increment) ]
 
