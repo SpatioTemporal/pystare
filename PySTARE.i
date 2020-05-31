@@ -639,27 +639,27 @@ def from_point(point, resolution):
     index_value = from_latlon([lat], [lon], resolution)
     return index_value
 
-def from_polygon(polygon, resolution=-1, range_size_limit=1000, nonconvex=True):
+def from_polygon(polygon, resolution=-1, nonconvex=True):
     "Return a range of indices covering the region curcumscribed by the counterclockwise polygon. Traced CW, the range covers just the polygon."
     latlon = polygon.exterior.coords.xy
     lon = latlon[0]
     lat = latlon[1]
     if nonconvex:
-        range_indices = to_nonconvex_hull_range_from_latlon(lat, lon, resolution)
+       range_indices = to_nonconvex_hull_range_from_latlon(lat, lon, resolution)
     else:
-        range_indices = to_hull_range_from_latlon(lat, lon, resolution, range_size_limit)
+       range_indices = to_hull_range_from_latlon(lat, lon, resolution)
     return range_indices
     
-def from_multipolygon(multipolygon, resolution=-1, range_size_limit=1000, nonconvex=True):
+def from_multipolygon(multipolygon, resolution=-1, nonconvex=True):
     range_indices = []
     for polygon in multipolygon.geoms:
-        range_indices += list(from_polygon(polygon, resolution, range_size_limit,nonconvex=nonconvex))
+        range_indices += list(from_polygon(polygon, resolution, nonconvex=nonconvex))
     return range_indices
     
 # Geopandas integration
 import geopandas
     
-def from_geopandas(gdf, resolution=-1, range_size_limit=1000, nonconvex=True):
+def from_geopandas(gdf, resolution=-1, nonconvex=True):
     # Test if all geometries are Points or Polygons
     if set(gdf.geom_type) == {'Point'}:
         lat = gdf.geometry.y
@@ -669,9 +669,9 @@ def from_geopandas(gdf, resolution=-1, range_size_limit=1000, nonconvex=True):
         index_values = []
         for polygon in gdf.geometry:
             if polygon.type == 'Polygon':
-                index_values.append(from_polygon(polygon, resolution, range_size_limit,nonconvex=nonconvex))
+                index_values.append(from_polygon(polygon, resolution, nonconvex=nonconvex))
             else:
-                index_values.append(from_multipolygon(polygon, resolution, range_size_limit,nonconvex=nonconvex))
+                index_values.append(from_multipolygon(polygon, resolution, nonconvex=nonconvex))
         return index_values        
     else:
         print('inhomogenous geometry types')
