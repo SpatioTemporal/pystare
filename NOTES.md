@@ -1,6 +1,10 @@
 
 # PySTARE Notes
 
+## 2020-05-28 0.5.2
+
+Tweak to geopandas for polygon orientation.
+
 ## 2020-05-28 0.5.0
 
 Added auto-sizing of results to many returns. Changed default in

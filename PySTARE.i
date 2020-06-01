@@ -659,7 +659,7 @@ def from_multipolygon(multipolygon, resolution=-1, nonconvex=True):
 # Geopandas integration
 import geopandas
     
-def from_geopandas(gdf, resolution=-1, nonconvex=True):
+def from_geopandas(gdf, resolution=-1, nonconvex=True, force_orientation=None):
     # Test if all geometries are Points or Polygons
     if set(gdf.geom_type) == {'Point'}:
         lat = gdf.geometry.y
@@ -669,9 +669,15 @@ def from_geopandas(gdf, resolution=-1, nonconvex=True):
         index_values = []
         for polygon in gdf.geometry:
             if polygon.type == 'Polygon':
-                index_values.append(from_polygon(polygon, resolution, nonconvex=nonconvex))
+                if force_orientation is not None:
+                    index_values.append(from_polygon(shapely.geometry.polygon.orient(polygon,force_orientation), resolution, nonconvex=nonconvex))
+                else:
+                    index_values.append(from_polygon(polygon, resolution, nonconvex=nonconvex))
             else:
-                index_values.append(from_multipolygon(polygon, resolution, nonconvex=nonconvex))
+                if force_orientation is not None:
+                    index_values.append(from_multipolygon(shapely.geometry.polygon.orient(polygon,force_orientation), resolution, nonconvex=nonconvex))
+                else:
+                    index_values.append(from_multipolygon(polygon, resolution, nonconvex=nonconvex))
         return index_values        
     else:
         print('inhomogenous geometry types')
