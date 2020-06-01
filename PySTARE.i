@@ -650,10 +650,13 @@ def from_polygon(polygon, resolution=-1, nonconvex=True):
        range_indices = to_hull_range_from_latlon(lat, lon, resolution)
     return range_indices
     
-def from_multipolygon(multipolygon, resolution=-1, nonconvex=True):
+def from_multipolygon(multipolygon, resolution=-1, nonconvex=True, force_orientation=None):
     range_indices = []
     for polygon in multipolygon.geoms:
-        range_indices += list(from_polygon(polygon, resolution, nonconvex=nonconvex))
+        if force_orientation is not None:
+            range_indices += list(from_polygon(shapely.geometry.polygon.orient(polygon,force_orientation), resolution, nonconvex=nonconvex))
+        else:
+            range_indices += list(from_polygon(polygon, resolution, nonconvex=nonconvex))
     return range_indices
     
 # Geopandas integration
@@ -675,7 +678,7 @@ def from_geopandas(gdf, resolution=-1, nonconvex=True, force_orientation=None):
                     index_values.append(from_polygon(polygon, resolution, nonconvex=nonconvex))
             else:
                 if force_orientation is not None:
-                    index_values.append(from_multipolygon(shapely.geometry.polygon.orient(polygon,force_orientation), resolution, nonconvex=nonconvex))
+                    index_values.append(from_multipolygon(polygon, resolution, nonconvex=nonconvex, force_orientation=force_orientation))
                 else:
                     index_values.append(from_multipolygon(polygon, resolution, nonconvex=nonconvex))
         return index_values        
