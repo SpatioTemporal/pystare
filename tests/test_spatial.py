@@ -132,3 +132,11 @@ class MainTest(unittest.TestCase):
         cover = pystare.to_circular_cover(1.5,0.5,0.25,14)
         for i in list(expected):
             self.assertEqual(i[1], cover[i[0]])
+
+    def test_spatial_resolution_from_km(self):
+        self.assertEqual(10,int(pystare.spatial_resolution_from_km(10)))
+
+    def test_spatial_resolution(self):
+        self.assertEqual(11,int(pystare.spatial_resolution(11)))
+        self.assertEqual(15,int(pystare.spatial_resolution(15)))
+        

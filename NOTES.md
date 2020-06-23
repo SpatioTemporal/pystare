@@ -1,6 +1,10 @@
 
 # PySTARE Notes
 
+## 2020-06-23 0.5.3
+
+Overwrote definition of spatial_resolution. Fixed by adding spatial_resolution_from_km.
+
 ## 2020-05-28 0.5.2
 
 Tweak to geopandas for polygon orientation.

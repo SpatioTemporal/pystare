@@ -589,7 +589,7 @@ def shiftarg_lat(lat):
     else:
         return lat
         
-def spatial_resolution(km):
+def spatial_resolution_from_km(km):
     return 10-numpy.log2(km/10)
 
 def spatial_scale_km(resolution):
