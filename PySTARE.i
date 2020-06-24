@@ -589,8 +589,11 @@ def shiftarg_lat(lat):
     else:
         return lat
         
-def spatial_resolution_from_km(km):
-    return 10-numpy.log2(km/10)
+def spatial_resolution_from_km(km,return_int=True):
+    if return_int:
+        return 10-numpy.log2(km/10)
+    else:
+        return int(10-numpy.log2(km/10))
 
 def spatial_scale_km(resolution):
     "A rough estimate for the length scale at level."

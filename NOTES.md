@@ -1,6 +1,10 @@
 
 # PySTARE Notes
 
+## 2020-06-24 0.5.4
+
+spatial_resolution_from_km now returns int by default. Selectable by return_int argument.
+
 ## 2020-06-23 0.5.3
 
 Overwrote definition of spatial_resolution. Fixed by adding spatial_resolution_from_km.
