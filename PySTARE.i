@@ -354,7 +354,7 @@
 {
   $result = (PyObject*)out$argnum;
 }
-
+  
 /*
  %typemap(argout) 
  (double* in_array1, int length1, double* in_array2, int length2, int resolution, int64_t* out_array1, int out_length1, int64_t* out_array2, int out_length2)
@@ -364,6 +364,17 @@
 */
 
 /* Applying the typemaps */
+
+
+
+%apply (double * INPLACE_ARRAY2, int DIM1, int DIM2) {
+    (double* lat, int lalen1, int lalen2),
+    (double* lon, int lolen1, int lolen2)
+}
+
+%apply (int64_t * INPLACE_ARRAY2, int DIM1, int DIM2) {
+    (int64_t* indices, int len1, int len2)
+}
 
 %apply (double * IN_ARRAY1, int DIM1) {
     (double* lat, int len_lat),
@@ -490,6 +501,13 @@ def to_hull_range(indices, resolution):
     range_indices = numpy.full([result.get_size_as_intervals()], -1, dtype=numpy.int64)
     result.copy_as_intervals(range_indices)
     return range_indices
+    
+def from_latlon2D(lat, lon, resolution=27, adapt_resolution=False):
+    if adapt_resolution:
+        resolution = 27
+    indices = numpy.full(lon.shape, -1, dtype=numpy.int64)
+    pystare._from_latlon2D(lat, lon, stare, 27, adapt_resolution)
+    return indices    
 
 def to_hull_range_from_latlon(lat, lon, resolution):
     result = _to_hull_range_from_latlon(lat, lon, resolution)
@@ -552,18 +570,27 @@ def to_vertices_latlon(indices):
 	return latsv,lonsv,lat_center,lon_center
     
 def cmp_spatial(indices1, indices2):
-	out_length = len(indices1)*len(indices2)
-	cmp = numpy.zeros([out_length],dtype=numpy.int64)
-	_cmp_spatial(indices1,indices2,cmp)
-	return cmp
+    """
+        calls cmp_spatial returning an element of {-1,0,1} depending on which, if either, element contains the other. Returns an array of x in {-1,0,1}, but cmp_spatial calculates all pairs (like an exterior product).
+    """
+    out_length = len(indices1)*len(indices2)
+    cmp = numpy.zeros([out_length],dtype=numpy.int64)
+    _cmp_spatial(indices1,indices2,cmp)
+    return cmp
 	    
 def cmp_temporal(indices1, indices2):
 	out_length = len(indices1)*len(indices2)
 	cmp = numpy.zeros([out_length],dtype=numpy.int64)
 	_cmp_temporal(indices1,indices2,cmp)
 	return cmp   
+
+def intersects(indices1, indices2):
+    return _intersects(indices1, indices2).astype(numpy.bool)
 	
 def intersect(indices1, indices2, multiresolution=True):
+    """
+     constructs SpatialRange objects from its arguments and then returns the intersection of those. Returns an array of spatial index values.
+    """
     out_length = 2*max(len(indices1), len(indices2))
     intersected = numpy.full([out_length], -1, dtype=numpy.int64)
     leni = 0
@@ -625,90 +652,6 @@ def triangulate_indices(indices):
     lons,lats,intmat = triangulate(latv,lonv)
     return lons,lats,intmat
 
-
-# Shapely integration 
-
-import shapely.geometry
-
-def from_shapely(geom, resolution):
-    if geom.geom_type == 'Point':
-        return from_point(geom, resolution)
-    if geom.geom_type == 'Polygon':
-        return from_polygon(geom)
-
-def from_point(point, resolution):
-    lat = point.y
-    lon = point.x
-    index_value = from_latlon([lat], [lon], resolution)
-    return index_value
-
-def from_polygon(polygon, resolution=-1, nonconvex=True):
-    "Return a range of indices covering the region curcumscribed by the counterclockwise polygon. Traced CW, the range covers just the polygon."
-    latlon = polygon.exterior.coords.xy
-    lon = latlon[0]
-    lat = latlon[1]
-    if nonconvex:
-       range_indices = to_nonconvex_hull_range_from_latlon(lat, lon, resolution)
-    else:
-       range_indices = to_hull_range_from_latlon(lat, lon, resolution)
-    return range_indices
-    
-def from_multipolygon(multipolygon, resolution=-1, nonconvex=True, force_orientation=None):
-    range_indices = []
-    for polygon in multipolygon.geoms:
-        if force_orientation is not None:
-            range_indices += list(from_polygon(shapely.geometry.polygon.orient(polygon,force_orientation), resolution, nonconvex=nonconvex))
-        else:
-            range_indices += list(from_polygon(polygon, resolution, nonconvex=nonconvex))
-    return range_indices
-    
-# Geopandas integration
-import geopandas
-    
-def from_geopandas(gdf, resolution=-1, nonconvex=True, force_orientation=None):
-    # Test if all geometries are Points or Polygons
-    if set(gdf.geom_type) == {'Point'}:
-        lat = gdf.geometry.y
-        lon = gdf.geometry.x
-        return from_latlon(lat, lon, resolution)
-    if not set(gdf.geom_type) - {'Polygon', 'MultiPolygon'}:
-        index_values = []
-        for polygon in gdf.geometry:
-            if polygon.type == 'Polygon':
-                if force_orientation is not None:
-                    index_values.append(from_polygon(shapely.geometry.polygon.orient(polygon,force_orientation), resolution, nonconvex=nonconvex))
-                else:
-                    index_values.append(from_polygon(polygon, resolution, nonconvex=nonconvex))
-            else:
-                if force_orientation is not None:
-                    index_values.append(from_multipolygon(polygon, resolution, nonconvex=nonconvex, force_orientation=force_orientation))
-                else:
-                    index_values.append(from_multipolygon(polygon, resolution, nonconvex=nonconvex))
-        return index_values        
-    else:
-        print('inhomogenous geometry types')
-        return 1
-
-def to_trixels_series(series):
-    trixels_series = []
-    for index_values in series:
-        trixels = to_trixels(index_values)
-        trixels = shapely.geometry.MultiPolygon(trixels)
-        trixels_series.append(trixels)
-    return trixels_series
-    
-def to_trixels(indices):
-    latv, lonv = _to_vertices_latlon(indices)
-    for i in range(len(latv)):
-        latv[i] = shiftarg_lat(latv[i])
-        lonv[i] = shiftarg_lon(lonv[i])
-    i = 0    
-    trixels = []
-    while i < len(latv):
-        geom = shapely.geometry.Polygon([[lonv[i], latv[i]], [lonv[i+1], latv[i+1]], [lonv[i+2], latv[i+2]]])
-        trixels.append(geom)
-        i += 4
-    return trixels
 
 spatial_resolution_mask =  31
 spatial_location_mask   = ~31

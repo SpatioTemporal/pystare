@@ -29,6 +29,12 @@ static STARE stare;
 
 // Spatial
 void from_latlon(double* lat, int len_lat,  double * lon, int len_lon, int64_t* indices, int level);
+
+void _from_latlon2D(double* lat, int lalen1, int lalen2, 
+                    double* lon, int lolen1, int lolen2, 
+                    int64_t* indices, int len1, int len2, 
+                    int level, bool adapt_resolution);
+
 void to_latlon(int64_t* indices, int len, double* lat, double* lon);
 void to_latlonlevel(int64_t* indices, int len, double* lat, double* lon, int* levels);
 void to_level(int64_t* indices, int len,  int* levels);

@@ -17,6 +17,33 @@ void from_latlon(double* lat, int len_lat, double * lon, int len_lon, int64_t* i
     }
 }
 
+void _from_latlon2D(double* lat, int lalen1, int lalen2, 
+                 double* lon, int lolen1, int lolen2, 
+                 int64_t* indices, int len1, int len2, int level, bool adapt_resolution) {
+    int n;   
+    static EmbeddedLevelNameEncoding lj;       // Use this to get the mask
+    int lvl;
+    
+    for (int i=0; i<lalen1; i++) {        
+        for (int j=0; j<lalen2; j++) {   
+            n = i * lalen2 + j;
+            indices[n] = stare.ValueFromLatLonDegrees(lat[n], lon[n], level);   
+            if (adapt_resolution) {
+                if (j==0) {        
+                    indices[n+1] = stare.ValueFromLatLonDegrees(lat[n+1], lon[n+1], level);            
+                    lvl = stare.cmpSpatialResolutionEstimateI(indices[n], indices[n+1]);
+                    indices[n] = (indices[n]& ~lj.levelMaskSciDB) | lvl;
+                } else {                    
+                    lvl = stare.cmpSpatialResolutionEstimateI(indices[n-1], indices[n]);
+                    indices[n] = (indices[n]& ~lj.levelMaskSciDB) | lvl;
+                }
+            }
+        }
+    }
+}
+
+
+
 void to_latlon(int64_t* indices, int len, double* lat, double* lon) { 
     for (int i=0; i< len; i++) { 
         LatLonDegrees64 latlon = stare.LatLonDegreesFromValue(indices[i]);
@@ -231,7 +258,7 @@ void _intersect(int64_t* indices1, int len1, int64_t* indices2, int len2, int64_
 	}
 }
 
-void intersects(int64_t* indices1, int len1, int64_t* indices2, int len2, int* intersects) {        
+void _intersects(int64_t* indices1, int len1, int64_t* indices2, int len2, int* intersects) {        
     for(int i=0; i<len2; ++i) {        
         intersects[i] = 0;
         for(int j=0; j<len1; ++j) {
