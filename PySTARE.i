@@ -506,7 +506,7 @@ def from_latlon2D(lat, lon, resolution=27, adapt_resolution=False):
     if adapt_resolution:
         resolution = 27
     indices = numpy.full(lon.shape, -1, dtype=numpy.int64)
-    pystare._from_latlon2D(lat, lon, stare, 27, adapt_resolution)
+    from_latlon2D(lat, lon, stare, 27, adapt_resolution)
     return indices    
 
 def to_hull_range_from_latlon(lat, lon, resolution):
