@@ -10,6 +10,8 @@
 
 #include "PySTARE.h"
 
+#include <algorithm>
+
 // Spatial
 void from_latlon(double* lat, int len_lat, double * lon, int len_lon, int64_t* indices, int level) {            
     for (int i=0; i<len_lat; i++) {        
@@ -231,16 +233,71 @@ void _intersect(int64_t* indices1, int len1, int64_t* indices2, int len2, int64_
 	}
 }
 
-void intersects(int64_t* indices1, int len1, int64_t* indices2, int len2, int* intersects) {        
-    for(int i=0; i<len2; ++i) {        
-        intersects[i] = 0;
-        for(int j=0; j<len1; ++j) {
-            if (cmpSpatial(indices2[i], indices1[j]) != 0) {
-                intersects[i] = 1;                
-                break;
-            }            
-        }
+void intersects(int64_t* indices1, int len1, int64_t* indices2, int len2, int* intersects, int method) {
+  if( method == 0 ) {
+    STARE_SpatialIntervals si1(indices1, indices1+len1);
+    SpatialRange r1(si1); // Possibly avoid copy above with new constructor?
+    for(int i=0; i<len2; ++i) {
+      intersects[i] = 0;
+      int istat = r1.intersects(indices2[i]);
+      if( istat != 0 ) {
+	intersects[i] = 1;
+      }
     }
+  } else if( method == 1 ) {
+    // Binary sort and search
+    sort(indices1,indices1+len1);
+    for(int i=0; i<len2; ++i) {
+      STARE_ArrayIndexSpatialValue test_siv = indices2[i];
+      intersects[i] = 0;
+      int start=0;
+      int end=len1-1;
+      int m = (start+end)/2;
+      bool done = false;
+      while( !done ) {
+	m = (start+end)/2;
+	if(indices1[m] < test_siv) {
+	  start = m+1;
+	  done = start > end;
+	} else if(indices1[m] > test_siv) {
+	  end = m-1;
+	  done = start > end;
+	} else {
+	  intersects[i] = 1; done = true;
+	}
+      }
+      if( intersects[i] == 0 ) {
+	if( (end >= 0) || (start < len1) ) {
+	  if( 0 <= m-1 ) {
+	    if( cmpSpatial(indices1[m-1],test_siv) != 0 ) {
+	      intersects[i] = 1;
+	    }
+	  }
+	  if( (0 <= m) && (m < len1) ) {
+	    if( cmpSpatial(indices1[m],test_siv) != 0 ) {
+	      intersects[i] = 1;
+	    }
+	  }
+	  if( m+1 < len1 ) {
+	    if( cmpSpatial(indices1[m+1],test_siv) != 0 ) {
+	      intersects[i] = 1;
+	    }
+	  }
+	}
+      }
+    }    
+  } else {
+    // Fall-through
+    for(int i=0; i<len2; ++i) {        
+      intersects[i] = 0;
+      for(int j=0; j<len1; ++j) {
+	if (cmpSpatial(indices2[i], indices1[j]) != 0) {
+	  intersects[i] = 1;
+	  break;
+	}            
+      }
+    }
+  } 
 }
 
 void _intersect_multiresolution(int64_t* indices1, int len1, int64_t* indices2, int len2, int64_t* intersection, int leni) {

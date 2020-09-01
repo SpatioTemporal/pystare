@@ -1,6 +1,17 @@
 
 # PySTARE Notes
 
+## 2020-09-01 0.5.5
+
+intersects now provides several methods for matching two arrays of
+indices. The method parameter defaults to '0' indicating using a STARE
+SpatialRange (skip list). '1' indicates a simple binary search and
+sort which re-orders the first input array, but is faster at present
+than method 0. '2' or other number uses an M*N brute force loop
+calling cmpSpatial. Method '0' is currently the fastest and has the
+best scaling. SpatialRange's own poor scaling is currently logged as
+an issue.
+
 ## 2020-06-24 0.5.4
 
 spatial_resolution_from_km now returns int by default. Selectable by return_int argument.

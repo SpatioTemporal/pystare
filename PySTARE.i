@@ -443,6 +443,9 @@
 
 %pythoncode %{
 import numpy
+from pkg_resources import get_distribution
+  
+__version__ = get_distribution('pystare').version
 
 class PyStareError(Exception):
     pass
