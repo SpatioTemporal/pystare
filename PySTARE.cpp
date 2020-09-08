@@ -261,7 +261,7 @@ void _intersect(int64_t* indices1, int len1, int64_t* indices2, int len2, int64_
 }
 
 
-void intersects(int64_t* indices1, int len1, int64_t* indices2, int len2, int* intersects, int method) {
+void _intersects(int64_t* indices1, int len1, int64_t* indices2, int len2, int* intersects, int method) {
   if( method == 0 ) {
     STARE_SpatialIntervals si1(indices1, indices1+len1);
     SpatialRange r1(si1); // Possibly avoid copy above with new constructor?

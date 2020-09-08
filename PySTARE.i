@@ -587,8 +587,9 @@ def cmp_temporal(indices1, indices2):
 	_cmp_temporal(indices1,indices2,cmp)
 	return cmp   
 
-def intersects(indices1, indices2):
-    return _intersects(indices1, indices2).astype(numpy.bool)
+def intersects(indices1, indices2, method=0):
+    # method = {'skiplist': 0, 'binsearch': 1, 'nn': 2}[method]
+    return _intersects(indices1, indices2, method).astype(numpy.bool)
 	
 def intersect(indices1, indices2, multiresolution=True):
     """
