@@ -29,6 +29,12 @@ static STARE stare;
 
 // Spatial
 void from_latlon(double* lat, int len_lat,  double * lon, int len_lon, int64_t* indices, int level);
+
+void _from_latlon2D(double* lat, int lalen1, int lalen2, 
+                    double* lon, int lolen1, int lolen2, 
+                    int64_t* indices, int len1, int len2, 
+                    int level, bool adapt_resolution);
+
 void to_latlon(int64_t* indices, int len, double* lat, double* lon);
 void to_latlonlevel(int64_t* indices, int len, double* lat, double* lon, int* levels);
 void to_level(int64_t* indices, int len,  int* levels);
@@ -44,7 +50,7 @@ void from_intervals(int64_t* intervals, int len, int64_t* indices_starts, int64_
 void _intersect(int64_t* indices1, int len1, int64_t* indices2, int len2, int64_t* intersection, int leni);
 void _intersect_multiresolution(int64_t* indices1, int len1, int64_t* indices2, int len2, int64_t* intersection, int leni);
 void _cmp_spatial(int64_t* indices1, int len1, int64_t* indices2, int len2, int64_t* cmp, int len12);
-void intersects(int64_t* indices1, int len1, int64_t* indices2, int len2, int* intersects, int method=0);
+void _intersects(int64_t* indices1, int len1, int64_t* indices2, int len2, int* intersects, int method=0);
 
 // Temporal
 void from_utc(int64_t *datetime, int len, int64_t *indices_out, int resolution);
