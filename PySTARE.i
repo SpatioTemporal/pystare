@@ -656,6 +656,25 @@ def triangulate_indices(indices):
     lons,lats,intmat = triangulate(latv,lonv)
     return lons,lats,intmat
 
+    
+def parent(sid):
+    """ 
+        given an SID, return its immediate parent
+    """
+    return None
+    
+def children(sid):
+    """ 
+        given an SID, return the 4 children 
+    """
+    return None
+    
+
+def is_ancestor(sid):
+    """ 
+        given an SID, evaluate if one is the ancesotr of the other
+    """
+    return None
 
 spatial_resolution_mask =  31
 spatial_location_mask   = ~31
