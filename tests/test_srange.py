@@ -12,7 +12,7 @@ class MainTest(unittest.TestCase):
         
     def test_make_srange10000(self):
         from tests.sids import sids
-        sids = sids[0:1000]
+        sids = sids[0:10000]
         srange = pystare.srange(sids)
         
     def test_collapse1(self):
