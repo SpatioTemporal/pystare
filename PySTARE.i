@@ -670,7 +670,7 @@ def children(sid):
     return None
     
 
-def is_ancestor(sid):
+def is_ancestor(sid1, sid2):
     """ 
         given an SID, evaluate if one is the ancesotr of the other
     """
