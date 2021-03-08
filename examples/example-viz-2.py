@@ -36,7 +36,7 @@ def plot1(lon,lat,lons,lats,triang,c0='r',c1='b',transf=None,lw=1):
         y=np.zeros([lat.size+1],dtype=np.double); y[:-1]=lat[:]; y[-1]=lat[0]
         ax.plot(x,y,True,transform=transf,c=c0)
     plt.triplot(triang,c1+'-',transform=transf,lw=lw,markersize=3)
-    plt.scatter(lons,lats,s=10,c=c1,transform=transf)
+    plt.scatter(lons,lats,s=10,c=c1,transform=ccrs.PlateCarree())
     return
 
 def make_hull(lat0,lon0,resolution0):

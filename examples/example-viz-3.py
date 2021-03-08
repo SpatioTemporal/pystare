@@ -36,7 +36,7 @@ def plot1(lon,lat,lons,lats,triang,c0='r',c1='b',transf=None,lw=1):
         y=np.zeros([lat.size+1],dtype=np.double); y[:-1]=lat[:]; y[-1]=lat[0]
         ax.plot(x,y,True,transform=transf,c=c0)
     plt.triplot(triang,c1+'-',transform=transf,lw=lw,markersize=3)
-    plt.scatter(lons,lats,s=10,c=c1,transform=transf)
+    plt.scatter(lons,lats,s=10,c=c1,transform=ccrs.PlateCarree())
     return
 
 def plot2(sivs,c1='g',transf=None):
@@ -96,16 +96,16 @@ lons3,lats3,intmat3 = triangulate1(latco,lonco)
 triang3 = tri.Triangulation(lons3,lats3,intmat3)
 
 # Set up the projection and transformation
-proj = ccrs.PlateCarree()
+# proj = ccrs.PlateCarree()
 # proj = ccrs.Robinson()
 # proj = ccrs.Geodesic()
-# proj   = ccrs.Mollweide()
+proj   = ccrs.Mollweide()
 transf = ccrs.Geodetic()
 # transf = ccrs.PlateCarree()
 plt.figure()
 plt.subplot(projection=proj,transform=transf)
 ax = plt.axes(projection=proj,transform=transf)
-ax.set_global()
+# ax.set_global()
 ax.coastlines()
 
 box_cover = ps.to_box_cover_from_latlon(np.array([-2,-2,-1,-1],dtype=np.double)
@@ -143,12 +143,23 @@ if flag6:
     print('hull6a: ',hex(hull6a[0]))
 
 # hull6 = np.array([0x3d2b61000000000a],dtype=np.int64)
+
+plot1(lon0,lat0,lons0,lats0,triang0,c0='r',c1='b',transf=transf)
+plot1(None,None,lons2,lats2,triang2,c0='r',c1='y',transf=transf)
+plot1(None,None,lons1,lats1,triang1,c0='c',c1='r',transf=transf)
+plot1(None,None,lons3,lats3,triang3,c0='c',c1='g',transf=transf)
+plot1(None,None,lons4,lats4,triang4,c0='c',c1='g',transf=transf)
+
+if flag5:
+    plot1(lon5,lat5,lons5,lats5,triang5,c0='c',c1='g',transf=transf)
+
+plt.show()
     
 # Set up the projection and transformation
-proj = ccrs.PlateCarree()
+# proj = ccrs.PlateCarree()
 # proj = ccrs.Robinson()
 # proj = ccrs.Geodesic()
-# proj   = ccrs.Mollweide()
+proj   = ccrs.Mollweide()
 transf = ccrs.Geodetic()
 # transf = ccrs.PlateCarree()
 plt.figure()
@@ -186,7 +197,7 @@ if False:
     plot2([0x3d2b61420000000d],c1='g',transf=transf)
     plot2([0x3d2b61440000000d],c1='b',transf=transf)
     plot2([0x3d2b61460000000d],c1='k',transf=transf)
-    plt.scatter(0.9474437025372493,-2.9981275066380708,s=10,c='c',transform=transf)
+    plt.scatter(0.9474437025372493,-2.9981275066380708,s=10,c='c',transform=ccrs.PlateCarree())
 
 test_trixels = [0x3d2b61400000000d,0x3d2b61420000000d,0x3d2b61440000000d,0x3d2b61460000000d]
     
