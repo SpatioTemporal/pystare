@@ -51,6 +51,7 @@ class MainTest(unittest.TestCase):
                              0x3000000000000000, 0x3800000000000000])
         sids = numpy.array([0x300a30000000000a, 0x300a30800000000a, 0x300a31000000000a, 0x300a31800000000a])
         indices = pystare.intersect(earth, sids, multiresolution=True)
+        ivs = indices
         with self.subTest():
             self.assertEqual(ivs.size, 1)
         with self.subTest():    
@@ -60,6 +61,7 @@ class MainTest(unittest.TestCase):
         sids = numpy.array([0x300a30000000000a, 0x300a30800000000a, 0x300a31000000000a, 0x300a31800000000a])
         parent = pystare.expand_intervals(sids, resolution=9)
         indices = pystare.intersect(parent, sids)
+        ivs = indices
         with self.subTest():
             self.assertEqual(ivs.size, 1)
         with self.subTest():    

@@ -212,7 +212,8 @@ StareResult _to_box_cover_from_latlon(double* lat, int len_lat, double* lon, int
 void _to_compressed_range(int64_t* indices, int len, int64_t* range_indices, int len_ri) {
 	STARE_SpatialIntervals si(indices, indices+len);
 	SpatialRange r(si);
-	STARE_SpatialIntervals result = r.toSpatialIntervals();
+	r.compress();
+	STARE_SpatialIntervals result = r.toSpatialIntervals(); 
 	for(int i=0; i<result.size(); ++i) {
 		range_indices[i] = result[i];
 	}
