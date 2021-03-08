@@ -14,7 +14,7 @@ def plot1(lon,lat,lons,lats,triang,c0='r',c1='b',transf=None,lw=1,ax=None):
         y=np.zeros([lat.size+1],dtype=np.double); y[:-1]=lat[:]; y[-1]=lat[0]
         ax.plot(x,y,True,transform=transf,c=c0)
     ax.triplot(triang,c1+'-',transform=transf,lw=lw,markersize=3)
-    ax.scatter(lons,lats,s=10,c=c1,transform=transf)
+    ax.scatter(lons,lats,s=10,c=c1,transform=ccrs.PlateCarree())
     return
 
 def test_intersect_single_res(proj,transf):
@@ -82,7 +82,8 @@ def main():
     print('test_intersect_single_res.py visualization')
 
     proj   = ccrs.PlateCarree()
-    transf = ccrs.Geodetic()
+    # transf = ccrs.Geodetic()
+    transf = ccrs.PlateCarree()
 
     test_intersect_single_res(proj,transf)
 

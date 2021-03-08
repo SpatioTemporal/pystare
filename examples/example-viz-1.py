@@ -118,7 +118,7 @@ def plot1(triang):
 
 test1_lons,test1_lats,test1_intmat = test1(indices)
 plot1(tri.Triangulation(test1_lons,test1_lats,test1_intmat))
-plt.scatter(test1_lons,test1_lats,s=5,c='r',transform=transf)  
+plt.scatter(test1_lons,test1_lats,s=5,c='r',transform=ccrs.PlateCarree())  
 
 # resolution = 2;
 resolution = 4;
@@ -193,7 +193,7 @@ if False:
     print('test im:    ',intmattest)    
     triangtest = tri.Triangulation(lonstest,latstest,intmattest)
     plt.triplot(triangtest,'g-',transform=transf)
-    plt.scatter(lonstest,latstest,s=5,c='g',transform=transf)
+    plt.scatter(lonstest,latstest,s=5,c='g',transform=ccrs.PlateCarree())
     # plt.triplot(triangtest,'go-',transform=ccrs.Geodetic())
     # plt.scatter(lonstest,latstest,s=10,c='g',transform=ccrs.Geodetic())
 
@@ -207,7 +207,7 @@ print('hull im len: ',len(intmat1))
 
 triang1 = tri.Triangulation(lons1,lats1,intmat1)
 plt.triplot(triang1,'b-',transform=transf,lw=1,markersize=3)
-plt.scatter(lons1,lats1,s=10,c='b',transform=transf)
+plt.scatter(lons1,lats1,s=10,c='b',transform=ccrs.PlateCarree())
 # # plt.contourf(xg,yg,v0g,60,transform=ccrs.PlateCarree())
 
 plt.show()
