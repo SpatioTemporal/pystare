@@ -45,7 +45,7 @@ data_files = []
 
 setup(
     name='pystare',
-    version='0.5.5',
+    version='0.6.0',
     description="",
     cmdclass={'build_py': build_py},
     long_description=LONG_DESCRIPTION,         

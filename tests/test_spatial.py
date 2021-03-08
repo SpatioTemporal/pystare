@@ -52,21 +52,44 @@ class MainTest(unittest.TestCase):
         numpy.testing.assert_allclose(area, expected)
     
     def test__tocompressedrange(self):
-        indices = numpy.array([4151504989081014892, 4161865161846704588, 3643626718498217164])
+        
+        # indices = numpy.array([4151504989081014892, 4161865161846704588, 3643626718498217164])
+        # expected = numpy.array([3643626718498217164, 4151504989081014892, 4161865161846704588])
+
+        indices  = numpy.array([0x399d1bcabd6f926c,0x39c1ea506ef249cc,0x3290c3321a355ccc])
+        expected = numpy.array([0x3290c3300000000c,0x399d1bc80000000c,0x39c1ea500000000c])
+
         compressed = numpy.array([0, 0, 0], dtype=numpy.int64)
         pystare._to_compressed_range(indices, compressed)
-        expected = numpy.array([3643626718498217164, 4151504989081014892, 4161865161846704588])
+            
         numpy.testing.assert_array_equal(compressed, expected)
     
     def test_tocompressedrange(self):
-        indices = numpy.array([4151504989081014892, 4161865161846704588, 3643626718498217164])
+
+        # indices = numpy.array([4151504989081014892, 4161865161846704588, 3643626718498217164])
+        # expected = numpy.array([3643626718498217164, 4151504989081014892, 4161865161846704588])
+
+        indices  = numpy.array([0x399d1bcabd6f926c,0x39c1ea506ef249cc,0x3290c3321a355ccc])
+        expected = numpy.array([0x3290c3300000000c,0x399d1bc80000000c,0x39c1ea500000000c])
+        
         compressed = pystare.to_compressed_range(indices)
-        expected = numpy.array([3643626718498217164, 4151504989081014892, 4161865161846704588])
+
+        # print('')
+        # print('indices','compressed','expected')
+        # for i in [0,1,2]:
+        #     print(i,hex(indices[i]),hex(compressed[i]),hex(expected[i]))
+        # print('\nindices')
+        # for i in [0,1,2]:
+        #     print(hex(indices[i]))
+        # print('\ncompressed')
+        # for i in [0,1,2]:
+        #     print(hex(compressed[i]))
+        
         numpy.testing.assert_array_equal(compressed, expected)
 
     def test__tohullrange(self):
         indices = numpy.array([4151504989081014892, 4161865161846704588, 3643626718498217164])
-        result_size = numpy.zeros([1], dtype=numpy.int)
+        result_size = numpy.zeros([1], dtype=numpy.int64)
         result = pystare._to_hull_range(indices, 8)
         hull_indices = numpy.zeros([result.get_size_as_intervals()], dtype=numpy.int64)
         result.copy_as_intervals(hull_indices)
