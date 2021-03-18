@@ -124,7 +124,7 @@ class MainTest(unittest.TestCase):
         expanded_len       = numpy.zeros([1],dtype=numpy.int64)
         intervals_len = len(src)
         resolution = -1
-        result = pystare._expand_intervals(src, resolution)
+        result = pystare._expand_intervals(src, resolution, multi_resolution=False)
         expanded_len = result.get_size_as_values()
         result.copy_as_values(expanded)
         self.assertEqual(expanded_len, 74)
@@ -139,7 +139,7 @@ class MainTest(unittest.TestCase):
         src = numpy.array(intervals.src,dtype=numpy.int64)
         expected_expanded = numpy.array(intervals.expanded_src,dtype=numpy.int64)
         resolution = -1
-        expanded = pystare.expand_intervals(src, resolution)        
+        expanded = pystare.expand_intervals(src, resolution, multi_resolution=False)        
         error_found = False
         for i in range(len(expanded)):
             if(expanded[i] != expected_expanded[i]):

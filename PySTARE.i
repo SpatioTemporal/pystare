@@ -482,8 +482,8 @@ def to_compressed_range(indices):
     range_indices = range_indices[:endarg]
     return range_indices
     
-def expand_intervals(intervals, resolution):
-    result = _expand_intervals(intervals,resolution)
+def expand_intervals(intervals, resolution, multi_resolution=False):
+    result = _expand_intervals(intervals,resolution,multi_resolution)
     expanded_intervals = numpy.zeros([result.get_size_as_intervals()],dtype=numpy.int64)
     result.copy_as_values(expanded_intervals)
     return expanded_intervals

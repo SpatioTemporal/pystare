@@ -71,6 +71,8 @@ class StareResult {
   void add_indexValues(STARE_ArrayIndexSpatialValues sisvs) { this->sisvs = sisvs; this->sCase = ArrayIndexSpatialValues; }
   virtual ~StareResult();
   int                           get_size();
+  bool                          values_multi_resolution = true;
+  void                          set_values_multi_resolution(bool multi_resolution);
   int                           get_size_as_values();
   int                           get_size_as_intervals();
   void                          copy             (int64_t* indices, int len);
@@ -90,7 +92,7 @@ StareResult _to_circular_cover(double lat, double lon, double radius, int resolu
 StareResult _to_nonconvex_hull_range_from_latlon(double* lat, int len_lat, double* lon, int len_lon, int resolution);
 
 // void _expand_intervals(int64_t* indices, int len, int resolution, int64_t* range_indices, int len_ri, int64_t* result_size, int len_rs);
-StareResult _expand_intervals(int64_t* indices, int len, int resolution);
+StareResult _expand_intervals(int64_t* indices, int len, int resolution, bool multi_resolution);
 
 // void _to_box_cover_from_latlon(double* lat, int len_lat, double* lon, int len_lon, int resolution, int64_t* range_indices, int len_ri, int64_t* result_size, int len_rs);
 StareResult _to_box_cover_from_latlon(double* lat, int len_lat, double* lon, int len_lon, int resolution);
@@ -125,20 +127,23 @@ public:
   void copy_intervals(int64_t* indices, int len);
 
   bool values_extracted = false;
-  void extract_values();
-  int get_size_as_values();
+  bool values_multi_resolution = true;
+  void set_values_multi_resolution(bool multi_resolution);
+  void extract_values(); // defaults to !multi_res
+  int get_size_as_values(); // defaults to !multi_res
   void copy_values(int64_t* indices, int len);
 
   void reset_extraction();
   void reset();
   void purge();
+  void compress() { range.compress(); }
 
   SpatialRange range;
   STARE_SpatialIntervals sis;
   STARE_ArrayIndexSpatialValues    sivs;
 
   void add_intersect(const srange& one, const srange& other,bool compress) {
-    // cout << " compress " << compress << endl << flush;
+    cout << " compress " << compress << endl << flush;
     
 //   HstmRange *range1 = new HstmRange(range.range->range->RangeFromIntersection(other.range.range->range,compress)); // NOTE mlr Probably about the safest way to inst. SpatialRange.
 // // #define DIAG
