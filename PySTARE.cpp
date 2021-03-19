@@ -166,10 +166,10 @@ void from_intervals(int64_t* intervals, int len, int64_t* indices_starts, int64_
 //	}
 }
 
-StareResult _expand_intervals(int64_t* indices, int len, int resolution) {
+StareResult _expand_intervals(int64_t* indices, int len, int resolution, bool multi_resolution) {
   STARE_SpatialIntervals si(indices,indices+len);
   StareResult result;
-  result.add_indexValues(expandIntervals(si,resolution));
+  result.add_indexValues(expandIntervalsMultiRes(si,resolution, multi_resolution));
   return result;
 }
 
@@ -212,7 +212,8 @@ StareResult _to_box_cover_from_latlon(double* lat, int len_lat, double* lon, int
 void _to_compressed_range(int64_t* indices, int len, int64_t* range_indices, int len_ri) {
 	STARE_SpatialIntervals si(indices, indices+len);
 	SpatialRange r(si);
-	STARE_SpatialIntervals result = r.toSpatialIntervals();
+	r.compress();
+	STARE_SpatialIntervals result = r.toSpatialIntervals(); 
 	for(int i=0; i<result.size(); ++i) {
 		range_indices[i] = result[i];
 	}
@@ -343,7 +344,8 @@ void _intersect_multiresolution(int64_t* indices1, int len1, int64_t* indices2, 
 	// cout << 300 << endl << flush;
 	STARE_SpatialIntervals result_intervals = ri->toSpatialIntervals();
 	delete ri;
-	STARE_ArrayIndexSpatialValues result = expandIntervals(result_intervals);
+	// STARE_ArrayIndexSpatialValues result = expandIntervals(result_intervals);
+	STARE_ArrayIndexSpatialValues result = expandIntervalsMultiRes(result_intervals,-1,true);
 	// cout << 400 << endl << flush;
 	leni = result.size();
 	// cout << 500 << " result size " << result.size() << endl << flush;
@@ -444,6 +446,9 @@ void _cmp_temporal(int64_t* indices1, int len1, int64_t* indices2, int len2, int
 	}
 }
 
+
+////////////////////////////////////////////////////////////////////////////////
+//
 StareResult::~StareResult() {}
 int  StareResult::get_size() {
   switch( sCase ) {
@@ -451,6 +456,9 @@ int  StareResult::get_size() {
   case SpatialIntervals        : return get_size_as_intervals();
   }
   return -1; // Maybe throw something instead.
+}
+void StareResult::set_values_multi_resolution(bool multi_resolution) {
+  values_multi_resolution = multi_resolution;  
 }
 int  StareResult::get_size_as_values() {
   if( sCase == SpatialIntervals ) {
@@ -506,11 +514,17 @@ void StareResult::convert() {
     }
     break;
   case SpatialIntervals :
-    sisvs = expandIntervals(sis);
+    sisvs = expandIntervalsMultiRes(sis,-1,values_multi_resolution);
     break;
   }
   converted = true;
 }
+////////////////////////////////////////////////////////////////////////////////
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+//
 
 srange::srange() {}
 
@@ -540,17 +554,18 @@ void srange::acontains(int64_t* indices1, int len1, int64_t* range_indices, int 
     }
   }
 }
-
 void srange::extract_intervals() {
   sis = range.toSpatialIntervals();
   intervals_extracted = true;
 }
-
+void srange::set_values_multi_resolution(bool multi_resolution) {
+  values_multi_resolution = multi_resolution;
+}
 void srange::extract_values() {
   if( !intervals_extracted ) {
     extract_intervals();
   }
-  sivs = expandIntervals(sis);
+  sivs = expandIntervalsMultiRes(sis,-1,values_multi_resolution);
   values_extracted = true;
 }
 
@@ -566,33 +581,28 @@ void srange::copy_intervals(int64_t* indices, int len) {
     indices[i] = sis[i];
   }
 }
-
 int srange::get_size_as_values() {
   if( !values_extracted ) {
     extract_values();
   }
   return sivs.size();
 }
-
 void srange::copy_values(int64_t* indices, int len) {
   int n_sivs = get_size_as_values();
   for(  int i=0; i < min(len,n_sivs); ++i ) {
     indices[i] = sivs[i];
   }
 }
-
 void srange::reset_extraction() {
   intervals_extracted = false;
   values_extracted = false;
   sis.clear();
   sivs.clear();
 }
-
 void srange::reset() {
   reset_extraction();
   range.reset();
 }
-
 void srange::purge() {
   reset_extraction();
   range.purge();

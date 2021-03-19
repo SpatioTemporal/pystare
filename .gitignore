@@ -1,4 +1,6 @@
-__pycache__/*
+tmp.py
+.DS_Store
+**/__pycache__/
 *.so
 pystare.egg-info/*
 build/*
