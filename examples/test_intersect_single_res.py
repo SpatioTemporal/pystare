@@ -74,10 +74,10 @@ def test_intersect_single_res(proj,transf):
      plot1(None,None,lonsT,latsT,triangT,c0='r',c1='b',transf=transf,ax=ax)
      # plt.show()
 
-     print('   len(False),len(True),delta: ',len(intersectedFalse),len(intersectedTrue),len(intersectedTrue)-len(intersectedFalse))
-     print('un len(False),len(True),delta: ',len(numpy.unique(intersectedFalse)),len(numpy.unique(intersectedTrue)),len(numpy.unique(intersectedTrue))-len(numpy.unique(intersectedFalse)))
-     print('compressed==True, first total, then w/o double counting: ',(7*16)+(17*4),(7*16)+(17*4)-(7+17))
-     print('count 0:    ',sum([1,34,34,4*6,24,22,9]))
+     ## ok ## print('   len(False),len(True),delta: ',len(intersectedFalse),len(intersectedTrue),len(intersectedTrue)-len(intersectedFalse))
+     ## ok ## print('un len(False),len(True),delta: ',len(numpy.unique(intersectedFalse)),len(numpy.unique(intersectedTrue)),len(numpy.unique(intersectedTrue))-len(numpy.unique(intersectedFalse)))
+     ## ok ## print('compressed==True, first total, then w/o double counting: ',(7*16)+(17*4),(7*16)+(17*4)-(7+17))
+     # print('count 0:    ',sum([1,34,34,4*6,24,22,9]))
      
      if True:
         r0 = pystare.srange()
@@ -104,7 +104,7 @@ def test_intersect_single_res(proj,transf):
         r01.add_intersect(r0,r1,True)
         # n01 = r01.get_size_as_values()
         # n01 = r01.get_size_as_values_multi_resolution(False)
-        n01 = r01.get_size_as_values_multi_resolution(True)
+        n01 = r01.get_size_as_values()
         #? self.assertEqual(172, n01)
         # self.assertEqual(82, n01)
         print('r01 n01: ',n01)
@@ -129,10 +129,10 @@ def test_intersect_single_res(proj,transf):
         lonsRT_,latsRT_,intmatRT_ = pystare.triangulate_indices(intersected[51:55])
         triangRT_ = tri.Triangulation(lonsRT_,latsRT_,intmatRT_)
 
-        k = 51
-        for j in intersected[51:55]:
-            print(k,' siv: 0x%016x'%intersected[k])
-            k += 1
+        # k = 51
+        # for j in intersected[51:55]:
+        #     print(k,' siv: 0x%016x'%intersected[k])
+        #     k += 1
 
         plot1(None,None,lonsRT_,latsRT_,triangRT_,c0='g',c1='g',transf=transf,ax=ax)
         

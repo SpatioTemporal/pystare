@@ -48,7 +48,7 @@ setup(
     version='0.6.0',
     description="",
     cmdclass={'build_py': build_py},
-    long_description=LONG_DESCRIPTION,         
+    long_description=LONG_DESCRIPTION,
     py_modules = ['pystare'],
     ext_modules=[pystare],    
     python_requires=">=3.5",

@@ -1,6 +1,16 @@
 
 # PySTARE Notes
 
+## 2020-03-19 0.5.6
+
+srange and intersect were often not returning multi-resolution
+results. Added a set_values_multi_resolution method to srange and
+added a multi_resolution flag to StareResult. Setting values
+multi_resolution to true turns on expandIntervalsMultiRes, coalescing
+quadruplets of trixels whenever it can. If values multi_resolution is
+false then we should get expansions based on the resolution encoded
+with the interval.
+
 ## 2020-09-01 0.5.5
 
 intersects now provides several methods for matching two arrays of

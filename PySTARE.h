@@ -143,7 +143,7 @@ public:
   STARE_ArrayIndexSpatialValues    sivs;
 
   void add_intersect(const srange& one, const srange& other,bool compress) {
-    cout << " compress " << compress << endl << flush;
+    // cout << " compress " << compress << endl << flush;
     
 //   HstmRange *range1 = new HstmRange(range.range->range->RangeFromIntersection(other.range.range->range,compress)); // NOTE mlr Probably about the safest way to inst. SpatialRange.
 // // #define DIAG
