@@ -1,7 +1,7 @@
 
 # PySTARE Notes
 
-## 2020-03-19 0.5.6
+## 2020-03-19 0.6.0
 
 srange and intersect were often not returning multi-resolution
 results. Added a set_values_multi_resolution method to srange and
