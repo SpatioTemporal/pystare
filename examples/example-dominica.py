@@ -159,6 +159,10 @@ def dominica1(proj,transf):
     print('')
     
     compressed = pystare.to_compressed_range(sids)
+    # compressed = compressed[0:6] # Broken
+    # compressed = compressed[0:5] # Broken
+    # compressed = compressed[0:4] # Broken # fixed
+    # compressed = compressed[0:3] # Okay
     print('compressed = pystare.to_compressed_range(sids)')
     k = 0
     for i in compressed:
@@ -182,7 +186,8 @@ def dominica1(proj,transf):
         k += 1
     print('')
 
-    fig, axs = plt.subplots(nrows=1,ncols=5,subplot_kw={'projection':proj,'transform':transf})
+    ncols = 4 # 5
+    fig, axs = plt.subplots(nrows=1,ncols=ncols,subplot_kw={'projection':proj,'transform':transf})
     # plt.figure()
     # plt.subplot(projection=proj,transform=transf)
 
@@ -219,12 +224,12 @@ def dominica1(proj,transf):
     plot2(expanded_mr,c0='r',c1='b',transf=transf,ax=ax)
     iax += 1
 
-    ax=axs[iax]
-    # ax.set_global()
-    ax.coastlines()
-    ax.title.set_text('5. Expand Compressed\n(multi-res)\nfrom STARE lib tests')    
-    plot2(expanded_stare_test,c0='r',c1='b',transf=transf,ax=ax)
-    iax += 1    
+#    ax=axs[iax]
+#    # ax.set_global()
+#    ax.coastlines()
+#    ax.title.set_text('5. Expand Compressed\n(multi-res)\nfrom STARE lib tests')    
+#    plot2(expanded_stare_test,c0='r',c1='b',transf=transf,ax=ax)
+#    iax += 1    
      
     plt.show()
     
