@@ -34,24 +34,28 @@ def nw_africa1(proj,transf):
     print('sids_l6 len: ',len(sids_l6))
     print('sids_l7 len: ',len(sids_l7))
     
-    sids = sids_l6[000:475]
-    sids = sids_l6[000:470]
-    sids = sids_l6[000:465]
-    sids = sids_l6[000:465]
-    sids = sids_l6[000:465] # ok
-    sids = sids_l6[000:467] # weird
-    sids = sids_l6[000:468] # weird
-    sids = sids_l6[  5:468] # weird
-    sids = sids_l6[  6:468] # weird
-    sids = sids_l6[  7:468] # weird    
-    sids = sids_l6[  8:468] # weird
-    sids = sids_l6[  9:468] # ok
-    sids = sids_l6[ 10:468] # ok
-    sids = sids_l6[ 11:468] # ok
-    sids = numpy.concatenate((sids_l6[0:8],sids_l6[9:467])) # weird
-    sids = numpy.concatenate((sids_l6[0:9],sids_l6[9:467]))
+    sids = sids_l6
+    # sids = sids_l7
+
     
-    sids.sort()
+#    sids = sids_l6[000:475]
+#    sids = sids_l6[000:470]
+#    sids = sids_l6[000:465]
+#    sids = sids_l6[000:465]
+#    sids = sids_l6[000:465] # ok
+#    sids = sids_l6[000:467] # weird
+#    sids = sids_l6[000:468] # weird
+#    sids = sids_l6[  5:468] # weird
+#    sids = sids_l6[  6:468] # weird
+#    sids = sids_l6[  7:468] # weird    
+#    sids = sids_l6[  8:468] # weird
+#    sids = sids_l6[  9:468] # ok
+#    sids = sids_l6[ 10:468] # ok
+#    sids = sids_l6[ 11:468] # ok
+#    sids = numpy.concatenate((sids_l6[0:8],sids_l6[9:467])) # weird
+#    sids = numpy.concatenate((sids_l6[0:9],sids_l6[9:467]))
+#    
+#    sids.sort()
 
     print('x,t:  ',hex(0x3fa0000000000003),hex(0x3fafffffffffffff))
     print('x,t_: ',hex(0x3fa0000000000003),hex(pystare.spatial_terminator(0x3fa0000000000003)))
@@ -134,7 +138,8 @@ def nw_africa1(proj,transf):
     ax=axs[iax]
     # ax.set_global()
     ax.coastlines()
-    ax.title.set_text('1. Original\n(res=0xA)')
+    # ax.title.set_text('1. Original\n(res=0xA)')
+    ax.title.set_text('1. Original\n(res=0x6)')
     ax.annotate(
         '1. sids\n2. compressed = pystare.to_compressed_range(sids) # Intervals. Terminators expressed as dots.\n3. expanded = pystare.expand_intervals(compressed,-1,False) # Intervals expanded according to embedded resolution.\n4. expanded_multires = pystare.expand_intervals(compressed,-1,True) # Intervals expanded into coarsest common ancestors.',
         xy=(50, 50), xycoords='figure pixels')
