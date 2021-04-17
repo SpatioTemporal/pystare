@@ -53,7 +53,7 @@ void _cmp_spatial(int64_t* indices1, int len1, int64_t* indices2, int len2, int6
 void _intersects(int64_t* indices1, int len1, int64_t* indices2, int len2, int* intersects, int method=0);
 
 // Temporal
-void from_utc(int64_t *datetime, int len, int64_t *indices_out, int resolution);
+void from_utc(int64_t *datetime, int len, int64_t *indices_out, int forward_resolution, int reverse_resolution);
 void to_utc_approximate(int64_t* indices, int len, int64_t* datetime_out);
 void _cmp_temporal(int64_t* indices1, int len1, int64_t* indices2, int len2, int64_t* cmp, int len12);
 

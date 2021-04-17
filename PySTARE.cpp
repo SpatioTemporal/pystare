@@ -367,16 +367,22 @@ void _cmp_spatial(int64_t* indices1, int len1, int64_t* indices2, int len2, int6
 }
 
 // Temporal
-void from_utc(int64_t *datetime, int len, int64_t *indices_out, int resolution) {
+void from_utc(int64_t *datetime, int len, int64_t *indices_out
+	      , int forward_resolution
+	      , int reverse_resolution
+	      ) {
 	// datetime is in ms (numpy default).
 	// double jd19700101_erfa = 2440587.5;
 
 //    cout << "from_utc resolution: " << resolution << endl << flush;
 	// cout << "from_utc" << endl << flush;
-    int type = 2;
+    int type = 1;
     for (int i=0; i<len; i++) {
     	int64_t idt = datetime[i]/1000;
-        indices_out[i] = stare.ValueFromUTC((time_t&)idt, resolution, type);
+        indices_out[i] = stare.ValueFromUTC((time_t&)idt
+					    , forward_resolution
+					    , reverse_resolution
+					    , type);
         idt = datetime[i]%1000;
         stare.tIndex.set_millisecond(idt);
         indices_out[i] = stare.getArrayIndexTemporalValue();
