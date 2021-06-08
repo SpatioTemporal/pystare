@@ -12,6 +12,9 @@
 
 #include <algorithm>
 
+// Info
+const char* stare_version() { return STARE_version(); }
+
 // Spatial
 void from_latlon(double* lat, int len_lat, double * lon, int len_lon, int64_t* indices, int level) {            
     for (int i=0; i<len_lat; i++) {        

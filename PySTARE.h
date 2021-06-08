@@ -27,6 +27,9 @@
 
 static STARE stare;
 
+// Info & Utility
+const char* stare_version();
+
 // Spatial
 void from_latlon(double* lat, int len_lat,  double * lon, int len_lon, int64_t* indices, int level);
 
