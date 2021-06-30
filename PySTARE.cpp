@@ -250,20 +250,32 @@ StareResult _to_nonconvex_hull_range_from_latlon(double* lat, int len_lat, doubl
 }
 
 void _intersect(int64_t* indices1, int len1, int64_t* indices2, int len2, int64_t* intersection, int leni) {
-	STARE_SpatialIntervals si1(indices1, indices1+len1);
-    STARE_SpatialIntervals si2(indices2, indices2+len2);
-	SpatialRange r1(si1);   
-    SpatialRange r2(si2);
-	SpatialRange *ri = sr_intersect(r1, r2, false);
-	STARE_SpatialIntervals result_intervals = ri->toSpatialIntervals();
-	delete ri;
-	STARE_ArrayIndexSpatialValues result = expandIntervals(result_intervals);
-	leni = result.size();
-	for(int i=0; i<leni; ++i) {
-		intersection[i] = result[i];
-	}
+  STARE_SpatialIntervals si1(indices1, indices1+len1);
+  STARE_SpatialIntervals si2(indices2, indices2+len2);
+  SpatialRange r1(si1);   
+  SpatialRange r2(si2);
+  SpatialRange *ri = sr_intersect(r1, r2, false);
+  STARE_SpatialIntervals result_intervals = ri->toSpatialIntervals();
+  delete ri;
+  cout << "_intersect:result_intervals" << endl << flush;
+  for(int i=0; i < result_intervals.size(); ++i) {
+    if ( i < 10 ) {
+      cout << "_intersect:result_intervals: " << setw(4) << dec << i << " " << setw(16) << hex << result_intervals[i] << endl << flush;
+    }
+  }
+  cout << "_intersect:expandIntervals" << endl << flush;
+  STARE_ArrayIndexSpatialValues result = expandIntervals(result_intervals);
+  cout << "_intersect:size" << endl << flush;
+  int leni_ = result.size();
+  cout << "_intersect:leni_" << " " << leni << endl << flush;
+  cout << "_intersect:result" << endl << flush;	
+  for(int i=0; i<leni_; ++i) {
+    if( i < 10 ) {
+      cout << "_intersect:result: " << setw(4) << dec << i << " " << setw(16) << hex << result[i] << endl << flush;
+    }
+    intersection[i] = result[i];
+  }
 }
-
 
 void _intersects(int64_t* indices1, int len1, int64_t* indices2, int len2, int* intersects, int method) {
   if( method == 0 ) {
