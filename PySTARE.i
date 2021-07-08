@@ -33,9 +33,6 @@
   $3 = (int64_t*) array_data((PyArrayObject*)out);
 }
 
-
-
-
 %typemap(in, numinputs=1)
   (double* in_array, int length, int64_t* out_array)
    (PyObject* out=NULL)
@@ -261,6 +258,80 @@
   $5 = (int64_t*) array_data((PyArrayObject*)out3);
   $6 = (int64_t*) array_data((PyArrayObject*)out4);
 }
+
+/*
+ * char** 
+ * From http://www.swig.org/Doc1.3/Python.html#Python_nn59
+ */
+/* %module argv */
+
+// This tells SWIG to treat char ** as a special case
+
+%typemap(in) char ** {
+  /* Check if is a list  */
+  if (PyList_Check($input)) {
+    int size = PyList_Size($input);
+    int i = 0;
+    $1 = (char **) malloc((size+1) * sizeof(char*));
+    for (i = 0; i < size; i++) {
+      PyObject *o = PyList_GetItem($input,i);
+      if (PyUnicode_Check(o)) {
+	// printf("100\n");
+	Py_ssize_t size_ = 0;
+	// printf("110\n");
+	const char *pc = PyUnicode_AsUTF8AndSize(o,&size_);
+	// $1[i] = PyUnicode_AsUTF8AndSize(o,&size_);
+	// printf("120\n");
+	string s(pc,size_);
+	// printf("130\n");
+	$1[i] = (char*) malloc((size_+1) * sizeof(char)); // Hello memory leak...
+	// printf("135\n");
+	size_t len = s.copy($1[i],size_);
+	// printf("140\n");
+      } else {
+        PyErr_SetString(PyExc_TypeError,"list must contain strings");
+        free($1);
+        return NULL;
+      }
+    }
+    $1[i] = 0;
+  } else if ($input == Py_None) {
+    $1 =  NULL;
+  } else {
+    PyErr_SetString(PyExc_TypeError,"not a list");
+    return NULL;
+  }
+}
+
+%typemap(freearg) char** {
+  free((char *) $1);
+}
+
+%typemap(out) char** {
+  int len;
+  int i;
+  len = 0;
+  while ($1[len]) len++;
+  $result = PyList_New(len);
+  for (i = 0; i < len; i++) {
+    PyList_SetItem($result, i, PyString_FromString($1[i]));
+  }
+}
+
+
+// Now a test function
+%inline %{
+  int print_args(char **argv) {
+    int i = 0;
+    while (argv[i]) {
+         printf("argv[%d] = %s\n", i,argv[i]);
+	 free(argv[i]); // Good bye, memory leak!
+         i++;
+    }
+    return i;
+}
+%}
+
 
 
 /****************/

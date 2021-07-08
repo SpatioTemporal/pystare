@@ -467,6 +467,10 @@ void _cmp_temporal(int64_t* indices1, int len1, int64_t* indices2, int len2, int
 	}
 }
 
+/*
+void fromStringTAI(char *tTAI_formatted, int64_t* in
+*/
+
 
 ////////////////////////////////////////////////////////////////////////////////
 //
