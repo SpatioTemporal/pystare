@@ -24,6 +24,7 @@
 #include <stdio.h>
 #include "STARE.h"
 #include "SpatialRange.h"
+#include "TemporalIndex.h"
 
 static STARE stare;
 
@@ -62,14 +63,17 @@ void _cmp_temporal(int64_t* indices1, int len1, int64_t* indices2, int len2, int
 
 void _from_tai_iso_strings(char **taiStrings, int64_t* out_array, int out_length);
 char** _to_tai_iso_strings(int64_t* indices, int len);
-// void _to_tai_iso_strings(int64_t* indices, int len, char **taiStrings);
-// void _to_tai_iso_strings(int64_t* indices, int len, vector<string>& taiStrings);
-// vector<string> _to_tai_iso_strings(int64_t* indices, int len);
-// void _to_tai_iso_strings(int64_t* indices, int len, vector<string>& taiStrings);
-  
+
 //void to_utc(int64_t* indices, int len, double* julian_day);
 //void from_tai(double* julian_day, int len, int64_t indices);
 //void to_tai(int64_t* indices, int len, double* julian_day);
+
+/*
+  From TemporalIndex.h
+ */
+void _scidbUpperBoundTAI(int64_t* indices, int len, int64_t* out_array, int out_length);
+void _scidbLowerBoundTAI(int64_t* indices, int len, int64_t* out_array, int out_length);
+/****/
 
 enum StareResultCase { SpatialIntervals, ArrayIndexSpatialValues };
 

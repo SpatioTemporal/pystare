@@ -328,19 +328,25 @@ namespace std {
 }
 
 %typemap(freearg) char** {
+    printf("freearg char**\n");
   free((char *) $1);
 }
 
 %typemap(out) char** {
+    printf("c**-000\n");
   int len;
   int i;
   len = 0;
   while ($1[len]) len++;
+    printf("c**-100 len = %d\n",len);
   $result = PyList_New(len);
+    printf("c**-200\n");
   for (i = 0; i < len; i++) {
-    // printf("out %d -> %s\n",i,$1[i]);
+    printf("out %d -> %s\n",i,$1[i]);
     PyList_SetItem($result, i, PyString_FromString($1[i]));
+    printf("c**-399\n");
   }
+    printf("c**-999\n");
 }
 
 
@@ -704,6 +710,27 @@ def from_tai_iso_strings(taiStrings):
 def to_tai_iso_strings(tIndices):
     taiStrings = _to_tai_iso_strings(tIndices)
     return taiStrings
+
+def to_temporal_triple_ms(tIndexValue):
+    ti_low = scidbLowerBoundMS(tIndexValue)
+    ti_hi  = scidbUpperBoundMS(tIndexValue)
+    return (ti_low,tIndexValue,ti_hi)
+
+def lowerBoundTAI(tIndexValue):
+    tret = tIndexValue.copy()
+    _scidbLowerBoundTAI(tIndexValue,tret)
+    return tret
+    
+def upperBoundTAI(tIndexValue):
+    tret = tIndexValue.copy()
+    _scidbUpperBoundTAI(tIndexValue,tret)
+    return tret
+
+def to_temporal_triple_tai(tIndexValue):
+    print('type ti: ',type(tIndexValue),tIndexValue)
+    ti_low = lowerBoundTAI(tIndexValue)
+    ti_hi  = upperBoundTAI(tIndexValue)
+    return (ti_low,tIndexValue,ti_hi)
     
 def intersects(indices1, indices2, method=0):
     # method = {'skiplist': 0, 'binsearch': 1, 'nn': 2}[method]

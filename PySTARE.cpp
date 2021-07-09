@@ -496,17 +496,38 @@ vector<string> _to_tai_iso_strings(int64_t* indices, int len ) {
 
 
 char **  _to_tai_iso_strings(int64_t* indices, int len ) {
+  printf("to_ti: len: %d\n",len);
   char ** taiStrings = (char **) malloc((len+1) * sizeof(char*));
+  for( int i = 0; i < len+1; ++ i ) {
+    taiStrings[i] = (char *) NULL;
+  }
+  printf("to_ti:100\n");
     int i = 0;
     while (i < len) {
+      printf("to_ti: i: %d\n",i);
+      printf("to_ti: x%016x",indices[i]);
       string s = toStringJulianTAI_ISO(indices[i]);
       taiStrings[i] = (char*)malloc((s.size()+1)*sizeof(char));
+      printf(" s.size: %d ",s.size());
       s.copy(taiStrings[i],s.size());
       taiStrings[i][s.size()] = '\0';
+      printf("%s\n",taiStrings[i]);
       i++;
     }
+    printf("to_ti:999\n");
     // i is the length
     return taiStrings;
+}
+
+void _scidbUpperBoundTAI(int64_t* indices, int len, int64_t* out_array, int out_length) {
+  for( int i=0; i < len; ++i ) {
+    out_array[i] = scidbUpperBoundTAI(indices[i]);
+  }
+}
+void _scidbLowerBoundTAI(int64_t* indices, int len, int64_t* out_array, int out_length) {
+  for( int i=0; i < len; ++i ) {
+    out_array[i] = scidbLowerBoundTAI(indices[i]);
+  }
 }
 
 
