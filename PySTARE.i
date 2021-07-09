@@ -4,10 +4,33 @@
 %{
   #define SWIG_FILE_WITH_INIT  /* To import_array() below */
   #include "PySTARE.h"
+  #include <vector>
+  #include <string>
 %}
 
 %include "numpy.i"
 
+%include "std_vector.i"
+%include "std_string.i"
+
+namespace std {
+%template(VectorString) vector< string >;    
+};
+
+/*
+%template(StringVector) std::vector< std::string >;
+*/
+
+/* %include "stl.i" */
+
+/*
+%template(StringVector) vector< string >;
+%template(StringVector) std::vector< std::string >;
+namespace std {
+%template(StringVector) std::vector<std::string>;
+%template(ConstCharVector) std::vector<const char*>;
+}
+*/
 
 %init %{
     import_array();
@@ -284,6 +307,7 @@
 	// printf("120\n");
 	string s(pc,size_);
 	// printf("130\n");
+	// It would be great to be able to just pass in the const char*.
 	$1[i] = (char*) malloc((size_+1) * sizeof(char)); // Hello memory leak...
 	// printf("135\n");
 	size_t len = s.copy($1[i],size_);
@@ -314,6 +338,7 @@
   while ($1[len]) len++;
   $result = PyList_New(len);
   for (i = 0; i < len; i++) {
+    // printf("out %d -> %s\n",i,$1[i]);
     PyList_SetItem($result, i, PyString_FromString($1[i]));
   }
 }
@@ -526,6 +551,7 @@
 %pythoncode %{
 import numpy
 from pkg_resources import get_distribution
+import re
   
 __version__ = get_distribution('pystare').version
 
@@ -656,8 +682,29 @@ def cmp_temporal(indices1, indices2):
 	out_length = len(indices1)*len(indices2)
 	cmp = numpy.zeros([out_length],dtype=numpy.int64)
 	_cmp_temporal(indices1,indices2,cmp)
-	return cmp   
+	return cmp
 
+
+def from_tai_iso_strings(taiStrings):
+    out_length = len(taiStrings)
+    tIndices   = numpy.zeros([out_length],dtype=numpy.int64)
+    p = re.compile('^([0-9]{4})-([0-2][0-9])-([0-3][0-9])T([0-2][0-9]):([0-5][0-9]):([0-5][0-9])(.([0-9]{3}))?(\s\(([0-9]+)\s([0-9]+)\)\s\(([0-9])\))?$')
+    for k in range(out_length):
+        s = p.match(taiStrings[k])
+        if s is not None:
+           if s.groups()[7] is None:
+              taiStrings[k] = taiStrings[k] + '.000 (48 48) (1)'
+           elif s.groups()[8] is None:
+              taiStrings[k] = taiStrings[k] + ' (48 48) (1)'
+        else:
+           raise ValueError('from_tai_iso_strings: unknown input "'+taiStrings[k]+'"')
+    _from_tai_iso_strings(taiStrings,tIndices)
+    return tIndices
+
+def to_tai_iso_strings(tIndices):
+    taiStrings = _to_tai_iso_strings(tIndices)
+    return taiStrings
+    
 def intersects(indices1, indices2, method=0):
     # method = {'skiplist': 0, 'binsearch': 1, 'nn': 2}[method]
     return _intersects(indices1, indices2, method).astype(numpy.bool)

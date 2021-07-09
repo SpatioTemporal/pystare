@@ -60,10 +60,16 @@ void from_utc(int64_t *datetime, int len, int64_t *indices_out, int forward_reso
 void to_utc_approximate(int64_t* indices, int len, int64_t* datetime_out);
 void _cmp_temporal(int64_t* indices1, int len1, int64_t* indices2, int len2, int64_t* cmp, int len12);
 
+void _from_tai_iso_strings(char **taiStrings, int64_t* out_array, int out_length);
+char** _to_tai_iso_strings(int64_t* indices, int len);
+// void _to_tai_iso_strings(int64_t* indices, int len, char **taiStrings);
+// void _to_tai_iso_strings(int64_t* indices, int len, vector<string>& taiStrings);
+// vector<string> _to_tai_iso_strings(int64_t* indices, int len);
+// void _to_tai_iso_strings(int64_t* indices, int len, vector<string>& taiStrings);
+  
 //void to_utc(int64_t* indices, int len, double* julian_day);
 //void from_tai(double* julian_day, int len, int64_t indices);
 //void to_tai(int64_t* indices, int len, double* julian_day);
-
 
 enum StareResultCase { SpatialIntervals, ArrayIndexSpatialValues };
 

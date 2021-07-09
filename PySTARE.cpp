@@ -471,6 +471,46 @@ void _cmp_temporal(int64_t* indices1, int len1, int64_t* indices2, int len2, int
 void fromStringTAI(char *tTAI_formatted, int64_t* in
 */
 
+void _from_tai_iso_strings(char ** taiStrings, int64_t* out_array, int out_length) {
+    int i = 0;
+    while (taiStrings[i]) {
+      out_array[i] = fromStringJulianTAI_ISO(taiStrings[i]);
+	 free(taiStrings[i]); // Good bye, memory leak!
+         i++;
+    }
+    // i is the length
+    return;
+}
+
+/*
+vector<string> _to_tai_iso_strings(int64_t* indices, int len ) {
+    vector<string> taiStrings(len);
+    int i = 0;
+    while (i < len) {
+      taiStrings[i] = toStringJulianTAI_ISO(indices[i]);
+      i++;
+    }
+    return taiStrings;
+}
+*/
+
+
+char **  _to_tai_iso_strings(int64_t* indices, int len ) {
+  char ** taiStrings = (char **) malloc((len+1) * sizeof(char*));
+    int i = 0;
+    while (i < len) {
+      string s = toStringJulianTAI_ISO(indices[i]);
+      taiStrings[i] = (char*)malloc((s.size()+1)*sizeof(char));
+      s.copy(taiStrings[i],s.size());
+      taiStrings[i][s.size()] = '\0';
+      i++;
+    }
+    // i is the length
+    return taiStrings;
+}
+
+
+
 
 ////////////////////////////////////////////////////////////////////////////////
 //
