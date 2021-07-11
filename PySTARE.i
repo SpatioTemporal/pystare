@@ -738,14 +738,16 @@ def upperBoundMS(tIndexValue):
     return tret
     
 def to_temporal_triple_tai(tIndexValue):
-    print('type ti: ',type(tIndexValue),tIndexValue)
+    print('type ti tai: ',type(tIndexValue),tIndexValue,hex(tIndexValue[0]))
     ti_low = lowerBoundTAI(tIndexValue)
+    print('ti_low: ',hex(ti_low[0]))
     ti_hi  = upperBoundTAI(tIndexValue)
     return (ti_low,tIndexValue,ti_hi)
 
 def to_temporal_triple_ms(tIndexValue):
-    print('type ti: ',type(tIndexValue),tIndexValue)
+    print('type ti ms : ',type(tIndexValue),tIndexValue,hex(tIndexValue[0]))
     ti_low = lowerBoundMS(tIndexValue)
+    print('ti_low: ',hex(ti_low[0]))
     ti_hi  = upperBoundMS(tIndexValue)
     return (ti_low,tIndexValue,ti_hi)
     

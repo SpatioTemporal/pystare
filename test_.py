@@ -42,7 +42,27 @@ if __name__ == '__main__':
         res = pystare.to_tai_iso_strings(tivs)
         print(res)
 
+    print()
+    tiv    = 2256562898056779093
+    tiv_lb_ms = pystare.lowerBoundMS(np.array([tiv],dtype=np.int64))
+    tiv_lb_tai = pystare.lowerBoundTAI(np.array([tiv],dtype=np.int64))
+    print('tiv type: ',type(tiv))
+    print('lb type ms:  ',type(tiv_lb_ms))
+
+    print('tiv:    ',hex(tiv))
+    print('lb ms:  ',list(map(hex,tiv_lb_ms)))
+    print('lb tai: ',list(map(hex,tiv_lb_tai)))
+    print('tiv:    ',pystare.to_tai_iso_strings([tiv]))
+    print('lb ms:  ',pystare.to_tai_iso_strings(tiv_lb_ms))
+    print('lb tai: ',pystare.to_tai_iso_strings(tiv_lb_tai))
+    triple = pystare.to_temporal_triple_tai(np.array([tiv],dtype=np.int64))
+    print('trp:  ',triple)
+    print('   :  ',list(map(lambda x: hex(x[0]),triple)))
+    print(' iso: ',list(map(pystare.to_tai_iso_strings,triple)))
+    print(' iso: ',pystare.to_tai_iso_strings(np.array(triple).flatten()))
+
     triple0 = pystare.from_tai_iso_strings(["2004-04-12T12:00:00","2004-04-13T12:00:00","2004-04-14T12:00:00"])
+    print()
     print('triple0: ',triple0)
     print('    :    ',pystare.to_tai_iso_strings(triple0))
     tiv0    = pystare.from_temporal_triple(triple0)
@@ -56,6 +76,7 @@ if __name__ == '__main__':
     # print('    :    ',pystare.to_tai_iso_strings(pystare.to_temporal_triple_tai(tiv0).flatten()))
     
     triple1 = pystare.from_tai_iso_strings(["2004-04-13T00:00:00","2004-04-14T00:00:00","2004-04-15T00:00:00"])
+    print()    
     print('triple1: ',triple1)
     print('    :    ',pystare.to_tai_iso_strings(triple1))
     
@@ -68,7 +89,8 @@ if __name__ == '__main__':
     tmp = np.array(pystare.to_temporal_triple_tai(tiv1),dtype=np.int64).flatten()
     print('    :     ',tmp)
     print('    :    ',pystare.to_tai_iso_strings(tmp))
-    
+
+    print()
     union01     = pystare.temporalValueUnionIfOverlap(tiv0,tiv1)
     print('u01: ',union01)
     
