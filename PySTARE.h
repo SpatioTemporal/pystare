@@ -78,7 +78,7 @@ void _scidbOverlap                            (int64_t* indices1, int len1, int6
  */
 void _scidbUpperBoundTAI(int64_t* indices, int len, int64_t* out_array, int out_length);
 void _scidbLowerBoundTAI(int64_t* indices, int len, int64_t* out_array, int out_length);
-void _scidbNewTemporalValue(int64_t* indices, int len, int64_t* new_indices);
+void _scidbNewTemporalValue(int64_t* indices, int len, int64_t* new_indices, bool include_bounds);
 /****/
 
 enum StareResultCase { SpatialIntervals, ArrayIndexSpatialValues };

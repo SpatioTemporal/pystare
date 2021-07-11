@@ -17,7 +17,7 @@ if __name__ == '__main__':
     print('tais:      ',tais)
     # print('list tais: ',list(tais))
     t_triple = pystare.to_temporal_triple_tai(tivs)
-    print('t_triple: ',t_triple)
+    print('t_triple: ',t_triple,type(t_triple))
     for i in range(len(t_triple[0])):
         print(     hex(t_triple[0][i])
                   ,hex(t_triple[1][i])
@@ -44,15 +44,30 @@ if __name__ == '__main__':
 
     triple0 = pystare.from_tai_iso_strings(["2004-04-12T12:00:00","2004-04-13T12:00:00","2004-04-14T12:00:00"])
     print('triple0: ',triple0)
+    print('    :    ',pystare.to_tai_iso_strings(triple0))
     tiv0    = pystare.from_temporal_triple(triple0)
-    print('tiv0:    ',tiv0)
+    print('tiv0:    ',tiv0,type(tiv0),tiv0.shape)
     print('    :    ',pystare.to_tai_iso_strings(tiv0))
+    try: del tmp
+    except: pass
+    tmp = np.array(pystare.to_temporal_triple_tai(tiv0),dtype=np.int64).flatten()
+    print('    :     ',tmp)
+    print('    :    ',pystare.to_tai_iso_strings(tmp))
+    # print('    :    ',pystare.to_tai_iso_strings(pystare.to_temporal_triple_tai(tiv0).flatten()))
     
     triple1 = pystare.from_tai_iso_strings(["2004-04-13T00:00:00","2004-04-14T00:00:00","2004-04-15T00:00:00"])
     print('triple1: ',triple1)
+    print('    :    ',pystare.to_tai_iso_strings(triple1))
+    
     tiv1    = pystare.from_temporal_triple(triple1)
     print('tiv1:    ',tiv1)
     print('    :    ',pystare.to_tai_iso_strings(tiv1))
+    # print('    :    ',pystare.to_tai_iso_strings(pystare.to_temporal_triple_tai(tiv1)))
+    try: del tmp
+    except: pass
+    tmp = np.array(pystare.to_temporal_triple_tai(tiv1),dtype=np.int64).flatten()
+    print('    :     ',tmp)
+    print('    :    ',pystare.to_tai_iso_strings(tmp))
     
     union01     = pystare.temporalValueUnionIfOverlap(tiv0,tiv1)
     print('u01: ',union01)

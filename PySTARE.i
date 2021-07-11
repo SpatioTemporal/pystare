@@ -749,9 +749,11 @@ def to_temporal_triple_ms(tIndexValue):
     ti_hi  = upperBoundMS(tIndexValue)
     return (ti_low,tIndexValue,ti_hi)
     
-def from_temporal_triple(triple):
+def from_temporal_triple(triple,include_bounds=True):
     "Calculate a temporal index value from a low, middle, and high tiv. Negative tiv are not used."
-    return _scidbNewTemporalValue(numpy.array(triple,dtype=numpy.int64))
+    tiv = numpy.zeros([1],dtype=numpy.int64)
+    tiv[0] = _scidbNewTemporalValue(numpy.array(triple,dtype=numpy.int64),include_bounds)[0]
+    return tiv
 
 def temporalValueIntersectionIfOverlap  (indices1, indices2):
     "Calculate intersection temporal index value element-by-element if they overlap."

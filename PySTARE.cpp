@@ -522,8 +522,8 @@ void _scidbLowerBoundMS(int64_t* indices, int len, int64_t* out_array, int out_l
     out_array[i] = scidbLowerBoundMS(indices[i]);
   }
 }
-void _scidbNewTemporalValue(int64_t* indices, int len, int64_t* new_indices) {
-  new_indices[0] = scidbNewTemporalValue(indices[0],indices[1],indices[2]);
+void _scidbNewTemporalValue(int64_t* indices, int len, int64_t* new_indices, bool include_bounds) {
+  new_indices[0] = scidbNewTemporalValue(indices[0],indices[1],indices[2],include_bounds);
 }
 
 void _scidbTemporalValueIntersectionIfOverlap (int64_t* indices1, int len1, int64_t* indices2, int len2, int64_t* cmp, int len12){
