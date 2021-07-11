@@ -328,25 +328,25 @@ namespace std {
 }
 
 %typemap(freearg) char** {
-    printf("freearg char**\n");
+  // printf("freearg char**\n");
   free((char *) $1);
 }
 
 %typemap(out) char** {
-    printf("c**-000\n");
+    // printf("c**-000\n");
   int len;
   int i;
   len = 0;
   while ($1[len]) len++;
-    printf("c**-100 len = %d\n",len);
+    // printf("c**-100 len = %d\n",len);
   $result = PyList_New(len);
-    printf("c**-200\n");
+    // printf("c**-200\n");
   for (i = 0; i < len; i++) {
-    printf("out %d -> %s\n",i,$1[i]);
+    // printf("out %d -> %s\n",i,$1[i]);
     PyList_SetItem($result, i, PyString_FromString($1[i]));
-    printf("c**-399\n");
+    // printf("c**-399\n");
   }
-    printf("c**-999\n");
+    // printf("c**-999\n");
 }
 
 
@@ -520,7 +520,8 @@ namespace std {
 
 %apply (int64_t* in_array, int length, int64_t* out_array) {
   (int64_t* datetime, int len,  int64_t* indices_out),
-  (int64_t* indices, int len,  int64_t* datetime_out)
+  (int64_t* indices, int len,  int64_t* datetime_out),
+  (int64_t* indices, int len,  int64_t* new_indices)
 }
 
 %apply (int64_t* in_array, int length, double* out_array) {
@@ -726,11 +727,63 @@ def upperBoundTAI(tIndexValue):
     _scidbUpperBoundTAI(tIndexValue,tret)
     return tret
 
+def lowerBoundMS(tIndexValue):
+    tret = tIndexValue.copy()
+    _scidbLowerBoundMS(tIndexValue,tret)
+    return tret
+    
+def upperBoundMS(tIndexValue):
+    tret = tIndexValue.copy()
+    _scidbUpperBoundMS(tIndexValue,tret)
+    return tret
+    
 def to_temporal_triple_tai(tIndexValue):
     print('type ti: ',type(tIndexValue),tIndexValue)
     ti_low = lowerBoundTAI(tIndexValue)
     ti_hi  = upperBoundTAI(tIndexValue)
     return (ti_low,tIndexValue,ti_hi)
+
+def to_temporal_triple_ms(tIndexValue):
+    print('type ti: ',type(tIndexValue),tIndexValue)
+    ti_low = lowerBoundMS(tIndexValue)
+    ti_hi  = upperBoundMS(tIndexValue)
+    return (ti_low,tIndexValue,ti_hi)
+    
+def from_temporal_triple(triple):
+    "Calculate a temporal index value from a low, middle, and high tiv. Negative tiv are not used."
+    return _scidbNewTemporalValue(numpy.array(triple,dtype=numpy.int64))
+
+def temporalValueIntersectionIfOverlap  (indices1, indices2):
+    "Calculate intersection temporal index value element-by-element if they overlap."
+    if indices1.shape != indices2.shape:
+        raise ValueError("Arrays being compared must have the same shape.")
+    cmp = numpy.zeros(indices1.shape,dtype=numpy.int64)
+    _scidbTemporalValueIntersectionIfOverlap (indices1, indices2, cmp)
+    return 
+
+def temporalValueUnionIfOverlap  (indices1, indices2):
+    "Calculate union temporal index value element-by-element if they overlap."
+    if indices1.shape != indices2.shape:
+        raise ValueError("Arrays being compared must have the same shape.")
+    cmp = numpy.zeros(indices1.shape,dtype=numpy.int64)
+    _scidbTemporalValueUnionIfOverlap (indices1, indices2, cmp)
+    return
+
+def temporalOverlapTAI  (indices1, indices2):
+    "Test for overlap, element by element. 0 if no overlap. Uses 'TAI'."
+    if indices1.shape != indices2.shape:
+        raise ValueError("Arrays being compared must have the same shape.")
+    cmp = numpy.zeros(indices1.shape,dtype=numpy.int)
+    _scidbOverlapTAI (indices1, indices2, cmp)
+    return cmp
+    
+def temporalOverlap  (indices1, indices2):
+    "Test for overlap, element by element. 0 if no overlap. Uses approximate millisecond calculation."
+    if indices1.shape != indices2.shape:
+        raise ValueError("Arrays being compared must have the same shape.")
+    cmp = numpy.zeros(indices1.shape,dtype=numpy.int)
+    _scidbOverlap (indices1, indices2, cmp)
+    return cmp
     
 def intersects(indices1, indices2, method=0):
     # method = {'skiplist': 0, 'binsearch': 1, 'nn': 2}[method]

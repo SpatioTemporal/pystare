@@ -467,10 +467,6 @@ void _cmp_temporal(int64_t* indices1, int len1, int64_t* indices2, int len2, int
 	}
 }
 
-/*
-void fromStringTAI(char *tTAI_formatted, int64_t* in
-*/
-
 void _from_tai_iso_strings(char ** taiStrings, int64_t* out_array, int out_length) {
     int i = 0;
     while (taiStrings[i]) {
@@ -482,39 +478,26 @@ void _from_tai_iso_strings(char ** taiStrings, int64_t* out_array, int out_lengt
     return;
 }
 
-/*
-vector<string> _to_tai_iso_strings(int64_t* indices, int len ) {
-    vector<string> taiStrings(len);
-    int i = 0;
-    while (i < len) {
-      taiStrings[i] = toStringJulianTAI_ISO(indices[i]);
-      i++;
-    }
-    return taiStrings;
-}
-*/
-
-
 char **  _to_tai_iso_strings(int64_t* indices, int len ) {
-  printf("to_ti: len: %d\n",len);
+  // printf("to_ti: len: %d\n",len);
   char ** taiStrings = (char **) malloc((len+1) * sizeof(char*));
   for( int i = 0; i < len+1; ++ i ) {
     taiStrings[i] = (char *) NULL;
   }
-  printf("to_ti:100\n");
+  // printf("to_ti:100\n");
     int i = 0;
     while (i < len) {
-      printf("to_ti: i: %d\n",i);
-      printf("to_ti: x%016x",indices[i]);
+      // printf("to_ti: i: %d\n",i);
+      // printf("to_ti: x%016x",indices[i]);
       string s = toStringJulianTAI_ISO(indices[i]);
       taiStrings[i] = (char*)malloc((s.size()+1)*sizeof(char));
-      printf(" s.size: %d ",s.size());
+      // printf(" s.size: %d ",s.size());
       s.copy(taiStrings[i],s.size());
       taiStrings[i][s.size()] = '\0';
-      printf("%s\n",taiStrings[i]);
+      // printf("%s\n",taiStrings[i]);
       i++;
     }
-    printf("to_ti:999\n");
+    // printf("to_ti:999\n");
     // i is the length
     return taiStrings;
 }
@@ -529,9 +512,40 @@ void _scidbLowerBoundTAI(int64_t* indices, int len, int64_t* out_array, int out_
     out_array[i] = scidbLowerBoundTAI(indices[i]);
   }
 }
+void _scidbUpperBoundMS(int64_t* indices, int len, int64_t* out_array, int out_length) {
+  for( int i=0; i < len; ++i ) {
+    out_array[i] = scidbUpperBoundMS(indices[i]);
+  }
+}
+void _scidbLowerBoundMS(int64_t* indices, int len, int64_t* out_array, int out_length) {
+  for( int i=0; i < len; ++i ) {
+    out_array[i] = scidbLowerBoundMS(indices[i]);
+  }
+}
+void _scidbNewTemporalValue(int64_t* indices, int len, int64_t* new_indices) {
+  new_indices[0] = scidbNewTemporalValue(indices[0],indices[1],indices[2]);
+}
 
-
-
+void _scidbTemporalValueIntersectionIfOverlap (int64_t* indices1, int len1, int64_t* indices2, int len2, int64_t* cmp, int len12){
+  for( int i = 0; i < len1; ++i ) {
+    cmp[i] = scidbTemporalValueIntersectionIfOverlap(indices1[i],indices2[i]);
+  }
+}
+void _scidbTemporalValueUnionIfOverlap        (int64_t* indices1, int len1, int64_t* indices2, int len2, int64_t* cmp, int len12){
+  for( int i = 0; i < len1; ++i ) {
+    cmp[i] = scidbTemporalValueUnionIfOverlap(indices1[i],indices2[i]);
+  }
+}
+void _scidbOverlapTAI                         (int64_t* indices1, int len1, int64_t* indices2, int len2, int* intersects){
+  for( int i = 0; i < len1; ++i ) {
+    intersects[i] = scidbOverlapTAI(indices1[i],indices2[i]) ? 1 : 0;
+  }
+}
+void _scidbOverlap                            (int64_t* indices1, int len1, int64_t* indices2, int len2, int* intersects){
+  for( int i = 0; i < len1; ++i ) {
+    intersects[i] = scidbOverlap(indices1[i],indices2[i]) ? 1 : 0;
+  }
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 //

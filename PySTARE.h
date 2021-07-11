@@ -64,6 +64,11 @@ void _cmp_temporal(int64_t* indices1, int len1, int64_t* indices2, int len2, int
 void _from_tai_iso_strings(char **taiStrings, int64_t* out_array, int out_length);
 char** _to_tai_iso_strings(int64_t* indices, int len);
 
+void _scidbTemporalValueIntersectionIfOverlap (int64_t* indices1, int len1, int64_t* indices2, int len2, int64_t* cmp, int len12);
+void _scidbTemporalValueUnionIfOverlap        (int64_t* indices1, int len1, int64_t* indices2, int len2, int64_t* cmp, int len12);
+void _scidbOverlapTAI                         (int64_t* indices1, int len1, int64_t* indices2, int len2, int* intersects);
+void _scidbOverlap                            (int64_t* indices1, int len1, int64_t* indices2, int len2, int* intersects);
+
 //void to_utc(int64_t* indices, int len, double* julian_day);
 //void from_tai(double* julian_day, int len, int64_t indices);
 //void to_tai(int64_t* indices, int len, double* julian_day);
@@ -73,6 +78,7 @@ char** _to_tai_iso_strings(int64_t* indices, int len);
  */
 void _scidbUpperBoundTAI(int64_t* indices, int len, int64_t* out_array, int out_length);
 void _scidbLowerBoundTAI(int64_t* indices, int len, int64_t* out_array, int out_length);
+void _scidbNewTemporalValue(int64_t* indices, int len, int64_t* new_indices);
 /****/
 
 enum StareResultCase { SpatialIntervals, ArrayIndexSpatialValues };

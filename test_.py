@@ -42,3 +42,24 @@ if __name__ == '__main__':
         res = pystare.to_tai_iso_strings(tivs)
         print(res)
 
+    triple0 = pystare.from_tai_iso_strings(["2004-04-12T12:00:00","2004-04-13T12:00:00","2004-04-14T12:00:00"])
+    print('triple0: ',triple0)
+    tiv0    = pystare.from_temporal_triple(triple0)
+    print('tiv0:    ',tiv0)
+    print('    :    ',pystare.to_tai_iso_strings(tiv0))
+    
+    triple1 = pystare.from_tai_iso_strings(["2004-04-13T00:00:00","2004-04-14T00:00:00","2004-04-15T00:00:00"])
+    print('triple1: ',triple1)
+    tiv1    = pystare.from_temporal_triple(triple1)
+    print('tiv1:    ',tiv1)
+    print('    :    ',pystare.to_tai_iso_strings(tiv1))
+    
+    union01     = pystare.temporalValueUnionIfOverlap(tiv0,tiv1)
+    print('u01: ',union01)
+    
+    intersect01 = pystare.temporalValueIntersectionIfOverlap(tiv0,tiv1)
+    print('i01: ',intersect01)
+
+
+
+    
