@@ -91,11 +91,18 @@ if __name__ == '__main__':
     print('    :    ',pystare.to_tai_iso_strings(tmp))
 
     print()
+    overlap     = pystare.temporalOverlap(tiv0,tiv1)
+    print('overlap:  ',overlap)
+
     union01     = pystare.temporalValueUnionIfOverlap(tiv0,tiv1)
+    print()
     print('u01: ',union01)
+    print('u01: ',pystare.to_tai_iso_strings(union01))
     
     intersect01 = pystare.temporalValueIntersectionIfOverlap(tiv0,tiv1)
+    print()
     print('i01: ',intersect01)
+    print('i01: ',pystare.to_tai_iso_strings(intersect01))
 
 
 

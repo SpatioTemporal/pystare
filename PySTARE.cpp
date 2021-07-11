@@ -536,14 +536,14 @@ void _scidbTemporalValueUnionIfOverlap        (int64_t* indices1, int len1, int6
     cmp[i] = scidbTemporalValueUnionIfOverlap(indices1[i],indices2[i]);
   }
 }
-void _scidbOverlapTAI                         (int64_t* indices1, int len1, int64_t* indices2, int len2, int* intersects){
+void _scidbOverlapTAI                         (int64_t* indices1, int len1, int64_t* indices2, int len2, int64_t* cmp, int len12){
   for( int i = 0; i < len1; ++i ) {
-    intersects[i] = scidbOverlapTAI(indices1[i],indices2[i]) ? 1 : 0;
+    cmp[i] = scidbOverlapTAI(indices1[i],indices2[i]) ? 1 : 0;
   }
 }
-void _scidbOverlap                            (int64_t* indices1, int len1, int64_t* indices2, int len2, int* intersects){
+void _scidbOverlap                            (int64_t* indices1, int len1, int64_t* indices2, int len2, int64_t* cmp, int len12){
   for( int i = 0; i < len1; ++i ) {
-    intersects[i] = scidbOverlap(indices1[i],indices2[i]) ? 1 : 0;
+    cmp[i] = scidbOverlap(indices1[i],indices2[i]) ? 1 : 0;
   }
 }
 

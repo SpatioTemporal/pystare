@@ -66,8 +66,8 @@ char** _to_tai_iso_strings(int64_t* indices, int len);
 
 void _scidbTemporalValueIntersectionIfOverlap (int64_t* indices1, int len1, int64_t* indices2, int len2, int64_t* cmp, int len12);
 void _scidbTemporalValueUnionIfOverlap        (int64_t* indices1, int len1, int64_t* indices2, int len2, int64_t* cmp, int len12);
-void _scidbOverlapTAI                         (int64_t* indices1, int len1, int64_t* indices2, int len2, int* intersects);
-void _scidbOverlap                            (int64_t* indices1, int len1, int64_t* indices2, int len2, int* intersects);
+void _scidbOverlapTAI                         (int64_t* indices1, int len1, int64_t* indices2, int len2, int64_t* cmp, int len12);
+void _scidbOverlap                            (int64_t* indices1, int len1, int64_t* indices2, int len2, int64_t* cmp, int len12);
 
 //void to_utc(int64_t* indices, int len, double* julian_day);
 //void from_tai(double* julian_day, int len, int64_t indices);

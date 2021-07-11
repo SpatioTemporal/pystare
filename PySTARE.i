@@ -763,7 +763,7 @@ def temporalValueIntersectionIfOverlap  (indices1, indices2):
         raise ValueError("Arrays being compared must have the same shape.")
     cmp = numpy.zeros(indices1.shape,dtype=numpy.int64)
     _scidbTemporalValueIntersectionIfOverlap (indices1, indices2, cmp)
-    return 
+    return cmp
 
 def temporalValueUnionIfOverlap  (indices1, indices2):
     "Calculate union temporal index value element-by-element if they overlap."
@@ -771,13 +771,13 @@ def temporalValueUnionIfOverlap  (indices1, indices2):
         raise ValueError("Arrays being compared must have the same shape.")
     cmp = numpy.zeros(indices1.shape,dtype=numpy.int64)
     _scidbTemporalValueUnionIfOverlap (indices1, indices2, cmp)
-    return
+    return cmp
 
 def temporalOverlapTAI  (indices1, indices2):
     "Test for overlap, element by element. 0 if no overlap. Uses 'TAI'."
     if indices1.shape != indices2.shape:
         raise ValueError("Arrays being compared must have the same shape.")
-    cmp = numpy.zeros(indices1.shape,dtype=numpy.int)
+    cmp = numpy.zeros(indices1.shape,dtype=numpy.int64)
     _scidbOverlapTAI (indices1, indices2, cmp)
     return cmp
     
@@ -785,7 +785,7 @@ def temporalOverlap  (indices1, indices2):
     "Test for overlap, element by element. 0 if no overlap. Uses approximate millisecond calculation."
     if indices1.shape != indices2.shape:
         raise ValueError("Arrays being compared must have the same shape.")
-    cmp = numpy.zeros(indices1.shape,dtype=numpy.int)
+    cmp = numpy.zeros(indices1.shape,dtype=numpy.int64)
     _scidbOverlap (indices1, indices2, cmp)
     return cmp
     
