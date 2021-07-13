@@ -425,6 +425,46 @@ void from_utc(int64_t *datetime, int len, int64_t *indices_out
 //    cout << endl << flush;
 }
 
+void from_utc_variable(int64_t *datetime, int len, int64_t *indices_out, int64_t* forward_resolution, int lenf, int64_t* reverse_resolution, int lenr) {
+	// datetime is in ms (numpy default).
+	// double jd19700101_erfa = 2440587.5;
+
+//    cout << "from_utc resolution: " << resolution << endl << flush;
+	// cout << "from_utc" << endl << flush;
+    int type = 1;
+    for (int i=0; i<len; i++) {
+    	int64_t idt = datetime[i]/1000;
+        indices_out[i] = stare.ValueFromUTC((time_t&)idt
+					    , forward_resolution[i]
+					    , reverse_resolution[i]
+					    , type);
+        idt = datetime[i]%1000;
+        stare.tIndex.set_millisecond(idt);
+        indices_out[i] = stare.getArrayIndexTemporalValue();
+        /*
+        double jd = stare.toJulianDayUTC();
+        double delta = jd - 2440587.5;
+        double iDelta = delta*86400.0;
+        cout
+		<< setprecision(16)
+		<< dec << i << " dt,jd,delta,iDelta "
+		<< datetime[i] << " "
+		<< setw(16) << setfill('0')	<< hex
+		<< indices_out[i] << " "
+		 << dec
+		 << setw(20) << setfill(' ') << scientific
+		 << jd << " "
+		 << setw(20) << setfill(' ') << scientific
+	     << delta << " "
+		 << setw(20) << setfill(' ') << scientific
+		 << iDelta << " "
+		 << stare.tIndex.toStringJulianTAI()
+		 << endl << flush;
+		 */
+    }
+//    cout << endl << flush;
+}
+
 void to_utc_approximate(int64_t *indices, int len, int64_t *datetime_out) {
 	double jd19700101_erfa = 2440587.5;
 //	cout << "to_utc_approximate" << endl << flush;

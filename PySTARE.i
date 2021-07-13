@@ -495,9 +495,10 @@ namespace std {
     (int64_t* range_indices, int len_ri),
     (int64_t* result_size, int len_rs),
     (int64_t* out_array, int out_length),
-    (int64_t* cmp, int len12)
+    (int64_t* cmp, int len12),
+    (int64_t* forward_resolution, int lenf),
+    (int64_t* reverse_resolution, int lenr)
 }
-
 
 %apply (double * INPLACE_ARRAY1, int DIM1) {
 	(double* triangle_info_lats, int dmy1),
@@ -738,16 +739,16 @@ def upperBoundMS(tIndexValue):
     return tret
     
 def to_temporal_triple_tai(tIndexValue):
-    print('type ti tai: ',type(tIndexValue),tIndexValue,hex(tIndexValue[0]))
+    # print('type ti tai: ',type(tIndexValue),tIndexValue,hex(tIndexValue[0]))
     ti_low = lowerBoundTAI(tIndexValue)
-    print('ti_low: ',hex(ti_low[0]))
+    # print('ti_low: ',hex(ti_low[0]))
     ti_hi  = upperBoundTAI(tIndexValue)
     return (ti_low,tIndexValue,ti_hi)
 
 def to_temporal_triple_ms(tIndexValue):
-    print('type ti ms : ',type(tIndexValue),tIndexValue,hex(tIndexValue[0]))
+    # print('type ti ms : ',type(tIndexValue),tIndexValue,hex(tIndexValue[0]))
     ti_low = lowerBoundMS(tIndexValue)
-    print('ti_low: ',hex(ti_low[0]))
+    # print('ti_low: ',hex(ti_low[0]))
     ti_hi  = upperBoundMS(tIndexValue)
     return (ti_low,tIndexValue,ti_hi)
     
