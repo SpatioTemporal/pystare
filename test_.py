@@ -126,18 +126,23 @@ class MainTest(unittest.TestCase):
                                        22,
                                        22], dtype=np.int64)
     
-        
+        global_flag = False # True
         del tivs
         tivs = pystare.from_utc_variable(datetime.astype(np.int64),forward_res,reverse_res)
-        print_(('tivs iso:    ',pystare.to_tai_iso_strings(tivs)))
+        print_(('tivs iso:    ',pystare.to_tai_iso_strings(tivs)),flag=global_flag)
         dt_utc = np.array(pystare.to_utc_approximate(tivs),dtype='datetime64[ms]')
-        print_(('dt_utc:      ',dt_utc.tolist()))
-        print_(('dt_utc:      ',[np.datetime_as_string(i) for i in dt_utc]))
-        print_(('dt_utc orig: ',[np.datetime_as_string(i) for i in datetime]))
-        print_(('tivs tai:    ',[i[0:-12] for i in pystare.to_tai_iso_strings(tivs)]))
+        print_(('dt_utc:      ',dt_utc.tolist()),flag=global_flag)
+        print_(('dt_utc:      ',[np.datetime_as_string(i) for i in dt_utc]),flag=global_flag)
+        print_(('dt_utc orig: ',[np.datetime_as_string(i) for i in datetime]),flag=global_flag)
+        print_(('tivs tai:    ',[i[0:-12] for i in pystare.to_tai_iso_strings(tivs)]),flag=global_flag)
     
         for s in zip([np.datetime_as_string(i) for i in datetime],[np.datetime_as_string(i) for i in dt_utc]):
             self.assertEqual(s[0],s[1])
 
+        # Regression
+        for s in zip(['1970-01-01T00:00:08.000', '2000-01-01T00:00:32.000', '2002-02-03T13:56:35.172', '2016-01-05T17:26:36.172'],
+                         pystare.to_tai_iso_strings(tivs)):
+            self.assertEqual(s[0],s[1][0:-12])
+            
 if __name__ == '__main__':
     unittest.main()
