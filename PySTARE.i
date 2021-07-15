@@ -805,7 +805,7 @@ def intersect(indices1, indices2, multiresolution=True):
       _intersect_multiresolution(indices1, indices2, intersected)
     else:
       _intersect(indices1, indices2, intersected)
-      print('isect:  ',intersected[0:20])
+      # print('isect:  ',intersected[0:20])
 
     # Argmax returns 0 if intersected is non-negative, and not len(intersected)+1
     # It's supposed to be the first index of the max val, but if all false...
@@ -813,9 +813,9 @@ def intersect(indices1, indices2, multiresolution=True):
     if endarg == 0:
       if intersected[0] >= 0:
          endarg = len(intersected)
-    print('endarg: ',endarg)
+    # print('endarg: ',endarg)
     intersected = intersected[:endarg]
-    print('isect- ',intersected)
+    # print('isect- ',intersected)
     return intersected
 
 def shiftarg_lon(lon):

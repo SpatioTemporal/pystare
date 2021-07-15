@@ -257,22 +257,28 @@ void _intersect(int64_t* indices1, int len1, int64_t* indices2, int len2, int64_
   SpatialRange *ri = sr_intersect(r1, r2, false);
   STARE_SpatialIntervals result_intervals = ri->toSpatialIntervals();
   delete ri;
+#if 0
   cout << "_intersect:result_intervals" << endl << flush;
   for(int i=0; i < result_intervals.size(); ++i) {
     if ( i < 10 ) {
       cout << "_intersect:result_intervals: " << setw(4) << dec << i << " " << setw(16) << hex << result_intervals[i] << endl << flush;
     }
   }
-  cout << "_intersect:expandIntervals" << endl << flush;
+#endif
+  //  cout << "_intersect:expandIntervals" << endl << flush;
   STARE_ArrayIndexSpatialValues result = expandIntervals(result_intervals);
-  cout << "_intersect:size" << endl << flush;
+  // cout << "_intersect:size" << endl << flush;
   int leni_ = result.size();
+#if 0
   cout << "_intersect:leni_" << " " << leni << endl << flush;
-  cout << "_intersect:result" << endl << flush;	
+  cout << "_intersect:result" << endl << flush;
+#endif
   for(int i=0; i<leni_; ++i) {
+#if 0
     if( i < 10 ) {
       cout << "_intersect:result: " << setw(4) << dec << i << " " << setw(16) << hex << result[i] << endl << flush;
     }
+#endif
     intersection[i] = result[i];
   }
 }
