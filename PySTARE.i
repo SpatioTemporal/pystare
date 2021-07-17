@@ -501,8 +501,10 @@ namespace std {
 }
 
 %apply (double * INPLACE_ARRAY1, int DIM1) {
-	(double* triangle_info_lats, int dmy1),
-	(double* triangle_info_lons, int dmy2)
+  (double* triangle_info_lats, int dmy1),
+  (double* triangle_info_lons, int dmy2),
+  (double* d1, int nd1),
+  (double* d2, int nd2)
 }
 
 # %apply (int64_t * ARGOUT_ARRAY1, int DIM1 ) {
@@ -789,6 +791,28 @@ def temporalOverlap  (indices1, indices2):
     cmp = numpy.zeros(indices1.shape,dtype=numpy.int64)
     _scidbOverlap (indices1, indices2, cmp)
     return cmp
+
+def to_JulianTAI(indices):
+    d1 = numpy.zeros(indices.shape,dtype=numpy.double)    
+    d2 = numpy.zeros(indices.shape,dtype=numpy.double)
+    _to_JulianTAI(indices,d1,d2)
+    return d1,d2
+
+def from_JulianTAI(d1,d2):
+    indices = numpy.zeros(d1.shape,dtype=numpy.int64)
+    _from_JulianTAI(d1,d2,indices)
+    return indices
+
+def to_JulianUTC(indices):
+    d1 = numpy.zeros(indices.shape,dtype=numpy.double)    
+    d2 = numpy.zeros(indices.shape,dtype=numpy.double)
+    _to_JulianUTC(indices,d1,d2)
+    return d1,d2
+
+def from_JulianUTC(d1,d2):
+    indices = numpy.zeros(d1.shape,dtype=numpy.int64)
+    _from_JulianUTC(d1,d2,indices)
+    return indices
     
 def intersects(indices1, indices2, method=0):
     # method = {'skiplist': 0, 'binsearch': 1, 'nn': 2}[method]

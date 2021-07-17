@@ -593,6 +593,36 @@ void _scidbOverlap                            (int64_t* indices1, int len1, int6
   }
 }
 
+void _to_JulianTAI   (int64_t* indices, int len, double* d1, int nd1, double* d2, int nd2) {
+  for( int j=0; j <= len; ++j ) {
+    TemporalIndex tIndex(indices[j]);
+    tIndex.toJulianTAI(d1[j],d2[j]);
+  }
+}
+
+void _from_JulianTAI (double* d1, int nd1, double* d2, int nd2, int64_t* out_array, int out_length) {
+  for( int j=0; j <= nd1; ++j ) {
+    TemporalIndex tIndex;
+    TemporalIndex tIndexResult = tIndex.fromJulianTAI( d1[j], d2[j] );
+    out_array[j] = tIndexResult.scidbTemporalIndex();
+  }
+}
+
+void _to_JulianUTC   (int64_t* indices, int len, double* d1, int nd1, double* d2, int nd2) {
+  for( int j=0; j <= len; ++j ) {
+    TemporalIndex tIndex(indices[j]);
+    tIndex.toJulianUTC(d1[j],d2[j]);
+  }
+}
+
+void _from_JulianUTC  (double* d1, int nd1, double* d2, int nd2, int64_t* out_array, int out_length) {
+  for( int j=0; j <= nd1; ++j ) {
+    TemporalIndex tIndex;
+    TemporalIndex tIndexResult = tIndex.fromJulianUTC( d1[j], d2[j] );
+    out_array[j] = tIndexResult.scidbTemporalIndex();
+  }
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 StareResult::~StareResult() {}

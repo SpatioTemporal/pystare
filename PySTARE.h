@@ -82,6 +82,13 @@ void _scidbLowerBoundTAI(int64_t* indices, int len, int64_t* out_array, int out_
 void _scidbUpperBoundMS(int64_t* indices, int len, int64_t* out_array, int out_length);
 void _scidbLowerBoundMS(int64_t* indices, int len, int64_t* out_array, int out_length);
 void _scidbNewTemporalValue(int64_t* indices, int len, int64_t* new_indices, bool include_bounds);
+
+void _to_JulianTAI   (int64_t* indices, int len, double* d1, int nd1, double* d2, int nd2);
+void _from_JulianTAI (double* d1, int nd1, double* d2, int nd2, int64_t* out_array, int out_length);
+
+void _to_JulianUTC   (int64_t* indices, int len, double* d1, int nd1, double* d2, int nd2);
+void _from_JulianUTC (double* d1, int nd1, double* d2, int nd2, int64_t* out_array, int out_length);
+
 /****/
 
 enum StareResultCase { SpatialIntervals, ArrayIndexSpatialValues };
