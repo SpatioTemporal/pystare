@@ -600,6 +600,11 @@ void _scidbOverlap                            (int64_t* indices1, int len1, int6
     cmp[i] = scidbOverlap(indices1[i],indices2[i]) ? 1 : 0;
   }
 }
+void _scidbContainsInstant                    (int64_t* indices1, int len1, int64_t* indices2, int len2, int64_t* cmp, int len12){
+  for( int i = 0; i < len1; ++i ) {
+    cmp[i] = scidbContainsInstant(indices1[i],indices2[i]) ? 1 : 0;
+  }
+}
 void _to_JulianTAI   (int64_t* indices, int len, double* d1, int nd1, double* d2, int nd2) {
   for( int j=0; j < len; ++j ) {
     TemporalIndex tIndex(indices[j]);

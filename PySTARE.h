@@ -71,6 +71,7 @@ void _scidbTemporalValueIntersectionIfOverlap (int64_t* indices1, int len1, int6
 void _scidbTemporalValueUnionIfOverlap        (int64_t* indices1, int len1, int64_t* indices2, int len2, int64_t* cmp, int len12);
 void _scidbOverlapTAI                         (int64_t* indices1, int len1, int64_t* indices2, int len2, int64_t* cmp, int len12);
 void _scidbOverlap                            (int64_t* indices1, int len1, int64_t* indices2, int len2, int64_t* cmp, int len12);
+void _scidbContainsInstant                    (int64_t* indices1, int len1, int64_t* indices2, int len2, int64_t* cmp, int len12);
 
 void _set_reverse_resolution(int64_t* indices, int len,
                              int64_t* reverse_resolution, int lenr,

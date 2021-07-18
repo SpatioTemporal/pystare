@@ -801,6 +801,14 @@ def temporalOverlap  (indices1, indices2):
     _scidbOverlap (indices1, indices2, cmp)
     return cmp
 
+def temporalContainsInstant (indices1, indices2):
+    "Do indices1 contain the instants in indices2. Compares element by element. Test for overlap, element by element. 0 if no overlap. Uses approximate millisecond calculation."
+    if indices1.shape != indices2.shape:
+        raise ValueError("Arrays being compared must have the same shape.")
+    cmp = numpy.zeros(indices1.shape,dtype=numpy.int64)
+    _scidbContainsInstant (indices1, indices2, cmp)
+    return cmp
+
 def to_JulianTAI(indices):
     d1 = numpy.zeros(indices.shape,dtype=numpy.double)    
     d2 = numpy.zeros(indices.shape,dtype=numpy.double)

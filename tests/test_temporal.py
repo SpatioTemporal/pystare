@@ -86,7 +86,26 @@ class MainTest(unittest.TestCase):
 
         # print('res r: ',pystare.reverse_resolution(res_f))
         # print('res f: ',pystare.forward_resolution(res_f))
+
+    def test_contains(self):
+        datetime1 = numpy.array(['1970-01-01T00:00:00', 
+                                 '2000-01-01T00:00:00', 
+                                 '2002-02-03T13:56:03.172', 
+                                 '2016-01-05T17:26:00.172'], dtype=numpy.datetime64)
+        index1 = pystare.from_utc(datetime1.astype(numpy.int64), 20, 30)
         
+        datetime2 = numpy.array(['1970-01-01T00:00:00', 
+                                 '2000-01-01T00:00:00', 
+                                 '2004-02-03T13:56:03.172', 
+                                 '2000-01-05T17:26:00.172'], dtype=numpy.datetime64)
+        index2 = pystare.from_utc(datetime2.astype(numpy.int64), 35, 35)
+
+        cmp = numpy.zeros(index2.shape,dtype=numpy.int64)
+        cmp[:] = pystare.temporalContainsInstant(index1,index2)
+        # print('cmp: ',cmp)
+        
+        numpy.testing.assert_array_equal(numpy.array([1,1,0,0],dtype=numpy.int64),cmp)
+
 if __name__ == "__main__":
     unittest.main()
 
