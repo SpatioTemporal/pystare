@@ -106,6 +106,27 @@ class MainTest(unittest.TestCase):
         
         numpy.testing.assert_array_equal(numpy.array([1,1,0,0],dtype=numpy.int64),cmp)
 
+    def test_variable_res(self):
+
+        index = pystare.from_tai_iso_strings([
+            "2003-02-13T12:00:00.000 (12 12) (1)"
+            ,"2004-02-13T12:00:00.000 (12 12) (1)"
+            ,"2004-03-13T12:00:00.000"
+            ,"2004-04-13T12:00:00"
+            ])
+        
+        # index = pystare.from_utc(datetime.astype(numpy.int64), 6, 6)
+        print("index sh:   ",index.shape)
+        index_with_variable_res = numpy.zeros(index.shape,dtype=numpy.int64)
+        print("index:      ",index)
+        print("index size: ",len(index))
+        for i in range(len(index)-3+1):
+            print("i: ",i,type(index_with_variable_res),len(index_with_variable_res))
+            triple = index[i:i+3]
+            i_varres = pystare.from_temporal_triple(triple,include_bounds=True)
+            print('triple: ',triple,pystare.to_tai_iso_strings(i_varres)[0])
+            index_with_variable_res[i]=pystare.from_temporal_triple(triple,include_bounds=True)[0]
+
 if __name__ == "__main__":
     unittest.main()
 
