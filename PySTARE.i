@@ -487,7 +487,9 @@ namespace std {
     (int64_t* datetime, int len),
     (int64_t* indices1, int len1),
     (int64_t* indices2, int len2),
-    (int64_t* indices, int len)
+    (int64_t* indices, int len),
+    (int64_t* reverse_increment, int lenr),
+    (int64_t* forward_increment, int lenf)
 }
 
 %apply (int64_t * INPLACE_ARRAY1, int DIM1) {
@@ -513,7 +515,8 @@ namespace std {
 # }
 
 %apply (double* in_array, int length, int64_t* out_array) {
-    (double* lon, int len_lon, int64_t* indices)
+  (double* lon, int len_lon, int64_t* indices),
+  (double* milliseconds, int len, int64_t* out_array)
 }
 
 %apply (int64_t* in_array, int length, int* out_array) {
@@ -687,13 +690,19 @@ def cmp_spatial(indices1, indices2):
     cmp = numpy.zeros([out_length],dtype=numpy.int64)
     _cmp_spatial(indices1,indices2,cmp)
     return cmp
-	    
+
+# Temporal
+
+def coarsest_resolution_finer_or_equal_ms(ms):
+    resolutions = numpy.zeros(ms.shape,dtype=numpy.int64)
+    _coarsest_resolution_finer_or_equal_milliseconds(ms,resolutions)
+    return resolutions
+
 def cmp_temporal(indices1, indices2):
 	out_length = len(indices1)*len(indices2)
 	cmp = numpy.zeros([out_length],dtype=numpy.int64)
 	_cmp_temporal(indices1,indices2,cmp)
 	return cmp
-
 
 def from_tai_iso_strings(taiStrings):
     out_length = len(taiStrings)
@@ -813,6 +822,32 @@ def from_JulianUTC(d1,d2):
     indices = numpy.zeros(d1.shape,dtype=numpy.int64)
     _from_JulianUTC(d1,d2,indices)
     return indices
+
+def set_reverse_resolution(indices,resolutions):
+    result = numpy.zeros(indices.shape,dtype=numpy.int64)
+    _set_reverse_resolution(indices,resolutions,result)
+    return result
+
+def set_forward_resolution(indices,resolutions):
+    result = numpy.zeros(indices.shape,dtype=numpy.int64)
+    _set_forward_resolution(indices,resolutions,result)
+    return result
+
+def reverse_resolution(indices):
+    result = numpy.zeros(indices.shape,dtype=numpy.int64)    
+    _reverse_resolution(indices,result)
+    return result
+    
+def forward_resolution(indices):
+    result = numpy.zeros(indices.shape,dtype=numpy.int64)    
+    _forward_resolution(indices,result)
+    return result
+
+def coarsen(indices,reverse_increments,forward_increments):
+    """TODO: Not tested"""
+    result = numpy.zeros(indices.shape,dtype=numpy.int64)    
+    _coarsen(indices,reverse_increments,forward_increments,result)
+    return result
     
 def intersects(indices1, indices2, method=0):
     # method = {'skiplist': 0, 'binsearch': 1, 'nn': 2}[method]

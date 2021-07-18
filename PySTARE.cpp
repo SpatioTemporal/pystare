@@ -388,6 +388,14 @@ void _cmp_spatial(int64_t* indices1, int len1, int64_t* indices2, int len2, int6
 }
 
 // Temporal
+
+void _coarsest_resolution_finer_or_equal_milliseconds(double*  milliseconds, int len, int64_t* out_array) {
+  TemporalIndex tIndex;
+  for(int i=0; i<len; ++i) {
+    out_array[i] = tIndex.coarsestResolutionFinerOrEqualMilliseconds(milliseconds[i]);
+  }
+}
+
 void from_utc(int64_t *datetime, int len, int64_t *indices_out
 	      , int forward_resolution
 	      , int reverse_resolution
@@ -592,36 +600,85 @@ void _scidbOverlap                            (int64_t* indices1, int len1, int6
     cmp[i] = scidbOverlap(indices1[i],indices2[i]) ? 1 : 0;
   }
 }
-
 void _to_JulianTAI   (int64_t* indices, int len, double* d1, int nd1, double* d2, int nd2) {
-  for( int j=0; j <= len; ++j ) {
+  for( int j=0; j < len; ++j ) {
     TemporalIndex tIndex(indices[j]);
     tIndex.toJulianTAI(d1[j],d2[j]);
   }
 }
-
+  // TODO Add resolution to the from_xxx routines?
 void _from_JulianTAI (double* d1, int nd1, double* d2, int nd2, int64_t* out_array, int out_length) {
-  for( int j=0; j <= nd1; ++j ) {
-    TemporalIndex tIndex;
+  TemporalIndex tIndex;
+  for( int j=0; j < nd1; ++j ) {
+    // cout << "tIndex " << j << " . " << flush;
     TemporalIndex tIndexResult = tIndex.fromJulianTAI( d1[j], d2[j] );
+    // cout << " result " << flush;
     out_array[j] = tIndexResult.scidbTemporalIndex();
+    // cout << out_array[j] << flush << endl;
+    // cout << endl << flush;
   }
 }
-
 void _to_JulianUTC   (int64_t* indices, int len, double* d1, int nd1, double* d2, int nd2) {
-  for( int j=0; j <= len; ++j ) {
+  for( int j=0; j < len; ++j ) {
     TemporalIndex tIndex(indices[j]);
     tIndex.toJulianUTC(d1[j],d2[j]);
   }
 }
-
 void _from_JulianUTC  (double* d1, int nd1, double* d2, int nd2, int64_t* out_array, int out_length) {
-  for( int j=0; j <= nd1; ++j ) {
+  for( int j=0; j < nd1; ++j ) {
     TemporalIndex tIndex;
     TemporalIndex tIndexResult = tIndex.fromJulianUTC( d1[j], d2[j] );
     out_array[j] = tIndexResult.scidbTemporalIndex();
   }
 }
+
+////////////////////////////////////////////////////////////////////////////////
+//
+
+void _set_reverse_resolution(int64_t* indices, int len,
+                             int64_t* reverse_resolution, int lenr,
+                             int64_t* out_array, int out_length
+                             ) {
+  for( int i = 0; i < len; ++i ) {
+    out_array[i] = set_reverse_resolution(indices[i], reverse_resolution[i]);
+  }
+}
+void _set_forward_resolution(int64_t* indices, int len,
+                             int64_t* forward_resolution, int lenf,
+                             int64_t* out_array, int out_length
+                             ) {
+  for( int i = 0; i < len; ++i ) {
+    out_array[i] = set_forward_resolution(indices[i], forward_resolution[i]);
+  }
+}
+
+void _forward_resolution(int64_t* indices, int len,
+                         int64_t* out_array, int out_length
+                         ) {
+  for( int i = 0; i < len; ++i ) {
+    out_array[i] = forward_resolution(indices[i]);
+  }
+}
+
+void _reverse_resolution(int64_t* indices, int len,
+                         int64_t* out_array, int out_length
+                         ) {
+  for( int i = 0; i < len; ++i ) {
+    out_array[i] = reverse_resolution(indices[i]);
+  }
+}
+
+void _coarsen(int64_t* indices, int len,
+                 int64_t* reverse_increment, int lenr,
+                 int64_t* forward_increment, int lenf,
+                 int64_t* out_array, int out_length
+                 ) {
+  for( int i = 0; i < len; ++i ) {
+    out_array[i] = coarsen(indices[i],reverse_increment[i],forward_increment[i]);
+  }
+}
+  
+
 
 ////////////////////////////////////////////////////////////////////////////////
 //

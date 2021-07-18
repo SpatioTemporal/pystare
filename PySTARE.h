@@ -62,6 +62,8 @@ void from_utc_variable(int64_t *datetime, int len, int64_t *indices_out, int64_t
 void to_utc_approximate(int64_t* indices, int len, int64_t* datetime_out);
 void _cmp_temporal(int64_t* indices1, int len1, int64_t* indices2, int len2, int64_t* cmp, int len12);
 
+void _coarsest_resolution_finer_or_equal_milliseconds(double*  milliseconds, int len, int64_t* out_array);
+
 void _from_tai_iso_strings(char **taiStrings, int64_t* out_array, int out_length);
 char** _to_tai_iso_strings(int64_t* indices, int len);
 
@@ -69,6 +71,29 @@ void _scidbTemporalValueIntersectionIfOverlap (int64_t* indices1, int len1, int6
 void _scidbTemporalValueUnionIfOverlap        (int64_t* indices1, int len1, int64_t* indices2, int len2, int64_t* cmp, int len12);
 void _scidbOverlapTAI                         (int64_t* indices1, int len1, int64_t* indices2, int len2, int64_t* cmp, int len12);
 void _scidbOverlap                            (int64_t* indices1, int len1, int64_t* indices2, int len2, int64_t* cmp, int len12);
+
+void _set_reverse_resolution(int64_t* indices, int len,
+                             int64_t* reverse_resolution, int lenr,
+                             int64_t* out_array, int out_length
+                             );
+void _set_forward_resolution(int64_t* indices, int len,
+                             int64_t* forward_resolution, int lenf,
+                             int64_t* out_array, int out_length
+                             );
+
+void _forward_resolution(int64_t* indices, int len,
+                         int64_t* out_array, int out_length
+                         );
+
+void _reverse_resolution(int64_t* indices, int len,
+                         int64_t* out_array, int out_length
+                         );
+                         
+void _coarsen(int64_t* indices, int len,
+                 int64_t* reverse_increment, int lenr,
+                 int64_t* forward_increment, int lenf,
+                 int64_t* out_array, int out_length
+                 );
 
 //void to_utc(int64_t* indices, int len, double* julian_day);
 //void from_tai(double* julian_day, int len, int64_t indices);
