@@ -856,6 +856,18 @@ def coarsen(indices,reverse_increments,forward_increments):
     result = numpy.zeros(indices.shape,dtype=numpy.int64)    
     _coarsen(indices,reverse_increments,forward_increments,result)
     return result
+
+def set_temporal_resolutions_from_sorted(sorted_indices,include_bounds=True):
+    index_with_variable_res = numpy.zeros(sorted_indices.shape,dtype=numpy.int64)
+    i_varres_str = []
+    ni = len(sorted_indices)
+    for i in range(ni):
+        tm = -1 if i-1 < 0 else sorted_indices[i-1]
+        t0 = sorted_indices[i]
+        tp = -1 if i+1 >= ni else sorted_indices[i+1]
+        triple=[tm,t0,tp]
+        index_with_variable_res[i]=from_temporal_triple(triple,include_bounds=include_bounds)[0]
+    return index_with_variable_res
     
 def intersects(indices1, indices2, method=0):
     # method = {'skiplist': 0, 'binsearch': 1, 'nn': 2}[method]
