@@ -120,11 +120,20 @@ class MainTest(unittest.TestCase):
         index_with_variable_res = numpy.zeros(index.shape,dtype=numpy.int64)
         print("index:      ",index)
         print("index size: ",len(index))
-        for i in range(len(index)-3+1):
-            print("i: ",i,type(index_with_variable_res),len(index_with_variable_res))
-            triple = index[i:i+3]
+        ni = len(index)
+        for i in range(ni):
+            tm = -1 if i-1 < 0 else index[i-1]
+            t0 = index[i]
+            tp = -1 if i+1 >= ni else index[i+1]
+            triple=[tm,t0,tp]
             i_varres = pystare.from_temporal_triple(triple,include_bounds=True)
-            print('triple: ',triple,pystare.to_tai_iso_strings(i_varres)[0])
+            print(i,'i_varres: ',pystare.to_temporal_triple_tai(i_varres))
+            print(i,'triple: %16x %16x %16x'%tuple(triple),pystare.to_tai_iso_strings(i_varres)[0]
+                  ,' [ '
+                  ,pystare.to_tai_iso_strings( numpy.concatenate(pystare.to_temporal_triple_tai(i_varres) ))
+                  ,' ] '
+                  )
+
             index_with_variable_res[i]=pystare.from_temporal_triple(triple,include_bounds=True)[0]
 
 if __name__ == "__main__":
