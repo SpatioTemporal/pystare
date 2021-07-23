@@ -565,6 +565,7 @@ namespace std {
 import numpy
 from pkg_resources import get_distribution
 import re
+from datetime import datetime
   
 __version__ = get_distribution('pystare').version
 
@@ -573,6 +574,12 @@ class PyStareError(Exception):
 
 class PyStareArrayBoundsExceeded(Exception):
     pass
+
+def current_datetime():
+    "Get a tiv from datetime.now(). To convert back use numpy.array(pystare.to_utc_approximate(i),dtype='datetime64[ms]'"
+    # bad: hard-coded resolution 48 
+    return \
+        from_utc(numpy.array([datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f")[0:-3]],dtype=numpy.datetime64).astype(numpy.int64),48,48)
 
 def to_neighbors(indices):
     result = _to_neighbors(indices)
