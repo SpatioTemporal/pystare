@@ -6,6 +6,7 @@ tmp.py
 *.so
 pystare.egg-info/*
 build/*
+dist/
 PySTARE_wrap.cpp
 pystare.py
 .directory

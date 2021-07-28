@@ -593,7 +593,7 @@ def to_compressed_range(indices):
     len_ri = 0
     _to_compressed_range(indices,range_indices)
     endarg = 0
-    while (endarg < out_length) and (range_indices[endarg] > 0):
+    while (endarg < out_length) and (range_indices[endarg] >= 0):
       endarg = endarg + 1
     # endarg = numpy.argmax(range_indices < 0)
     range_indices = range_indices[:endarg]
