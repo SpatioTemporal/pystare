@@ -499,7 +499,8 @@ namespace std {
     (int64_t* out_array, int out_length),
     (int64_t* cmp, int len12),
     (int64_t* forward_resolution, int lenf),
-    (int64_t* reverse_resolution, int lenr)
+    (int64_t* reverse_resolution, int lenr),
+    (int64_t* indices_inplace, int len)
 }
 
 %apply (double * INPLACE_ARRAY1, int DIM1) {
@@ -865,16 +866,8 @@ def coarsen(indices,reverse_increments,forward_increments):
     return result
 
 def set_temporal_resolutions_from_sorted(sorted_indices,include_bounds=True):
-    index_with_variable_res = numpy.zeros(sorted_indices.shape,dtype=numpy.int64)
-    i_varres_str = []
-    ni = len(sorted_indices)
-    for i in range(ni):
-        tm = -1 if i-1 < 0 else sorted_indices[i-1]
-        t0 = sorted_indices[i]
-        tp = -1 if i+1 >= ni else sorted_indices[i+1]
-        triple=[tm,t0,tp]
-        index_with_variable_res[i]=from_temporal_triple(triple,include_bounds=include_bounds)[0]
-    return index_with_variable_res
+    _set_temporal_resolutions_from_sorted_inplace(sorted_indices,include_bounds)
+    return sorted_indices
     
 def intersects(indices1, indices2, method=0):
     # method = {'skiplist': 0, 'binsearch': 1, 'nn': 2}[method]

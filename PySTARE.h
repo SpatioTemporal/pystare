@@ -114,6 +114,7 @@ void _from_JulianTAI (double* d1, int nd1, double* d2, int nd2, int64_t* out_arr
 
 void _to_JulianUTC   (int64_t* indices, int len, double* d1, int nd1, double* d2, int nd2);
 void _from_JulianUTC (double* d1, int nd1, double* d2, int nd2, int64_t* out_array, int out_length);
+void _set_temporal_resolutions_from_sorted_inplace (int64_t* indices_inplace, int len, bool include_bounds);
 
 /****/
 

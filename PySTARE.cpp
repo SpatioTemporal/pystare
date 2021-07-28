@@ -640,6 +640,10 @@ void _from_JulianUTC  (double* d1, int nd1, double* d2, int nd2, int64_t* out_ar
 ////////////////////////////////////////////////////////////////////////////////
 //
 
+void _set_temporal_resolutions_from_sorted_inplace (int64_t* indices_inplace, int len, bool include_bounds) {
+  set_temporal_resolutions_from_sorted_inplace(indices_inplace,len,include_bounds);
+}
+
 void _set_reverse_resolution(int64_t* indices, int len,
                              int64_t* reverse_resolution, int lenr,
                              int64_t* out_array, int out_length
