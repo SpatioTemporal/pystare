@@ -712,20 +712,21 @@ def cmp_temporal(indices1, indices2):
 	_cmp_temporal(indices1,indices2,cmp)
 	return cmp
 
-def from_tai_iso_strings(taiStrings):
-    out_length = len(taiStrings)
+def from_tai_iso_strings(tai_strings_in):
+    tai_strings = numpy.copy(tai_strings_in)
+    out_length = len(tai_strings )
     tIndices   = numpy.zeros([out_length],dtype=numpy.int64)
-    p = re.compile('^([0-9]{4})-([0-2][0-9])-([0-3][0-9])T([0-2][0-9]):([0-5][0-9]):([0-5][0-9])(.([0-9]{3}))?(\s\(([0-9]+)\s([0-9]+)\)\s\(([0-9])\))?$')
+    p = re.compile('^([0-9]{4})-([0-2][0-9])-([0-3][0-9])T([0-2][0-9]):([0-5][0-9]):([0-5][0-9])(.([0-9]+))?(\s\(([0-9]+)\s([0-9]+)\)\s\(([0-9])\))?$')
     for k in range(out_length):
-        s = p.match(taiStrings[k])
+        s = p.match(tai_strings [k])
         if s is not None:
            if s.groups()[7] is None:
-              taiStrings[k] = taiStrings[k] + '.000 (48 48) (1)'
+              tai_strings [k] = tai_strings [k] + '.000 (48 48) (1)'
            elif s.groups()[8] is None:
-              taiStrings[k] = taiStrings[k] + ' (48 48) (1)'
+              tai_strings [k] = tai_strings [k] + ' (48 48) (1)'
         else:
-           raise ValueError('from_tai_iso_strings: unknown input "'+taiStrings[k]+'"')
-    _from_tai_iso_strings(taiStrings,tIndices)
+           raise ValueError('from_tai_iso_strings: unknown input "' + tai_strings [k] + '"')
+    _from_tai_iso_strings(list(tai_strings), tIndices)
     return tIndices
 
 def to_tai_iso_strings(tIndices):
