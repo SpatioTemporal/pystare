@@ -12,6 +12,9 @@
 
 #include <algorithm>
 
+// Info
+const char* stare_version() { return STARE_version(); }
+
 // Spatial
 void from_latlon(double* lat, int len_lat, double * lon, int len_lon, int64_t* indices, int level) {            
     for (int i=0; i<len_lat; i++) {        
@@ -247,20 +250,38 @@ StareResult _to_nonconvex_hull_range_from_latlon(double* lat, int len_lat, doubl
 }
 
 void _intersect(int64_t* indices1, int len1, int64_t* indices2, int len2, int64_t* intersection, int leni) {
-	STARE_SpatialIntervals si1(indices1, indices1+len1);
-    STARE_SpatialIntervals si2(indices2, indices2+len2);
-	SpatialRange r1(si1);   
-    SpatialRange r2(si2);
-	SpatialRange *ri = sr_intersect(r1, r2, false);
-	STARE_SpatialIntervals result_intervals = ri->toSpatialIntervals();
-	delete ri;
-	STARE_ArrayIndexSpatialValues result = expandIntervals(result_intervals);
-	leni = result.size();
-	for(int i=0; i<leni; ++i) {
-		intersection[i] = result[i];
-	}
+  STARE_SpatialIntervals si1(indices1, indices1+len1);
+  STARE_SpatialIntervals si2(indices2, indices2+len2);
+  SpatialRange r1(si1);   
+  SpatialRange r2(si2);
+  SpatialRange *ri = sr_intersect(r1, r2, false);
+  STARE_SpatialIntervals result_intervals = ri->toSpatialIntervals();
+  delete ri;
+#if 0
+  cout << "_intersect:result_intervals" << endl << flush;
+  for(int i=0; i < result_intervals.size(); ++i) {
+    if ( i < 10 ) {
+      cout << "_intersect:result_intervals: " << setw(4) << dec << i << " " << setw(16) << hex << result_intervals[i] << endl << flush;
+    }
+  }
+#endif
+  //  cout << "_intersect:expandIntervals" << endl << flush;
+  STARE_ArrayIndexSpatialValues result = expandIntervals(result_intervals);
+  // cout << "_intersect:size" << endl << flush;
+  int leni_ = result.size();
+#if 0
+  cout << "_intersect:leni_" << " " << leni << endl << flush;
+  cout << "_intersect:result" << endl << flush;
+#endif
+  for(int i=0; i<leni_; ++i) {
+#if 0
+    if( i < 10 ) {
+      cout << "_intersect:result: " << setw(4) << dec << i << " " << setw(16) << hex << result[i] << endl << flush;
+    }
+#endif
+    intersection[i] = result[i];
+  }
 }
-
 
 void _intersects(int64_t* indices1, int len1, int64_t* indices2, int len2, int* intersects, int method) {
   if( method == 0 ) {
@@ -367,16 +388,70 @@ void _cmp_spatial(int64_t* indices1, int len1, int64_t* indices2, int len2, int6
 }
 
 // Temporal
-void from_utc(int64_t *datetime, int len, int64_t *indices_out, int resolution) {
+
+void _coarsest_resolution_finer_or_equal_milliseconds(double*  milliseconds, int len, int64_t* out_array) {
+  TemporalIndex tIndex;
+  for(int i=0; i<len; ++i) {
+    out_array[i] = tIndex.coarsestResolutionFinerOrEqualMilliseconds(milliseconds[i]);
+  }
+}
+
+void from_utc(int64_t *datetime, int len, int64_t *indices_out
+	      , int forward_resolution
+	      , int reverse_resolution
+	      ) {
 	// datetime is in ms (numpy default).
 	// double jd19700101_erfa = 2440587.5;
 
 //    cout << "from_utc resolution: " << resolution << endl << flush;
 	// cout << "from_utc" << endl << flush;
-    int type = 2;
+    int type = 1;
     for (int i=0; i<len; i++) {
     	int64_t idt = datetime[i]/1000;
-        indices_out[i] = stare.ValueFromUTC((time_t&)idt, resolution, type);
+        indices_out[i] = stare.ValueFromUTC((time_t&)idt
+					    , forward_resolution
+					    , reverse_resolution
+					    , type);
+        idt = datetime[i]%1000;
+        stare.tIndex.set_millisecond(idt);
+        indices_out[i] = stare.getArrayIndexTemporalValue();
+        /*
+        double jd = stare.toJulianDayUTC();
+        double delta = jd - 2440587.5;
+        double iDelta = delta*86400.0;
+        cout
+		<< setprecision(16)
+		<< dec << i << " dt,jd,delta,iDelta "
+		<< datetime[i] << " "
+		<< setw(16) << setfill('0')	<< hex
+		<< indices_out[i] << " "
+		 << dec
+		 << setw(20) << setfill(' ') << scientific
+		 << jd << " "
+		 << setw(20) << setfill(' ') << scientific
+	     << delta << " "
+		 << setw(20) << setfill(' ') << scientific
+		 << iDelta << " "
+		 << stare.tIndex.toStringJulianTAI()
+		 << endl << flush;
+		 */
+    }
+//    cout << endl << flush;
+}
+
+void from_utc_variable(int64_t *datetime, int len, int64_t *indices_out, int64_t* forward_resolution, int lenf, int64_t* reverse_resolution, int lenr) {
+	// datetime is in ms (numpy default).
+	// double jd19700101_erfa = 2440587.5;
+
+//    cout << "from_utc resolution: " << resolution << endl << flush;
+	// cout << "from_utc" << endl << flush;
+    int type = 1;
+    for (int i=0; i<len; i++) {
+    	int64_t idt = datetime[i]/1000;
+        indices_out[i] = stare.ValueFromUTC((time_t&)idt
+					    , forward_resolution[i]
+					    , reverse_resolution[i]
+					    , type);
         idt = datetime[i]%1000;
         stare.tIndex.set_millisecond(idt);
         indices_out[i] = stare.getArrayIndexTemporalValue();
@@ -445,6 +520,173 @@ void _cmp_temporal(int64_t* indices1, int len1, int64_t* indices2, int len2, int
 		}
 	}
 }
+
+void _from_tai_iso_strings(char ** taiStrings, int64_t* out_array, int out_length) {
+    int i = 0;
+    while (taiStrings[i]) {
+      out_array[i] = fromStringJulianTAI_ISO(taiStrings[i]);
+	 free(taiStrings[i]); // Good bye, memory leak!
+         i++;
+    }
+    // i is the length
+    return;
+}
+
+char **  _to_tai_iso_strings(int64_t* indices, int len ) {
+  // printf("to_ti: len: %d\n",len);
+  char ** taiStrings = (char **) malloc((len+1) * sizeof(char*));
+  for( int i = 0; i < len+1; ++ i ) {
+    taiStrings[i] = (char *) NULL;
+  }
+  // printf("to_ti:100\n");
+    int i = 0;
+    while (i < len) {
+      // printf("to_ti: i: %d\n",i);
+      // printf("to_ti: x%016x",indices[i]);
+      string s = toStringJulianTAI_ISO(indices[i]);
+      taiStrings[i] = (char*)malloc((s.size()+1)*sizeof(char));
+      // printf(" s.size: %d ",s.size());
+      s.copy(taiStrings[i],s.size());
+      taiStrings[i][s.size()] = '\0';
+      // printf("%s\n",taiStrings[i]);
+      i++;
+    }
+    // printf("to_ti:999\n");
+    // i is the length
+    return taiStrings;
+}
+
+void _scidbUpperBoundTAI(int64_t* indices, int len, int64_t* out_array, int out_length) {
+  for( int i=0; i < len; ++i ) {
+    out_array[i] = scidbUpperBoundTAI(indices[i]);
+  }
+}
+void _scidbLowerBoundTAI(int64_t* indices, int len, int64_t* out_array, int out_length) {
+  for( int i=0; i < len; ++i ) {
+    out_array[i] = scidbLowerBoundTAI(indices[i]);
+  }
+}
+void _scidbUpperBoundMS(int64_t* indices, int len, int64_t* out_array, int out_length) {
+  for( int i=0; i < len; ++i ) {
+    out_array[i] = scidbUpperBoundMS(indices[i]);
+  }
+}
+void _scidbLowerBoundMS(int64_t* indices, int len, int64_t* out_array, int out_length) {
+  for( int i=0; i < len; ++i ) {
+    out_array[i] = scidbLowerBoundMS(indices[i]);
+  }
+}
+void _scidbNewTemporalValue(int64_t* indices, int len, int64_t* new_indices, bool include_bounds) {
+  new_indices[0] = scidbNewTemporalValue(indices[0],indices[1],indices[2],include_bounds);
+}
+
+void _scidbTemporalValueIntersectionIfOverlap (int64_t* indices1, int len1, int64_t* indices2, int len2, int64_t* cmp, int len12){
+  for( int i = 0; i < len1; ++i ) {
+    cmp[i] = scidbTemporalValueIntersectionIfOverlap(indices1[i],indices2[i]);
+  }
+}
+void _scidbTemporalValueUnionIfOverlap        (int64_t* indices1, int len1, int64_t* indices2, int len2, int64_t* cmp, int len12){
+  for( int i = 0; i < len1; ++i ) {
+    cmp[i] = scidbTemporalValueUnionIfOverlap(indices1[i],indices2[i]);
+  }
+}
+void _scidbOverlapTAI                         (int64_t* indices1, int len1, int64_t* indices2, int len2, int64_t* cmp, int len12){
+  for( int i = 0; i < len1; ++i ) {
+    cmp[i] = scidbOverlapTAI(indices1[i],indices2[i]) ? 1 : 0;
+  }
+}
+void _scidbOverlap                            (int64_t* indices1, int len1, int64_t* indices2, int len2, int64_t* cmp, int len12){
+  for( int i = 0; i < len1; ++i ) {
+    cmp[i] = scidbOverlap(indices1[i],indices2[i]) ? 1 : 0;
+  }
+}
+void _scidbContainsInstant                    (int64_t* indices1, int len1, int64_t* indices2, int len2, int64_t* cmp, int len12){
+  for( int i = 0; i < len1; ++i ) {
+    cmp[i] = scidbContainsInstant(indices1[i],indices2[i]) ? 1 : 0;
+  }
+}
+void _to_JulianTAI   (int64_t* indices, int len, double* d1, int nd1, double* d2, int nd2) {
+  for( int j=0; j < len; ++j ) {
+    TemporalIndex tIndex(indices[j]);
+    tIndex.toJulianTAI(d1[j],d2[j]);
+  }
+}
+  // TODO Add resolution to the from_xxx routines?
+void _from_JulianTAI (double* d1, int nd1, double* d2, int nd2, int64_t* out_array, int out_length) {
+  TemporalIndex tIndex;
+  for( int j=0; j < nd1; ++j ) {
+    // cout << "tIndex " << j << " . " << flush;
+    TemporalIndex tIndexResult = tIndex.fromJulianTAI( d1[j], d2[j] );
+    // cout << " result " << flush;
+    out_array[j] = tIndexResult.scidbTemporalIndex();
+    // cout << out_array[j] << flush << endl;
+    // cout << endl << flush;
+  }
+}
+void _to_JulianUTC   (int64_t* indices, int len, double* d1, int nd1, double* d2, int nd2) {
+  for( int j=0; j < len; ++j ) {
+    TemporalIndex tIndex(indices[j]);
+    tIndex.toJulianUTC(d1[j],d2[j]);
+  }
+}
+void _from_JulianUTC  (double* d1, int nd1, double* d2, int nd2, int64_t* out_array, int out_length) {
+  for( int j=0; j < nd1; ++j ) {
+    TemporalIndex tIndex;
+    TemporalIndex tIndexResult = tIndex.fromJulianUTC( d1[j], d2[j] );
+    out_array[j] = tIndexResult.scidbTemporalIndex();
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+//
+
+void _set_temporal_resolutions_from_sorted_inplace (int64_t* indices_inplace, int len, bool include_bounds) {
+  set_temporal_resolutions_from_sorted_inplace(indices_inplace,len,include_bounds);
+}
+
+void _set_reverse_resolution(int64_t* indices, int len,
+                             int64_t* reverse_resolution, int lenr,
+                             int64_t* out_array, int out_length
+                             ) {
+  for( int i = 0; i < len; ++i ) {
+    out_array[i] = set_reverse_resolution(indices[i], reverse_resolution[i]);
+  }
+}
+void _set_forward_resolution(int64_t* indices, int len,
+                             int64_t* forward_resolution, int lenf,
+                             int64_t* out_array, int out_length
+                             ) {
+  for( int i = 0; i < len; ++i ) {
+    out_array[i] = set_forward_resolution(indices[i], forward_resolution[i]);
+  }
+}
+
+void _forward_resolution(int64_t* indices, int len,
+                         int64_t* out_array, int out_length
+                         ) {
+  for( int i = 0; i < len; ++i ) {
+    out_array[i] = forward_resolution(indices[i]);
+  }
+}
+
+void _reverse_resolution(int64_t* indices, int len,
+                         int64_t* out_array, int out_length
+                         ) {
+  for( int i = 0; i < len; ++i ) {
+    out_array[i] = reverse_resolution(indices[i]);
+  }
+}
+
+void _coarsen(int64_t* indices, int len,
+                 int64_t* reverse_increment, int lenr,
+                 int64_t* forward_increment, int lenf,
+                 int64_t* out_array, int out_length
+                 ) {
+  for( int i = 0; i < len; ++i ) {
+    out_array[i] = coarsen(indices[i],reverse_increment[i],forward_increment[i]);
+  }
+}
+  
 
 
 ////////////////////////////////////////////////////////////////////////////////

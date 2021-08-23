@@ -1,9 +1,12 @@
+.eggs
+dist
 tmp.py
 .DS_Store
 **/__pycache__/
 *.so
 pystare.egg-info/*
 build/*
+dist/
 PySTARE_wrap.cpp
 pystare.py
 .directory

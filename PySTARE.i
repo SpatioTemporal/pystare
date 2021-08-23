@@ -4,10 +4,33 @@
 %{
   #define SWIG_FILE_WITH_INIT  /* To import_array() below */
   #include "PySTARE.h"
+  #include <vector>
+  #include <string>
 %}
 
 %include "numpy.i"
 
+%include "std_vector.i"
+%include "std_string.i"
+
+namespace std {
+%template(VectorString) vector< string >;    
+};
+
+/*
+%template(StringVector) std::vector< std::string >;
+*/
+
+/* %include "stl.i" */
+
+/*
+%template(StringVector) vector< string >;
+%template(StringVector) std::vector< std::string >;
+namespace std {
+%template(StringVector) std::vector<std::string>;
+%template(ConstCharVector) std::vector<const char*>;
+}
+*/
 
 %init %{
     import_array();
@@ -32,9 +55,6 @@
   $2 = (int) array_size(array,0);    
   $3 = (int64_t*) array_data((PyArrayObject*)out);
 }
-
-
-
 
 %typemap(in, numinputs=1)
   (double* in_array, int length, int64_t* out_array)
@@ -262,6 +282,88 @@
   $6 = (int64_t*) array_data((PyArrayObject*)out4);
 }
 
+/*
+ * char** 
+ * From http://www.swig.org/Doc1.3/Python.html#Python_nn59
+ */
+/* %module argv */
+
+// This tells SWIG to treat char ** as a special case
+
+%typemap(in) char ** {
+  /* Check if is a list  */
+  if (PyList_Check($input)) {
+    int size = PyList_Size($input);
+    int i = 0;
+    $1 = (char **) malloc((size+1) * sizeof(char*));
+    for (i = 0; i < size; i++) {
+      PyObject *o = PyList_GetItem($input,i);
+      if (PyUnicode_Check(o)) {
+	// printf("100\n");
+	Py_ssize_t size_ = 0;
+	// printf("110\n");
+	const char *pc = PyUnicode_AsUTF8AndSize(o,&size_);
+	// $1[i] = PyUnicode_AsUTF8AndSize(o,&size_);
+	// printf("120\n");
+	string s(pc,size_);
+	// printf("130\n");
+	// It would be great to be able to just pass in the const char*.
+	$1[i] = (char*) malloc((size_+1) * sizeof(char)); // Hello memory leak...
+	// printf("135\n");
+	size_t len = s.copy($1[i],size_);
+	// printf("140\n");
+      } else {
+        PyErr_SetString(PyExc_TypeError,"list must contain strings");
+        free($1);
+        return NULL;
+      }
+    }
+    $1[i] = 0;
+  } else if ($input == Py_None) {
+    $1 =  NULL;
+  } else {
+    PyErr_SetString(PyExc_TypeError,"not a list");
+    return NULL;
+  }
+}
+
+%typemap(freearg) char** {
+  // printf("freearg char**\n");
+  free((char *) $1);
+}
+
+%typemap(out) char** {
+    // printf("c**-000\n");
+  int len;
+  int i;
+  len = 0;
+  while ($1[len]) len++;
+    // printf("c**-100 len = %d\n",len);
+  $result = PyList_New(len);
+    // printf("c**-200\n");
+  for (i = 0; i < len; i++) {
+    // printf("out %d -> %s\n",i,$1[i]);
+    PyList_SetItem($result, i, PyString_FromString($1[i]));
+    // printf("c**-399\n");
+  }
+    // printf("c**-999\n");
+}
+
+
+// Now a test function
+%inline %{
+  int print_args(char **argv) {
+    int i = 0;
+    while (argv[i]) {
+         printf("argv[%d] = %s\n", i,argv[i]);
+	 free(argv[i]); // Good bye, memory leak!
+         i++;
+    }
+    return i;
+}
+%}
+
+
 
 /****************/
 /* OUT typemaps */
@@ -385,7 +487,9 @@
     (int64_t* datetime, int len),
     (int64_t* indices1, int len1),
     (int64_t* indices2, int len2),
-    (int64_t* indices, int len)
+    (int64_t* indices, int len),
+    (int64_t* reverse_increment, int lenr),
+    (int64_t* forward_increment, int lenf)
 }
 
 %apply (int64_t * INPLACE_ARRAY1, int DIM1) {
@@ -393,13 +497,17 @@
     (int64_t* range_indices, int len_ri),
     (int64_t* result_size, int len_rs),
     (int64_t* out_array, int out_length),
-    (int64_t* cmp, int len12)
+    (int64_t* cmp, int len12),
+    (int64_t* forward_resolution, int lenf),
+    (int64_t* reverse_resolution, int lenr),
+    (int64_t* indices_inplace, int len)
 }
 
-
 %apply (double * INPLACE_ARRAY1, int DIM1) {
-	(double* triangle_info_lats, int dmy1),
-	(double* triangle_info_lons, int dmy2)
+  (double* triangle_info_lats, int dmy1),
+  (double* triangle_info_lons, int dmy2),
+  (double* d1, int nd1),
+  (double* d2, int nd2)
 }
 
 # %apply (int64_t * ARGOUT_ARRAY1, int DIM1 ) {
@@ -408,7 +516,8 @@
 # }
 
 %apply (double* in_array, int length, int64_t* out_array) {
-    (double* lon, int len_lon, int64_t* indices)
+  (double* lon, int len_lon, int64_t* indices),
+  (double* milliseconds, int len, int64_t* out_array)
 }
 
 %apply (int64_t* in_array, int length, int* out_array) {
@@ -418,7 +527,8 @@
 
 %apply (int64_t* in_array, int length, int64_t* out_array) {
   (int64_t* datetime, int len,  int64_t* indices_out),
-  (int64_t* indices, int len,  int64_t* datetime_out)
+  (int64_t* indices, int len,  int64_t* datetime_out),
+  (int64_t* indices, int len,  int64_t* new_indices)
 }
 
 %apply (int64_t* in_array, int length, double* out_array) {
@@ -455,6 +565,8 @@
 %pythoncode %{
 import numpy
 from pkg_resources import get_distribution
+import re
+from datetime import datetime
   
 __version__ = get_distribution('pystare').version
 
@@ -463,6 +575,12 @@ class PyStareError(Exception):
 
 class PyStareArrayBoundsExceeded(Exception):
     pass
+
+def current_datetime():
+    "Get a tiv from datetime.now(). To convert back use numpy.array(pystare.to_utc_approximate(i),dtype='datetime64[ms]'"
+    # bad: hard-coded resolution 48 
+    return \
+        from_utc(numpy.array([datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f")[0:-3]],dtype=numpy.datetime64).astype(numpy.int64),48,48)
 
 def to_neighbors(indices):
     result = _to_neighbors(indices)
@@ -476,7 +594,7 @@ def to_compressed_range(indices):
     len_ri = 0
     _to_compressed_range(indices,range_indices)
     endarg = 0
-    while (endarg < out_length) and (range_indices[endarg] > 0):
+    while (endarg < out_length) and (range_indices[endarg] >= 0):
       endarg = endarg + 1
     # endarg = numpy.argmax(range_indices < 0)
     range_indices = range_indices[:endarg]
@@ -580,13 +698,178 @@ def cmp_spatial(indices1, indices2):
     cmp = numpy.zeros([out_length],dtype=numpy.int64)
     _cmp_spatial(indices1,indices2,cmp)
     return cmp
-	    
+
+# Temporal
+
+def coarsest_resolution_finer_or_equal_ms(ms):
+    resolutions = numpy.zeros(ms.shape,dtype=numpy.int64)
+    _coarsest_resolution_finer_or_equal_milliseconds(ms,resolutions)
+    return resolutions
+
 def cmp_temporal(indices1, indices2):
 	out_length = len(indices1)*len(indices2)
 	cmp = numpy.zeros([out_length],dtype=numpy.int64)
 	_cmp_temporal(indices1,indices2,cmp)
-	return cmp   
+	return cmp
 
+def from_tai_iso_strings(tai_strings_in):
+    tai_strings = numpy.copy(tai_strings_in)
+    out_length = len(tai_strings )
+    tIndices   = numpy.zeros([out_length],dtype=numpy.int64)
+    p = re.compile('^([0-9]{4})-([0-2][0-9])-([0-3][0-9])T([0-2][0-9]):([0-5][0-9]):([0-5][0-9])(.([0-9]+))?(\s\(([0-9]+)\s([0-9]+)\)\s\(([0-9])\))?$')
+    for k in range(out_length):
+        s = p.match(tai_strings [k])
+        if s is not None:
+           if s.groups()[7] is None:
+              tai_strings [k] = tai_strings [k] + '.000 (48 48) (1)'
+           elif s.groups()[8] is None:
+              tai_strings [k] = tai_strings [k] + ' (48 48) (1)'
+        else:
+           raise ValueError('from_tai_iso_strings: unknown input "' + tai_strings [k] + '"')
+    _from_tai_iso_strings(list(tai_strings), tIndices)
+    return tIndices
+
+def to_tai_iso_strings(tIndices):
+    taiStrings = _to_tai_iso_strings(tIndices)
+    return taiStrings
+
+def to_temporal_triple_ms(tIndexValue):
+    ti_low = scidbLowerBoundMS(tIndexValue)
+    ti_hi  = scidbUpperBoundMS(tIndexValue)
+    return (ti_low,tIndexValue,ti_hi)
+
+def lowerBoundTAI(tIndexValue):
+    tret = tIndexValue.copy()
+    _scidbLowerBoundTAI(tIndexValue,tret)
+    return tret
+    
+def upperBoundTAI(tIndexValue):
+    tret = tIndexValue.copy()
+    _scidbUpperBoundTAI(tIndexValue,tret)
+    return tret
+
+def lowerBoundMS(tIndexValue):
+    tret = tIndexValue.copy()
+    _scidbLowerBoundMS(tIndexValue,tret)
+    return tret
+    
+def upperBoundMS(tIndexValue):
+    tret = tIndexValue.copy()
+    _scidbUpperBoundMS(tIndexValue,tret)
+    return tret
+    
+def to_temporal_triple_tai(tIndexValue):
+    # print('type ti tai: ',type(tIndexValue),tIndexValue,hex(tIndexValue[0]))
+    ti_low = lowerBoundTAI(tIndexValue)
+    # print('ti_low: ',hex(ti_low[0]))
+    ti_hi  = upperBoundTAI(tIndexValue)
+    return (ti_low,tIndexValue,ti_hi)
+
+def to_temporal_triple_ms(tIndexValue):
+    # print('type ti ms : ',type(tIndexValue),tIndexValue,hex(tIndexValue[0]))
+    ti_low = lowerBoundMS(tIndexValue)
+    # print('ti_low: ',hex(ti_low[0]))
+    ti_hi  = upperBoundMS(tIndexValue)
+    return (ti_low,tIndexValue,ti_hi)
+    
+def from_temporal_triple(triple,include_bounds=True):
+    "Calculate a temporal index value from a low, middle, and high tiv. Negative tiv are not used."
+    tiv = numpy.zeros([1],dtype=numpy.int64)
+    tiv[0] = _scidbNewTemporalValue(numpy.array(triple,dtype=numpy.int64),include_bounds)[0]
+    return tiv
+
+def temporalValueIntersectionIfOverlap  (indices1, indices2):
+    "Calculate intersection temporal index value element-by-element if they overlap."
+    if indices1.shape != indices2.shape:
+        raise ValueError("Arrays being compared must have the same shape.")
+    cmp = numpy.zeros(indices1.shape,dtype=numpy.int64)
+    _scidbTemporalValueIntersectionIfOverlap (indices1, indices2, cmp)
+    return cmp
+
+def temporalValueUnionIfOverlap  (indices1, indices2):
+    "Calculate union temporal index value element-by-element if they overlap."
+    if indices1.shape != indices2.shape:
+        raise ValueError("Arrays being compared must have the same shape.")
+    cmp = numpy.zeros(indices1.shape,dtype=numpy.int64)
+    _scidbTemporalValueUnionIfOverlap (indices1, indices2, cmp)
+    return cmp
+
+def temporalOverlapTAI  (indices1, indices2):
+    "Test for overlap, element by element. 0 if no overlap. Uses 'TAI'."
+    if indices1.shape != indices2.shape:
+        raise ValueError("Arrays being compared must have the same shape.")
+    cmp = numpy.zeros(indices1.shape,dtype=numpy.int64)
+    _scidbOverlapTAI (indices1, indices2, cmp)
+    return cmp
+    
+def temporalOverlap  (indices1, indices2):
+    "Test for overlap, element by element. 0 if no overlap. Uses approximate millisecond calculation."
+    if indices1.shape != indices2.shape:
+        raise ValueError("Arrays being compared must have the same shape.")
+    cmp = numpy.zeros(indices1.shape,dtype=numpy.int64)
+    _scidbOverlap (indices1, indices2, cmp)
+    return cmp
+
+def temporalContainsInstant (indices1, indices2):
+    "Do indices1 contain the instants in indices2. Compares element by element. Test for overlap, element by element. 0 if no overlap. Uses approximate millisecond calculation."
+    if indices1.shape != indices2.shape:
+        raise ValueError("Arrays being compared must have the same shape.")
+    cmp = numpy.zeros(indices1.shape,dtype=numpy.int64)
+    _scidbContainsInstant (indices1, indices2, cmp)
+    return cmp
+
+def to_JulianTAI(indices):
+    d1 = numpy.zeros(indices.shape,dtype=numpy.double)    
+    d2 = numpy.zeros(indices.shape,dtype=numpy.double)
+    _to_JulianTAI(indices,d1,d2)
+    return d1,d2
+
+def from_JulianTAI(d1,d2):
+    indices = numpy.zeros(d1.shape,dtype=numpy.int64)
+    _from_JulianTAI(d1,d2,indices)
+    return indices
+
+def to_JulianUTC(indices):
+    d1 = numpy.zeros(indices.shape,dtype=numpy.double)    
+    d2 = numpy.zeros(indices.shape,dtype=numpy.double)
+    _to_JulianUTC(indices,d1,d2)
+    return d1,d2
+
+def from_JulianUTC(d1,d2):
+    indices = numpy.zeros(d1.shape,dtype=numpy.int64)
+    _from_JulianUTC(d1,d2,indices)
+    return indices
+
+def set_reverse_resolution(indices,resolutions):
+    result = numpy.zeros(indices.shape,dtype=numpy.int64)
+    _set_reverse_resolution(indices,resolutions,result)
+    return result
+
+def set_forward_resolution(indices,resolutions):
+    result = numpy.zeros(indices.shape,dtype=numpy.int64)
+    _set_forward_resolution(indices,resolutions,result)
+    return result
+
+def reverse_resolution(indices):
+    result = numpy.zeros(indices.shape,dtype=numpy.int64)    
+    _reverse_resolution(indices,result)
+    return result
+    
+def forward_resolution(indices):
+    result = numpy.zeros(indices.shape,dtype=numpy.int64)    
+    _forward_resolution(indices,result)
+    return result
+
+def coarsen(indices,reverse_increments,forward_increments):
+    """TODO: Not tested"""
+    result = numpy.zeros(indices.shape,dtype=numpy.int64)    
+    _coarsen(indices,reverse_increments,forward_increments,result)
+    return result
+
+def set_temporal_resolutions_from_sorted(sorted_indices,include_bounds=True):
+    _set_temporal_resolutions_from_sorted_inplace(sorted_indices,include_bounds)
+    return sorted_indices
+    
 def intersects(indices1, indices2, method=0):
     # method = {'skiplist': 0, 'binsearch': 1, 'nn': 2}[method]
     return _intersects(indices1, indices2, method).astype(numpy.bool)
@@ -602,8 +885,17 @@ def intersect(indices1, indices2, multiresolution=True):
       _intersect_multiresolution(indices1, indices2, intersected)
     else:
       _intersect(indices1, indices2, intersected)
+      # print('isect:  ',intersected[0:20])
+
+    # Argmax returns 0 if intersected is non-negative, and not len(intersected)+1
+    # It's supposed to be the first index of the max val, but if all false...
     endarg = numpy.argmax(intersected < 0)
+    if endarg == 0:
+      if intersected[0] >= 0:
+         endarg = len(intersected)
+    # print('endarg: ',endarg)
     intersected = intersected[:endarg]
+    # print('isect- ',intersected)
     return intersected
 
 def shiftarg_lon(lon):

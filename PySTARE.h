@@ -24,8 +24,12 @@
 #include <stdio.h>
 #include "STARE.h"
 #include "SpatialRange.h"
+#include "TemporalIndex.h"
 
 static STARE stare;
+
+// Info & Utility
+const char* stare_version();
 
 // Spatial
 void from_latlon(double* lat, int len_lat,  double * lon, int len_lon, int64_t* indices, int level);
@@ -53,14 +57,66 @@ void _cmp_spatial(int64_t* indices1, int len1, int64_t* indices2, int len2, int6
 void _intersects(int64_t* indices1, int len1, int64_t* indices2, int len2, int* intersects, int method=0);
 
 // Temporal
-void from_utc(int64_t *datetime, int len, int64_t *indices_out, int resolution);
+void from_utc(int64_t *datetime, int len, int64_t *indices_out, int forward_resolution, int reverse_resolution);
+void from_utc_variable(int64_t *datetime, int len, int64_t *indices_out, int64_t* forward_resolution, int lenf, int64_t* reverse_resolution, int lenr);
 void to_utc_approximate(int64_t* indices, int len, int64_t* datetime_out);
 void _cmp_temporal(int64_t* indices1, int len1, int64_t* indices2, int len2, int64_t* cmp, int len12);
+
+void _coarsest_resolution_finer_or_equal_milliseconds(double*  milliseconds, int len, int64_t* out_array);
+
+void _from_tai_iso_strings(char **taiStrings, int64_t* out_array, int out_length);
+char** _to_tai_iso_strings(int64_t* indices, int len);
+
+void _scidbTemporalValueIntersectionIfOverlap (int64_t* indices1, int len1, int64_t* indices2, int len2, int64_t* cmp, int len12);
+void _scidbTemporalValueUnionIfOverlap        (int64_t* indices1, int len1, int64_t* indices2, int len2, int64_t* cmp, int len12);
+void _scidbOverlapTAI                         (int64_t* indices1, int len1, int64_t* indices2, int len2, int64_t* cmp, int len12);
+void _scidbOverlap                            (int64_t* indices1, int len1, int64_t* indices2, int len2, int64_t* cmp, int len12);
+void _scidbContainsInstant                    (int64_t* indices1, int len1, int64_t* indices2, int len2, int64_t* cmp, int len12);
+
+void _set_reverse_resolution(int64_t* indices, int len,
+                             int64_t* reverse_resolution, int lenr,
+                             int64_t* out_array, int out_length
+                             );
+void _set_forward_resolution(int64_t* indices, int len,
+                             int64_t* forward_resolution, int lenf,
+                             int64_t* out_array, int out_length
+                             );
+
+void _forward_resolution(int64_t* indices, int len,
+                         int64_t* out_array, int out_length
+                         );
+
+void _reverse_resolution(int64_t* indices, int len,
+                         int64_t* out_array, int out_length
+                         );
+                         
+void _coarsen(int64_t* indices, int len,
+                 int64_t* reverse_increment, int lenr,
+                 int64_t* forward_increment, int lenf,
+                 int64_t* out_array, int out_length
+                 );
 
 //void to_utc(int64_t* indices, int len, double* julian_day);
 //void from_tai(double* julian_day, int len, int64_t indices);
 //void to_tai(int64_t* indices, int len, double* julian_day);
 
+/*
+  From TemporalIndex.h
+ */
+void _scidbUpperBoundTAI(int64_t* indices, int len, int64_t* out_array, int out_length);
+void _scidbLowerBoundTAI(int64_t* indices, int len, int64_t* out_array, int out_length);
+void _scidbUpperBoundMS(int64_t* indices, int len, int64_t* out_array, int out_length);
+void _scidbLowerBoundMS(int64_t* indices, int len, int64_t* out_array, int out_length);
+void _scidbNewTemporalValue(int64_t* indices, int len, int64_t* new_indices, bool include_bounds);
+
+void _to_JulianTAI   (int64_t* indices, int len, double* d1, int nd1, double* d2, int nd2);
+void _from_JulianTAI (double* d1, int nd1, double* d2, int nd2, int64_t* out_array, int out_length);
+
+void _to_JulianUTC   (int64_t* indices, int len, double* d1, int nd1, double* d2, int nd2);
+void _from_JulianUTC (double* d1, int nd1, double* d2, int nd2, int64_t* out_array, int out_length);
+void _set_temporal_resolutions_from_sorted_inplace (int64_t* indices_inplace, int len, bool include_bounds);
+
+/****/
 
 enum StareResultCase { SpatialIntervals, ArrayIndexSpatialValues };
 

@@ -4,14 +4,27 @@ import unittest
 
 
 class MainTest(unittest.TestCase):
+
+    def test_bug38(self):
+        "https://github.com/SpatioTemporal/pystare/issues/38"
+        sids     = numpy.array([0x0,0x3f08000000000005],dtype=numpy.int64)
+        numpy.testing.assert_array_equal(sids,pystare.to_compressed_range(sids))
     
     def test_make_srange1000(self):
-        from tests.sids import sids
+        try:
+            from sids import sids
+        except:
+            from tests.sids import sids
+            pass
         sids = sids[0:1000]
         srange = pystare.srange(sids)
         
     def test_make_srange10000(self):
-        from tests.sids import sids
+        try:
+            from sids import sids
+        except:
+            from tests.sids import sids
+            pass
         sids = sids[0:10000]
         srange = pystare.srange(sids)
         
@@ -67,3 +80,6 @@ class MainTest(unittest.TestCase):
         with self.subTest():    
             self.assertEqual(hex(ivs[0]), '0x300a300000000009')
         
+if __name__ == "__main__":
+    unittest.main()
+

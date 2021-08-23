@@ -1,6 +1,10 @@
 
 # PySTARE Notes
 
+## 2021-05-21
+
+Added stare_version, retuning STARE's version string.
+
 ## 2020-03-19 0.6.0
 
 srange and intersect were often not returning multi-resolution
