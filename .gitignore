@@ -4,6 +4,7 @@ tmp.py
 .DS_Store
 **/__pycache__/
 *.so
+core.py
 pystare.egg-info/*
 build/*
 dist/

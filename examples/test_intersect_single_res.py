@@ -47,10 +47,10 @@ def test_intersect_single_res(proj,transf):
      plot1(None,None,lons1,lats1,triang1,c0='c',c1='r',transf=transf,ax=ax)
      # plt.show()
      
-     intersectedFalse = pystare.intersect(hull0, hull1, multiresolution=False)
+     intersectedFalse = pystare.intersection(hull0, hull1, multi_resolution=False)
      # print('intersectedFalse: ',intersectedFalse)
      
-     intersectedTrue  = pystare.intersect(hull0, hull1, multiresolution=True)
+     intersectedTrue  = pystare.intersection(hull0, hull1, multi_resolution=True)
 
      # plt.figure()
      # plt.subplot(projection=proj,transform=transf)

@@ -16,7 +16,7 @@
 const char* stare_version() { return STARE_version(); }
 
 // Spatial
-void from_latlon(double* lat, int len_lat, double * lon, int len_lon, int64_t* indices, int level) {            
+void _from_latlon(double* lat, int len_lat, double * lon, int len_lon, int64_t* indices, int level) {
     for (int i=0; i<len_lat; i++) {        
         indices[i] = stare.ValueFromLatLonDegrees(lat[i], lon[i], level);
     }
@@ -49,7 +49,7 @@ void _from_latlon2D(double* lat, int lalen1, int lalen2,
 
 
 
-void to_latlon(int64_t* indices, int len, double* lat, double* lon) { 
+void _to_latlon(int64_t* indices, int len, double* lat, double* lon) {
     for (int i=0; i< len; i++) { 
         LatLonDegrees64 latlon = stare.LatLonDegreesFromValue(indices[i]);
 		lat[i] = latlon.lat; 
@@ -57,7 +57,7 @@ void to_latlon(int64_t* indices, int len, double* lat, double* lon) {
     }    
 }
 
-void to_latlonlevel(int64_t* indices, int len, double* lat, double* lon, int* levels) {
+void _to_latlonlevel(int64_t* indices, int len, double* lat, double* lon, int* levels) {
     for (int i=0; i<len; i++) {                
         LatLonDegrees64 latlon = stare.LatLonDegreesFromValue(indices[i]);
         lat[i] = latlon.lat; 
@@ -66,7 +66,7 @@ void to_latlonlevel(int64_t* indices, int len, double* lat, double* lon, int* le
     }
 }
 
-void to_level(int64_t* indices, int len, int* levels) {
+void _to_level(int64_t* indices, int len, int* levels) {
     for (int i=0; i<len; i++) {                
         levels[i] = stare.ResolutionLevelFromValue(indices[i]);
     }
@@ -127,7 +127,7 @@ void _to_vertices_latlon(int64_t* indices, int len, double* triangle_info_lats, 
     }
 }
 
-void to_area(int64_t* indices, int len, double* areas) {
+void _to_area(int64_t* indices, int len, double* areas) {
     for (int i=0; i<len; i++) {
         areas[i] = stare.AreaFromValue(indices[i]);        
     }
@@ -138,7 +138,7 @@ void to_area(int64_t* indices, int len, double* areas) {
  */
 
 
-void from_intervals(int64_t* intervals, int len, int64_t* indices_starts, int64_t* indices_terminators ) {
+void _from_intervals(int64_t* intervals, int len, int64_t* indices_starts, int64_t* indices_terminators ) {
 	// cout << "len: " << len << endl << flush;
 	// if(false) {
 	EmbeddedLevelNameEncoding leftJustified;
@@ -396,7 +396,7 @@ void _coarsest_resolution_finer_or_equal_milliseconds(double*  milliseconds, int
   }
 }
 
-void from_utc(int64_t *datetime, int len, int64_t *indices_out
+void _from_utc(int64_t *datetime, int len, int64_t *indices_out
 	      , int forward_resolution
 	      , int reverse_resolution
 	      ) {
@@ -439,7 +439,7 @@ void from_utc(int64_t *datetime, int len, int64_t *indices_out
 //    cout << endl << flush;
 }
 
-void from_utc_variable(int64_t *datetime, int len, int64_t *indices_out, int64_t* forward_resolution, int lenf, int64_t* reverse_resolution, int lenr) {
+void _from_utc_variable(int64_t *datetime, int len, int64_t *indices_out, int64_t* forward_resolution, int lenf, int64_t* reverse_resolution, int lenr) {
 	// datetime is in ms (numpy default).
 	// double jd19700101_erfa = 2440587.5;
 
@@ -479,7 +479,7 @@ void from_utc_variable(int64_t *datetime, int len, int64_t *indices_out, int64_t
 //    cout << endl << flush;
 }
 
-void to_utc_approximate(int64_t *indices, int len, int64_t *datetime_out) {
+void _to_utc_approximate(int64_t *indices, int len, int64_t *datetime_out) {
 	double jd19700101_erfa = 2440587.5;
 //	cout << "to_utc_approximate" << endl << flush;
   for (int i=0; i<len; i++) {

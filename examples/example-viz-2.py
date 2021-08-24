@@ -64,7 +64,7 @@ print('hull1: ',len(hull1))
 if True:
     intersected = np.full([1000],-1,dtype=np.int64)
     # intersected = ps.intersect(hull0,hull1,multiresolution=False)
-    intersected = ps.intersect(hull0,hull1,multiresolution=True)
+    intersected = ps.intersection(hull0, hull1, multi_resolution=True)
     # intersected = ps.intersect(hull0,hull1,multiresolution=True)
     # print('hull0: ',[hex(i) for i in hull0])
     # print('hull1: ',[hex(i) for i in hull1])

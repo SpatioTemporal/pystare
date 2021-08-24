@@ -65,27 +65,27 @@ class MainTest(unittest.TestCase):
         
     def test_intersect(self):
         indices = pystare.from_latlon(lat, lon, 12)
-        intersected = pystare.intersect(indices, indices)        
+        intersected = pystare.intersection(indices, indices)
         expected = numpy.array([3643626709468577804, 4151504977312874508, 4161865159985332236])
         numpy.testing.assert_array_equal(intersected, expected)
         
     def test_intersect_multires(self):
         indices = pystare.from_latlon(lat, lon, 12)
-        intersected = pystare.intersect(indices, indices, multiresolution=True)
+        intersected = pystare.intersection(indices, indices, multi_resolution=True)
         expected = numpy.array([3643626709468577804, 4151504977312874508, 4161865159985332236])
         numpy.testing.assert_array_equal(intersected, expected)
 
     def test_intersect_multires2(self):
         indices1 = pystare.from_latlon(lat, lon, 12)
         indices2 = numpy.array([indices1[1]], dtype=numpy.int64)
-        intersected = pystare.intersect(indices1, indices2, multiresolution=True)
+        intersected = pystare.intersection(indices1, indices2, multi_resolution=True)
         expected = numpy.array([4161865159985332236])
         numpy.testing.assert_array_equal(intersected, expected)
         
     def test_intersect_multires3(self):
         indices1 = pystare.from_latlon(lat, lon, 12)
         indices2 = numpy.array([0x100000000000000c], dtype=numpy.int64)
-        intersected = pystare.intersect(indices1, indices2, multiresolution=True)
+        intersected = pystare.intersection(indices1, indices2, multi_resolution=True)
         numpy.testing.assert_array_equal(intersected, numpy.array([], dtype=numpy.int64))
         
     def test_intersect_single_res(self):
@@ -100,8 +100,8 @@ class MainTest(unittest.TestCase):
         lon1 = numpy.array([-60, 60, 60, -60], dtype=numpy.double)
         hull1 = pystare.to_hull_range_from_latlon(lat1, lon1, resolution1)
 
-        intersectedFalse = pystare.intersect(hull0, hull1, multiresolution=False)
-        intersectedTrue  = pystare.intersect(hull0, hull1, multiresolution=True)
+        intersectedFalse = pystare.intersection(hull0, hull1, multi_resolution=False)
+        intersectedTrue  = pystare.intersection(hull0, hull1, multi_resolution=True)
 
         # See examples/test_intersect_single_res.py
         self.assertEqual(328, len(intersectedFalse))
@@ -113,7 +113,7 @@ class MainTest(unittest.TestCase):
         a = [4114022797720682508, 4505997421712506892, 4505997834029367308, 4505997868389105676, 4505998418144919564]
         b = [4528191461944221900, 4505997456072245260]
         for i in range(1, 10000):        
-            pystare.intersect(a, b)
+            pystare.intersection(a, b)
         self.assertTrue(True)
 
     def test_intersect_range_single_res(self):

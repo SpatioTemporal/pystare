@@ -54,7 +54,7 @@ def make_hull(lat0,lon0,resolution0):
     return lats0,lons0,triang0,hull0
 
 def make_nc_hull(lat0,lon0,resolution0,restrict=None):
-    hull0 = ps.to_nonconvex_hull_range_from_latlon(lat0,lon0,resolution0)
+    hull0 = ps.cover_from_ring(lat0, lon0, resolution0)
     print('make_nc_hull hull size: ',len(hull0))
     if restrict is not None:
         try:
