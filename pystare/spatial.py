@@ -32,7 +32,7 @@ def from_latlon(lat, lon, level):
     array([3331783833575763399])
     """
     if level < 0 or level > 27:
-        raise pystare.exceptions.PyStareError()
+        raise pystare.exceptions.PyStareLevelError()
     sids = pystare.core._from_latlon(lat, lon, level)
     return sids
 
@@ -301,6 +301,8 @@ def expand_intervals(intervals, level, multi_resolution=False):
     >>> import pystare
     >>>
     """
+    if level < 0 or level > 27:
+        raise pystare.exceptions.PyStareLevelError()
     result = pystare.core._expand_intervals(intervals, level, multi_resolution)
     expanded_intervals = numpy.zeros([result.get_size_as_intervals()], dtype=numpy.int64)
     result.copy_as_values(expanded_intervals)
@@ -337,7 +339,7 @@ def adapt_resolution_to_proximity(sids):
     return adapted_sids
 
 
-def to_hull_range(indices, resolution):
+def to_hull_range(indices, level):
     """
 
     Parameters
@@ -351,8 +353,10 @@ def to_hull_range(indices, resolution):
     >>> import pystare
     >>>
     """
+    if level < 0 or level > 27:
+        raise pystare.exceptions.PyStareLevelError()
 
-    result = pystare.core._to_hull_range(indices, resolution)
+    result = pystare.core._to_hull_range(indices, level)
     range_indices = numpy.full([result.get_size_as_intervals()], -1, dtype=numpy.int64)
     result.copy_as_intervals(range_indices)
     return range_indices
@@ -400,6 +404,9 @@ def cover_from_hull(lat, lon, level):
     array([4251398048237748227, 4269412446747230211, 4278419646001971203,
            4539628424389459971, 4548635623644200963, 4566650022153682947])
     """
+    if level < 0 or level > 27:
+        raise pystare.exceptions.PyStareLevelError()
+
     result = pystare.core._to_hull_range_from_latlon(lat, lon, level)
     range_indices = numpy.full([result.get_size_as_intervals()], -1, dtype=numpy.int64)
     result.copy_as_intervals(range_indices)
@@ -450,7 +457,11 @@ def cover_from_ring(lat, lon, level):
            4271664246560915461, 4280671445815656453, 4281234395769077765,
            4282360295675920389, 4284049145536184325, 4285175045443026949,
            4541880224203145221, 4553139223271571461, 4571153621781053445])  """
-    result = pystare.core._to_nonconvex_hull_range_from_latlon(lat, lon, level);
+
+    if level < 0 or level > 27:
+        raise pystare.exceptions.PyStareLevelError()
+
+    result = pystare.core._to_nonconvex_hull_range_from_latlon(lat, lon, level)
     out_length = result.get_size_as_intervals()
     range_indices = numpy.zeros([out_length], dtype=numpy.int64)
     result.copy_as_intervals(range_indices)
@@ -471,6 +482,8 @@ def to_circular_cover(lat, lon, radius, level):
     >>> import pystare
     >>>
     """
+    if level < 0 or level > 27:
+        raise pystare.exceptions.PyStareLevelError()
 
     result = pystare.core._to_circular_cover(lat, lon, radius, level)
     out_length = result.get_size_as_intervals()
@@ -479,7 +492,7 @@ def to_circular_cover(lat, lon, radius, level):
     return range_indices
 
 
-def circular_cover_from(index, radius, resolution):
+def circular_cover_from(index, radius, level):
     """
 
     Parameters
@@ -493,8 +506,12 @@ def circular_cover_from(index, radius, resolution):
     >>> import pystare
     >>>
     """
+
+    if level < 0 or level > 27:
+        raise pystare.exceptions.PyStareLevelError()
+
     latsv, lonsv, lat_center, lon_center = to_vertices_latlon([index])
-    return to_circular_cover(lat_center[0], lon_center[0], radius, resolution)
+    return to_circular_cover(lat_center[0], lon_center[0], radius, level)
 
 
 def to_box_cover_from_latlon(lat, lon, resolution):
@@ -684,7 +701,7 @@ def intersection(sids1, sids2, multi_resolution=True):
 
 def spatial_increment_from_level(level):
     if level < 0 or level > 27:
-        raise pystare.exceptions.PyStareError()
+        raise pystare.exceptions.PyStareLevelError()
     return 1 << (59 - 2 * level)
 
 
@@ -694,7 +711,7 @@ def spatial_resolution(sid):
 
 def spatial_terminator_mask(level):
     if level < 0 or level > 27:
-        raise pystare.exceptions.PyStareError()
+        raise pystare.exceptions.PyStareLevelError()
     return (1 << (1 + 58 - 2 * level)) - 1
 
 
