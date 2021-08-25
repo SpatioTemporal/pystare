@@ -80,12 +80,12 @@ def from_latlon_2d(lat, lon, level=None, adapt_level=False):
     Examples
     -----------
     >>> import pystare
-    >>> lats = numpy.array([[53.20177841, 53.20317078, 53.20351791],
-                  [53.29219437, 53.29222107, 53.29125977],
-                  [53.28958893, 53.29105759, 53.29147339]])
-    >>> lons = numpy.array([[-15.9339962 , -16.2881012 , -16.62910461],
-                        [-15.93274784, -16.28762245, -16.62934113],
-                        [-15.93699169, -16.29188538, -16.63365936]])
+    >>> lats = numpy.array([[53.20177841, 53.20317078, 53.20351791], \
+                            [53.29219437, 53.29222107, 53.29125977], \
+                            [53.28958893, 53.29105759, 53.29147339]])
+    >>> lons = numpy.array([[-15.9339962 , -16.2881012 , -16.62910461], \
+                            [-15.93274784, -16.28762245, -16.62934113], \
+                            [-15.93699169, -16.29188538, -16.63365936]])
     >>> pystare.from_latlon_2d(lats, lons, adapt_level=True)
     array([[4298473764500464809, 4298458168380511209, 4297394569014717897],
            [4298462872969244297, 4298459225563237225, 4297297422977447753],
@@ -188,7 +188,7 @@ def to_level(sids):
     >>> import numpy
     >>> sids = numpy.array([4151504989081014894, 4161865161846704590, 3643626718498217166])
     >>> pystare.to_level(sids)
-    array([14, 14, 14], dtype=int32))
+    array([14, 14, 14], dtype=int32)
     """
     return pystare.core._to_level(sids)
 
@@ -212,8 +212,8 @@ def to_area(sids):
     >>> import numpy
     >>> import math
     >>> sids = numpy.array([4151504989081014894, 4161865161846704590, 3643626718498217166])
-    >>> pystare.to_level(sids)
-        array([8.66507750e-08, 8.74786654e-08, 7.97819113e-08])
+    >>> pystare.to_area(sids)
+    array([5.41567334e-09, 5.46741649e-09, 4.98636938e-09])
 
     >>> level = 8
     >>> n = 8 * (4 ** level)
@@ -396,10 +396,10 @@ def cover_from_hull(lat, lon, level):
     Examples
     ----------
     >>> import pystare
-    >>> lat = [53.75702912049104, 54.98310415304803, 53.69393219666267, 50.128051662794235, 49.01778351500333,
+    >>> lat = [53.75702912049104, 54.98310415304803, 53.69393219666267, 50.128051662794235, 49.01778351500333, \
                47.62058197691181, 47.467645575544, 50.266337795607285, 51.10667409932158, 53.75702912049104]
-    >>> lon = [14.119686313542559, 9.921906365609118, 7.100424838905269, 6.043073357781111, 8.099278598674744,
-               7.466759067422231, 12.932626987365948, 12.240111118222558, 15.01699588385867, 14.119686313542559]
+    >>> lon = [14.119686313542559, 9.921906365609118, 7.100424838905269, 6.043073357781111, 8.099278598674744, \
+                7.466759067422231, 12.932626987365948, 12.240111118222558, 15.01699588385867, 14.119686313542559]
     >>> pystare.cover_from_hull(lat, lon, 3)
     array([4251398048237748227, 4269412446747230211, 4278419646001971203,
            4539628424389459971, 4548635623644200963, 4566650022153682947])
@@ -447,9 +447,9 @@ def cover_from_ring(lat, lon, level):
     Examples
     ----------
     >>> import pystare
-    >>> lat = [53.75702912049104, 54.98310415304803, 53.69393219666267, 50.128051662794235, 49.01778351500333,
+    >>> lat = [53.75702912049104, 54.98310415304803, 53.69393219666267, 50.128051662794235, 49.01778351500333, \
                47.62058197691181, 47.467645575544, 50.266337795607285, 51.10667409932158, 53.75702912049104]
-    >>> lon = [14.119686313542559, 9.921906365609118, 7.100424838905269, 6.043073357781111, 8.099278598674744,
+    >>> lon = [14.119686313542559, 9.921906365609118, 7.100424838905269, 6.043073357781111, 8.099278598674744, \
                7.466759067422231, 12.932626987365948, 12.240111118222558, 15.01699588385867, 14.119686313542559]
     >>> pystare.cover_from_ring(lat, lon, 5)
     array([4254212798004854789, 4255901647865118725, 4256464597818540037,
@@ -648,7 +648,7 @@ def intersects(cover, sids, method='binsearch'):
 
     if isinstance(method, str):
         method = {'skiplist': 0, 'binsearch': 1, 'nn': 2}[method]
-    does_intersect = pystare.core._intersects(cover, sids, method).astype(numpy.bool)
+    does_intersect = pystare.core._intersects(cover, sids, method).astype(bool)
     return does_intersect
 
 
@@ -780,11 +780,11 @@ def triangulate_indices(indices):
     """
     Prepare data for matplotlib.tri.Triangulate.
 
-    Examples
+    Usage
     ----------
-    >>> lons,lats,intmat = triangulate_indices(indices)
-    >>> triang = tri.Triangulation(lons,lats,intmat)
-    >>> plt.triplot(triang,'r-',transform=transform,lw=1,markersize=3)
+    >>> lons,lats,intmat = triangulate_indices(indices) # doctest: +SKIP
+    >>> triang = tri.Triangulation(lons,lats,intmat)     # doctest: +SKIP
+    >>> plt.triplot(triang,'r-',transform=transform,lw=1,markersize=3) # doctest: +SKIP
     """
 
     latv, lonv, lat_center, lon_center = to_vertices_latlon(indices)

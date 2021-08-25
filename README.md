@@ -5,7 +5,8 @@ PySTARE exposes the STARE library to python.
 
 
 ## Requirements:
-By default, pystare requires STARE to be installed i.e. expects libSTARE.a in /usr/local/lib/ and STARE.h in /usr/local/include/
+Pystare requires STARE to be installed.
+It expects libSTARE.a in /usr/local/lib/ and STARE.h in /usr/local/include/
 
     git clone https://github.com/SpatioTemporal/STARE
     cd STARE
@@ -13,7 +14,8 @@ By default, pystare requires STARE to be installed i.e. expects libSTARE.a in /u
     make
     make install
 
-If no rights for make install are present, the location of libSTARE.a and STARE.h can be specified in setup.py
+If no rights for ```make install``` are present, 
+the location of libSTARE.a and STARE.h can be specified in setup.py
 
     library_dirs=[],       # Location of libSTARE.a
     include_dirs=[],       # Location of STARE.h
@@ -25,8 +27,6 @@ or by shell environment variables (e.g. in bash):
 
 It may be necessary to set PYTHON_INCLUDE_DIRS, if, for example, numpy
 headers cannot be found.
-
-STARE version 0.16.0 or greater is required.
 
 ## Installation
 
@@ -40,12 +40,14 @@ STARE version 0.16.0 or greater is required.
     
 ### Manual build
     
-    python3 setup.py build_ext --inplace
-    python3 setup.py build --force
-    
+    python3 setup.py build_ext --inplace 
     
 ## Tests
-    python3 setup.py test
+pystare uses pytest. Simply run ```pytest``` to run all tests.
+Or 
+pytest --doctest-modules 
+
+
     
     
 ## Usage
