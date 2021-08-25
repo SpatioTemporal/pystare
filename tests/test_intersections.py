@@ -2,27 +2,29 @@ import numpy
 import pystare 
 import unittest
 
-lat = numpy.array([30,45,60], dtype=numpy.double)
-lon = numpy.array([45,60,10], dtype=numpy.double)
+lat = numpy.array([30, 45, 60], dtype=numpy.double)
+lon = numpy.array([45, 60, 10], dtype=numpy.double)
+
 
 def shiftarg_lon(lon):
     "If lon is outside +/-180, then correct back."
-    if(lon>180):
+    if lon > 180:
         return ((lon + 180.0) % 360.0)-180.0
     else:
         return lon
 
-def triangulate(i0,i1,i2):
+
+def triangulate(i0, i1, i2):
     "Prepare data structures for tri.Triangulate."
     # print('triangulating...')
     # i0,i1,i2,ic = ps.to_vertices(indices)
-    i0lat,i0lon = ps.to_latlon(i0)
-    i1lat,i1lon = ps.to_latlon(i1)
-    i2lat,i2lon = ps.to_latlon(i2)
-    lats    = np.zeros([3*len(i0lat)],dtype=np.double)
-    lons    = np.zeros([3*len(i0lat)],dtype=np.double)
-    intmat  = []
-    k=0
+    i0lat, i0lon = pystare.to_latlon(i0)
+    i1lat, i1lon = pystare.to_latlon(i1)
+    i2lat, i2lon = pystare.to_latlon(i2)
+    lats = numpy.zeros([3*len(i0lat)], dtype=numpu.double)
+    lons = numpy.zeros([3*len(i0lat)], dtype=numpy.double)
+    intmat = []
+    k = 0
     for i in range(len(i0)):
         lats[k]   = i0lat[i]
         lons[k]   = i0lon[i]
@@ -30,36 +32,35 @@ def triangulate(i0,i1,i2):
         lons[k+1] = i1lon[i]
         lats[k+2] = i2lat[i]
         lons[k+2] = i2lon[i]
-        intmat.append([k,k+1,k+2])
+        intmat.append([k, k+1, k+2])
         k=k+3
     for i in range(len(lons)):
         lons[i] = shiftarg_lon(lons[i])
         # print('triangulating done.')      
-    return lons,lats,intmat
+    return lons, lats, intmat
+
 
 def triangulate1(lats,lons):
     "Prepare data for tri.Triangulate."
     # print('triangulating1...')
-    intmat=[]
-    npts=int(len(lats)/3)
-    k=0
+    intmat = []
+    npts = int(len(lats)/3)
+    k = 0
     for i in range(npts):
-        intmat.append([k,k+1,k+2])
-        k=k+3
+        intmat.append([k, k+1, k+2])
+        k = k+3
     for i in range(len(lons)):
         lons[i] = shiftarg_lon(lons[i])
     # print('triangulating1 done.')      
-    return lons,lats,intmat
-
+    return lons, lats, intmat
 
 
 class MainTest(unittest.TestCase):
-    
-    
+
     def test__intersect(self):        
         indices = pystare.from_latlon(lat, lon, 12)
         intersected = numpy.zeros([3], dtype=numpy.int64)
-        pystare._intersect(indices, indices, intersected)
+        pystare.core._intersect(indices, indices, intersected)
         expected = numpy.array([3643626709468577804, 4151504977312874508, 4161865159985332236])
         numpy.testing.assert_array_equal(intersected, expected)
         
@@ -93,12 +94,12 @@ class MainTest(unittest.TestCase):
         resolution0 = resolution
         lat0 = numpy.array([ 10, 5, 60,70], dtype=numpy.double)
         lon0 = numpy.array([-30,-20,60,10], dtype=numpy.double)
-        hull0 = pystare.to_hull_range_from_latlon(lat0, lon0, resolution0)
+        hull0 = pystare.cover_from_hull(lat0, lon0, resolution0)
                                               
         resolution1 = 6
         lat1 = numpy.array([10,  20, 30, 20 ], dtype=numpy.double)
         lon1 = numpy.array([-60, 60, 60, -60], dtype=numpy.double)
-        hull1 = pystare.to_hull_range_from_latlon(lat1, lon1, resolution1)
+        hull1 = pystare.cover_from_hull(lat1, lon1, resolution1)
 
         intersectedFalse = pystare.intersection(hull0, hull1, multi_resolution=False)
         intersectedTrue  = pystare.intersection(hull0, hull1, multi_resolution=True)
@@ -121,22 +122,22 @@ class MainTest(unittest.TestCase):
         resolution0 = resolution
         lat0 = numpy.array([ 10, 5, 60,70], dtype=numpy.double)
         lon0 = numpy.array([-30,-20,60,10], dtype=numpy.double)
-        hull0 = pystare.to_hull_range_from_latlon(lat0, lon0, resolution0)
+        hull0 = pystare.cover_from_hull(lat0, lon0, resolution0)
         # print("len hull0: ",len(hull0))
                                               
         resolution1 = 6
         lat1 = numpy.array([10,  20, 30, 20 ], dtype=numpy.double)
         lon1 = numpy.array([-60, 60, 60, -60], dtype=numpy.double)
-        hull1 = pystare.to_hull_range_from_latlon(lat1, lon1, resolution1)
+        hull1 = pystare.cover_from_hull(lat1, lon1, resolution1)
         # print("len hull1: ",len(hull1))
 
-        r0 = pystare.srange()
+        r0 = pystare.core.srange()
         r0.add_intervals(hull0)
 
-        r1 = pystare.srange()
+        r1 = pystare.core.srange()
         r1.add_intervals(hull1)
 
-        r01 = pystare.srange()
+        r01 = pystare.core.srange()
         # print("0800")
         
         r01.add_intersect(r0,r1,False)

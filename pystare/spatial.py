@@ -363,7 +363,8 @@ def to_hull_range(indices, level):
 
 
 def to_hull_range_from_latlon(lat, lon, level):
-    warnings.warn('Use range_from_hull() instead', DeprecationWarning)
+    warnings.warn('to_hull_range_from_latlon() is depreciated and will be removed in the future'
+                  'Use cover_from_hull() instead', DeprecationWarning)
     return cover_from_hull(lat, lon, level)
 
 

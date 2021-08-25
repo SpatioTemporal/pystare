@@ -5,10 +5,11 @@ import unittest
 
 class MainTest(unittest.TestCase):
 
+
     def test_bug38(self):
-        "https://github.com/SpatioTemporal/pystare/issues/38"
-        sids     = numpy.array([0x0,0x3f08000000000005],dtype=numpy.int64)
-        numpy.testing.assert_array_equal(sids,pystare.to_compressed_range(sids))
+        #https://github.com/SpatioTemporal/pystare/issues/38
+        sids = numpy.array([0x0, 0x3f08000000000005], dtype=numpy.int64)
+        numpy.testing.assert_array_equal(sids, pystare.to_compressed_range(sids))
     
     def test_make_srange1000(self):
         try:
@@ -17,7 +18,7 @@ class MainTest(unittest.TestCase):
             from tests.sids import sids
             pass
         sids = sids[0:1000]
-        srange = pystare.srange(sids)
+        srange = pystare.core.srange(sids)
         
     def test_make_srange10000(self):
         try:
@@ -26,7 +27,7 @@ class MainTest(unittest.TestCase):
             from tests.sids import sids
             pass
         sids = sids[0:10000]
-        srange = pystare.srange(sids)
+        srange = pystare.core.srange(sids)
         
     def test_collapse1(self):
         # parent with 4 children 
