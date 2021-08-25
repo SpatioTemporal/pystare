@@ -51,8 +51,8 @@ class MainTest(unittest.TestCase):
     
         print_(())
         tiv    = 2256562898056779093
-        tiv_lb_ms = pystare.lowerBoundMS(np.array([tiv],dtype=np.int64))
-        tiv_lb_tai = pystare.lowerBoundTAI(np.array([tiv],dtype=np.int64))
+        tiv_lb_ms = pystare.lower_bound_ms(np.array([tiv], dtype=np.int64))
+        tiv_lb_tai = pystare.lower_bound_tai(np.array([tiv], dtype=np.int64))
         print_(('tiv type: ',type(tiv)))
         print_(('lb type ms:  ',type(tiv_lb_ms)))
 
@@ -98,15 +98,15 @@ class MainTest(unittest.TestCase):
         print_(('    :    ',pystare.to_tai_iso_strings(tmp)))
     
         print_(())
-        overlap     = pystare.temporalOverlap(tiv0,tiv1)
+        overlap     = pystare.temporal_overlap(tiv0, tiv1)
         print_(('overlap:  ',overlap))
     
-        union01     = pystare.temporalValueUnionIfOverlap(tiv0,tiv1)
+        union01     = pystare.temporal_value_union_if_overlap(tiv0, tiv1)
         print_(())
         print_(('u01: ',union01))
         print_(('u01: ',pystare.to_tai_iso_strings(union01)))
         
-        intersect01 = pystare.temporalValueIntersectionIfOverlap(tiv0,tiv1)
+        intersect01 = pystare.temporal_value_intersection_if_overlap(tiv0, tiv1)
         print_(())
         print_(('i01: ',intersect01))
         print_(('i01: ',pystare.to_tai_iso_strings(intersect01)))
