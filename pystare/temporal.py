@@ -595,6 +595,12 @@ def from_julian_date(jd1, jd2, scale, forward_res=48, reverse_res=48):
 def to_julian_date(tivs, scale):
     """Converts STARE temporal index values to two-part Julian Dates
 
+    from [Julian Day Wikipedia](https://en.wikipedia.org/wiki/Julian_day)
+    "the Julian date (JD) of any instant is the Julian day number plus the
+    fraction of a day since the preceding noon in Universal Time.
+    Julian dates are expressed as a Julian day number with a decimal fraction added.
+    For example, the Julian Date for 00:30:00.0 UT January 1, 2013, is 2 456 293.520 833.
+
     Parameters
     ----------
     tivs: 1D array-like
@@ -626,25 +632,100 @@ def to_julian_date(tivs, scale):
     return jd1, jd2
 
 
-def set_reverse_resolution(indices, resolutions):
-    result = numpy.zeros(indices.shape, dtype=numpy.int64)
-    pystare.core._set_reverse_resolution(indices, resolutions, result)
+def adapt_resolutions_shape(tivs, resolutions):
+    if isinstance(resolutions, int):
+        resolutions = numpy.full(tivs.shape, resolutions)
+    elif isinstance(resolutions, list):
+        resolutions = numpy.array(resolutions)
+    if resolutions.shape != (1,) and resolutions.shape != tivs.shape:
+        raise pystare.exceptions.PyStareError('resolution has to have length 1 or same shape as tivs')
+    return resolutions
+
+
+def set_reverse_resolution(tivs, resolutions):
+    """Set the reverse resolution of STARE temporal index values
+
+    Parameters
+    -----------
+    tivs: 1D array-like
+        tivs to set the resolution for
+    resolutions: 1D array-like
+        resolutions to be set. Either single value or same resolution as tivs
+
+    Examples
+    ----------
+    >>> tivs = numpy.array([2275448179115690537, 2234915782217697833])
+    >>> pystare.set_reverse_resolution(tivs, numpy.array([9, 9]))
+    array([2275448179115690533, 2234915782217697829])
+    >>> pystare.set_reverse_resolution(tivs, [9, 9])
+    array([2275448179115690533, 2234915782217697829])
+    >>> pystare.set_reverse_resolution(tivs, 9)
+    array([2275448179115690533, 2234915782217697829])
+    >>> tiv = pystare.set_reverse_resolution(numpy.array([2275448179115690533]), 9)
+    >>> pystare.reverse_resolution(tiv)
+    array([9])
+    """
+    resolutions = adapt_resolutions_shape(tivs, resolutions)
+
+    result = numpy.zeros(tivs.shape, dtype=numpy.int64)
+    pystare.core._set_reverse_resolution(tivs, resolutions, result)
     return result
 
 
-def set_forward_resolution(indices, resolutions):
-    result = numpy.zeros(indices.shape, dtype=numpy.int64)
-    pystare.core._set_forward_resolution(indices, resolutions, result)
+def set_forward_resolution(tivs, resolutions):
+    """Set the forward resolution of STARE temporal index values
+
+    Parameters
+    -----------
+    tivs: 1D array-like
+        tivs to set the resolution for
+    resolutions: 1D array-like
+        resolutions to be set. Either single value or same resolution as tivs
+
+    Examples
+    ----------
+    >>> tivs = numpy.array([2275448179115690537, 2234915782217697833])
+    >>> pystare.set_forward_resolution(tivs, numpy.array([9, 9]))
+    array([2275448179115690281, 2234915782217697577])
+    >>> pystare.set_forward_resolution(tivs, [9, 9])
+    array([2275448179115690281, 2234915782217697577])
+    >>> pystare.set_forward_resolution(tivs, 9)
+    array([2275448179115690281, 2234915782217697577])
+    >>> tiv = pystare.set_forward_resolution(numpy.array([2275448179115690533]), 8)
+    >>> pystare.forward_resolution(tiv)
+    array([8])
+    """
+    resolutions = adapt_resolutions_shape(tivs, resolutions)
+
+    result = numpy.zeros(tivs.shape, dtype=numpy.int64)
+    pystare.core._set_forward_resolution(tivs, resolutions, result)
     return result
 
 
 def reverse_resolution(indices):
+    """ Retrieve the reverse resolution
+
+    Examples
+    ----------
+    >>> tiv = pystare.set_reverse_resolution(numpy.array([2275448179115690533]), 9)
+    >>> pystare.reverse_resolution(tiv)
+    array([9])
+    """
+
     result = numpy.zeros(indices.shape, dtype=numpy.int64)
     pystare.core._reverse_resolution(indices, result)
     return result
 
 
 def forward_resolution(indices):
+    """ Retrieve the forward resolution
+
+    Examples
+    ----------
+    >>> tiv = pystare.set_forward_resolution(numpy.array([2275448179115690533]), 7)
+    >>> pystare.forward_resolution(tiv)
+    array([7])
+    """
     result = numpy.zeros(indices.shape, dtype=numpy.int64)
     pystare.core._forward_resolution(indices, result)
     return result
@@ -658,6 +739,9 @@ def coarsen(indices, reverse_increments, forward_increments):
 
 
 def set_temporal_resolutions_from_sorted(sorted_indices, include_bounds=True):
+    """
+    TODO
+    """
     pystare.core._set_temporal_resolutions_from_sorted_inplace(sorted_indices, include_bounds)
     return sorted_indices
 
