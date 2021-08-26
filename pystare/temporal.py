@@ -529,7 +529,7 @@ def to_stare_timestring(tivs, scale='TAI'):
     return stare_string
 
 
-def from_julian(jd1, jd2, scale, forward_res=48, reverse_res=48, ):
+def from_julian_date(jd1, jd2, scale, forward_res=48, reverse_res=48):
     """ Converts two-part Julian Dates (JD) to SIVs.
 
     [astropy.time](https://docs.astropy.org/en/stable/time/index.html) provides a simple interface to convert between
@@ -558,6 +558,8 @@ def from_julian(jd1, jd2, scale, forward_res=48, reverse_res=48, ):
         jd1+jd2 is Julian Date apportioned in any convenient
     jd2: double
         jd1+jd2 is Julian Date apportioned in any convenient
+    scale: str. Either 'tai' or 'utc
+        The time scale (or time standard)
     forward_res: int. Valid range is 0..48
         The forward resolution (c.f :func:`~coarsest_resolution_finer_or_equal_ms()`)
     reverse_res: int. Valid range is 0..48
@@ -572,10 +574,10 @@ def from_julian(jd1, jd2, scale, forward_res=48, reverse_res=48, ):
     ----------
     >>> jd1 = numpy.array([2459453.0])
     >>> jd2 = numpy.array([0.23387067236111114])
-    >>> tivs = pystare.from_julian(jd1=jd1, jd2=jd2, scale='tai', forward_res=10, reverse_res=10)
+    >>> tivs = pystare.from_julian_date(jd1=jd1, jd2=jd2, scale='tai', forward_res=10, reverse_res=10)
     >>> pystare.to_stare_timestring(tivs)
     ['2021-08-26T17:36:46.426 (10 10) (1)']
-    >>> tivs = pystare.from_julian(jd1=jd1, jd2=jd2, scale='utc', forward_res=10, reverse_res=10)
+    >>> tivs = pystare.from_julian_date(jd1=jd1, jd2=jd2, scale='utc', forward_res=10, reverse_res=10)
     >>> pystare.to_stare_timestring(tivs)
     ['2021-08-26T17:37:23.426 (10 10) (1)']
     """
@@ -590,18 +592,38 @@ def from_julian(jd1, jd2, scale, forward_res=48, reverse_res=48, ):
     return tivs
 
 
-def to_julian_tai(indices):
-    d1 = numpy.zeros(indices.shape, dtype=numpy.double)
-    d2 = numpy.zeros(indices.shape, dtype=numpy.double)
-    pystare.core._to_JulianTAI(indices, d1, d2)
-    return d1, d2
+def to_julian_date(tivs, scale):
+    """Converts STARE temporal index values to two-part Julian Dates
 
+    Parameters
+    ----------
+    tivs: 1D array-like
+        The STARE temporal index values to convert
+    scale: str. Either 'tai' or 'utc
+        The time scale (or time standard)
 
-def to_julian_utc(indices):
-    d1 = numpy.zeros(indices.shape, dtype=numpy.double)
-    d2 = numpy.zeros(indices.shape, dtype=numpy.double)
-    pystare.core._to_JulianUTC(indices, d1, d2)
-    return d1, d2
+    Returns
+    --------
+    jd1: double
+        jd1+jd2 is Julian Date apportioned in any convenient
+    jd2: double
+        jd1+jd2 is Julian Date apportioned in any convenient
+
+    Examples
+    -----------
+    >>> tiv = numpy.array([2276038620410065089])
+    >>> pystare.to_julian_date(tiv, scale='tai')
+    (array([2459215.5]), array([237.71107206]))
+    >>> pystare.to_julian_date(tiv, scale='utc')
+    (array([2459215.5]), array([237.71064382]))
+    """
+    jd1 = numpy.zeros(tivs.shape, dtype=numpy.double)
+    jd2 = numpy.zeros(tivs.shape, dtype=numpy.double)
+    if scale == 'tai':
+        pystare.core._to_JulianTAI(tivs, jd1, jd2)
+    elif scale == 'utc':
+        pystare.core._to_JulianUTC(tivs, jd1, jd2)
+    return jd1, jd2
 
 
 def set_reverse_resolution(indices, resolutions):
@@ -638,6 +660,7 @@ def coarsen(indices, reverse_increments, forward_increments):
 def set_temporal_resolutions_from_sorted(sorted_indices, include_bounds=True):
     pystare.core._set_temporal_resolutions_from_sorted_inplace(sorted_indices, include_bounds)
     return sorted_indices
+
 
 def lower_bound_tai(tiv):
     """
