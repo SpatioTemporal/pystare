@@ -1,21 +1,23 @@
 import datetime
 import numpy
-import pystare
+import pystare.core
+import pystare.exceptions
 import re
 
 
 def from_ms_since_epoch_utc(ms_since_epoch_utc, forward_resolution=48, reverse_resolution=48):
-    """
-    Converts an integer of milliseconds since unix epoch in UTC to TIV.
+    """ Converts an integer of milliseconds since unix epoch in UTC to TIV.
+
+
 
     Parameters
     -----------
     ms_since_epoch_utc: array-like of ints
         milliseconds since unix epoch in UTC
-    forward_resolution: array-like of ints
-        The forward resolution
-    reverse_resolution: array-like of ints. Valid range is 14..64
-        The reverse resolution
+    forward_resolution: int. Valid range is 0..48
+        The forward resolution (c.f :func:`~coarsest_resolution_finer_or_equal_ms()`)
+    reverse_resolution: int. Valid range is 0..48
+        The reverse resolution (c.f. :func:`~coarsest_resolution_finer_or_equal_ms()`
 
     Returns
     --------
@@ -33,7 +35,7 @@ def from_ms_since_epoch_utc(ms_since_epoch_utc, forward_resolution=48, reverse_r
 
     See Also
     --------
-    :func:`~to_utc_approximate()`
+    :func:`~to_ms_since_epoch_utc()`
 
     """
     tivs = pystare.core._from_utc(ms_since_epoch_utc, forward_resolution, reverse_resolution)
@@ -75,7 +77,13 @@ def from_utc_variable(datetime, forward_resolution, reverse_resolution):
 
 def now(forward_resolution=48, reverse_resolution=48):
     """Get a tiv representing current point in time.
-    # TODO: Isn't this more of an example usecase code than anything useful
+
+    Parameters
+    ------------
+    forward_resolution: int. Valid range is 0..48
+        The forward resolution (c.f :func:`~coarsest_resolution_finer_or_equal_ms()`)
+    reverse_resolution: int. Valid range is 0..48
+        The reverse resolution (c.f. :func:`~coarsest_resolution_finer_or_equal_ms()`
 
     Examples
     ---------
@@ -90,10 +98,52 @@ def now(forward_resolution=48, reverse_resolution=48):
 
 
 def coarsest_resolution_finer_or_equal_ms(ms):
-    """TODO: What does this function do?
+    """ Converts milliseconds to finer or equal STARE temporal resolution.
+
+    Resolutions go from 0 being coarsest to 48 being the finest.
+    Bits are numbered in the opposite direction.
+    The biggest year bit is bit 62. The smallest millisecond bit is at bit 14. So we have:
+
+    Field | Resolutions | Start | End | Size | Unit
+    -- | -- | -- | -- | -- | --
+    0 | - | 0 | 1 | 2 | Calendar or Scaleindicator
+    1 | - | 2 | 7 | 6 | Reverse Neighborhood
+    2 | - | 8 | 13 | 6 | Forward Neighborhood
+    3 | 48-39 | 14 | 23 | 10 | Millisecond
+    4 | 38-33 | 24 | 29 | 6 | Second
+    5 | 32-27 | 30 | 35 | 6 | Minute
+    6 | 26-22 | 36 | 40 | 5 | Hour
+    7 | 21-19 | 41 | 43 | 3 | Day-of-week
+    8 | 18-17 | 44 | 45 | 2 | Week-of-month
+    9 | 16-13 | 46 | 49 | 4 | Month-of-year
+    10 | 12-0 | 50 | 62 | 13 | Year
+    11 | - | - | - | 1 | Before/After Epoch
+
+
+    Arguments
+    ----------
+    ms: 1D array of ints
+        resolution in milliseconds
+
+    Returns
+    ---------
+    resolutions: 1D numpy array of ints
+        STARE temporal resolutrions corresponding to ms
+
+    Examples
+    ---------
+    >>> import pystare
+    >>> millisecond  = 1
+    >>> second = 1000 * millisecond
+    >>> minute = 60 * second
+    >>> hour = 60 * minute
+    >>> day = 86400 * second
+    >>> year = 365 * day
+    >>> times = numpy.array([millisecond, second, minute, hour, day, year], dtype=numpy.int64)
+    >>> pystare.coarsest_resolution_finer_or_equal_ms(times)
+    array([48, 38, 32, 26, 21, 12])
     """
-    resolutions = numpy.zeros(ms.shape, dtype=numpy.int64)
-    pystare.core._coarsest_resolution_finer_or_equal_milliseconds(ms, resolutions)
+    resolutions = pystare.core._coarsest_resolution_finer_or_equal_milliseconds(ms)
     return resolutions
 
 
@@ -122,9 +172,10 @@ def cmp_temporal(tivs1, tivs2, flatten=True):
     >>> ts2 = numpy.array(['2021-05-01T10', '1986-10-01'], dtype='datetime64[ms]').astype(numpy.int64)
     >>> tiv1 = pystare.from_ms_since_epoch_utc(ts1, 10, 10)
     >>> tiv2 = pystare.from_ms_since_epoch_utc(ts2, 10, 10)
-    >>> pystare.cmp_temporal(tiv1, tiv2)
+    >>> pystare.cmp_temporal(tiv1, tiv2, flatten=False)
+    array([[1, 0],
+           [0, 1]])
     """
-    
     out_length = len(tivs1) * len(tivs2)
     cmp = numpy.zeros([out_length], dtype=numpy.int64)
     pystare.core._cmp_temporal(tivs1, tivs2, cmp)
@@ -133,27 +184,325 @@ def cmp_temporal(tivs1, tivs2, flatten=True):
     return cmp
 
 
-def from_tai_iso_strings(tai_strings_in):
-    tai_strings = numpy.copy(tai_strings_in)
-    out_length = len(tai_strings)
-    tivs = numpy.zeros([out_length], dtype=numpy.int64)
-    p = re.compile('^([0-9]{4})-([0-2][0-9])-([0-3][0-9])T([0-2][0-9]):([0-5][0-9]):([0-5][0-9])(.([0-9]+))?(\s\(([0-9]+)\s([0-9]+)\)\s\(([0-9])\))?$')
-    for k in range(out_length):
-        s = p.match(tai_strings[k])
-        if s is not None:
-            if s.groups()[7] is None:
-                tai_strings[k] = tai_strings[k] + '.000 (48 48) (1)'
-            elif s.groups()[8] is None:
-                tai_strings[k] = tai_strings[k] + ' (48 48) (1)'
+regex_iso8601 = r'^(-?(?:[1-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])' \
+                r'T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\.[0-9]+)' \
+                r'?(Z|[+-](?:2[0-3]|[01][0-9]):[0-5][0-9])?$'
+match_iso8601 = re.compile(regex_iso8601).match
+
+
+def validate_iso8601_string(iso_string, has_ms=True, has_tz=False):
+    """Test if string is ISO 8601 timestring.
+    Also verify if string includes milliseconds and timezone
+    https://en.wikipedia.org/wiki/ISO_8601
+
+    Parameters
+    -----------
+    iso_string: str
+        A formated timestring
+    has_ms: bool
+        Test if string includes milliseconds
+    has_tz: bool
+        Test if string includes timezone
+
+    Returns
+    --------
+    valid: Bool or str
+        Returns True if timestring is of shape %Y-%m-%dT%H:%M:%S.%ms.
+        Else False
+
+    Examples
+    -----------
+    >>> validate_iso8601_string('2021-01-09T17:47:56.154564', has_ms=True, has_tz=False) # ISO8601 w/o timezone and with ms
+    True
+    >>> validate_iso8601_string('2021-01-09T17:47:56.154564', has_ms=False) # ISO8601 w/o timezone and with ms
+    False
+    >>> validate_iso8601_string('2021-01-09T17:47:56', has_ms=True) # No ms
+    False
+    >>> validate_iso8601_string('2021-01-09T17:47:56', has_ms=False) # No ms
+    True
+    >>> validate_iso8601_string('2021-01-09T17:47:56.2435+05:00', has_tz=True) # includes timezone
+    True
+    >>> validate_iso8601_string('2021-01-09T17:47:56.2435+05:00', has_tz=False) # includes timezone
+    False
+    >>> validate_iso8601_string('2021-01-09T17:47:56.154564 (45 12) (1)') # STARE timestring
+    False
+    >>> validate_iso8601_string('Wolfgang') # Not a timestamp
+    False
+    """
+    match = match_iso8601(iso_string)
+    if match is None:
+        return False
+    else:
+        groups = match.groups()
+        if (groups[7] is None) == has_tz:
+            return False
+        elif (groups[6] is None) == has_ms:
+            return False
         else:
-            raise ValueError('from_tai_iso_strings: unknown input "' + tai_strings[k] + '"')
-    pystare.core._from_tai_iso_strings(list(tai_strings), tivs)
+            return True
+
+
+def analyze_iso8601_string(iso_string):
+    """
+    Returns 'has_tz' if timestring contains timezone
+    Returns 'no_ms' if timestring does not contain milliseconds
+    Returns 'nat' if timestring is not a ISO8601 timestring
+    Returns 'good' if timestring contains ms but no tz
+
+    Examples
+    ---------
+    >>> analyze_iso8601_string('2021-01-09T17:47:56') # No ms
+    'no_ms'
+    >>> analyze_iso8601_string('2021-01-09T17:47:56.2435+05:00') # includes timezone
+    'has_tz'
+    """
+    match = match_iso8601(iso_string)
+    if match is None:
+        return 'nat'
+    elif match.groups()[7] is not None:
+        return 'has_tz'
+    elif match.groups()[6] is None:
+        return 'no_ms'
+    else:
+        return 'good'
+
+
+def validate_iso8601_strings(time_strings, has_ms, has_tz):
+    """Validate if collection of strings all are ISO8601.
+     Also verify if timestamps includes milliseconds and  timezone.
+
+    Parameters
+    ----------
+    time_strings: 1D array-like of strings
+        collection of timestrings to be validated
+    has_ms: bool
+        Test if strings include milliseconds
+    has_tz: bool
+        Test if strings include timezone
+
+    Returns
+    ---------
+    are_valid: bool
+        True if all strings in collection are ISO8601 timestamps including ms and excluding timezone. False otherwise
+
+    Examples
+    ----------
+    >>> time_strings = ['2021-01-09T17:47:56.154564', '2021-05-09T17:47:56.13']
+    >>> pystare.validate_iso8601_strings(time_strings, has_ms=True, has_tz=False)
+    True
+    >>> time_strings = ['2021-01-09T17:47:56.154564', '2021-05-09T17:47:51']
+    >>> pystare.validate_iso8601_strings(time_strings, has_ms=True, has_tz=False)
+    False
+
+    See Also
+    ---------
+    :func:`~validate_iso8601_string()`
+    """
+    for time_string in time_strings:
+        if validate_iso8601_string(time_string, has_ms, has_tz) is not True:
+            return False
+    return True
+
+
+regex_stare = r'^(-?(?:[1-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])' \
+              r'T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])\.([0-9]{3})' \
+              r'?(\s\(([0-9]+)\s([0-9]+)\)\s\(([0-9])\))$'
+match_stare = re.compile(regex_stare).match
+
+
+def validate_stare_timestring(timestrings):
+    """ Tests if timestring has shape of STARE timestring,
+
+    STARE timestrings are of the form "%Y-%m-%dT%H:%M:%S.%ms (f_res, b_res) (type)"
+
+    Examples
+    ----------
+    >>> pystare.validate_stare_timestring('2021-01-09T17:47:56.154 (45 12) (1)')
+    True
+    >>> pystare.validate_stare_timestring('2021-01-09T17:47:56.15 (45 12) (1)')
+    False
+    >>> pystare.validate_stare_timestring('2021-01-09T17:47:56.15345345 (45 12) (1)')
+    False
+    >>> pystare.validate_stare_timestring('2021-01-09T17:47:56 (45 12) (1)')
+    False
+    >>> pystare.validate_stare_timestring('2021-01-09T17:47:56.154564')
+    False
+    """
+    if match_stare(timestrings) is not None:
+        return True
+    else:
+        return False
+
+
+def validate_stare_timestrings(timestrings):
+    """ Validate if collection of strings are STARE timestrings.
+    STARE timestrings are of the form "%Y-%m-%dT%H:%M:%S.%ms (f_res, r_res) (type)"
+
+    Examples
+    ---------
+    >>> stare_ts = ['2021-01-09T17:47:56.154 (45 12) (1)']
+    >>> validate_stare_timestrings(stare_ts)
+    True
+
+    See Also
+    ---------
+    :func:`~validate_stare_timestring()`
+
+    """
+    for timestring in timestrings:
+        if validate_stare_timestring(timestring) is False:
+            return False
+    return True
+
+
+def force_3ms(timestamp):
+    """ Forces 3 digits for the millisecods in an ISO timestamp.
+
+    Examples
+    ---------
+    >>> pystare.force_3ms('2021-08-26T17:03:56.6')
+    '2021-08-26T17:03:56.600'
+    >>> pystare.force_3ms('2021-08-26T17:03:56.643365456345')
+    '2021-08-26T17:03:56.643'
+    """
+    ms = match_iso8601(timestamp).groups()[6]
+    ms3 = ms.ljust(4, '0')[0:4]
+    timestamp = timestamp.replace(ms, ms3)
+    return timestamp
+
+
+def iso_to_stare_timestrings(iso_strings, forward_resolution, reverse_resolution, stare_type):
+    """ Converts an ISO 8601 timestring to a STARE timestring.
+
+    The ISO 8601 timestring has to contain exactly 3 digits for milliseconds but no timezone.
+    I.e. it is of the form "%Y-%m-%dT%H:%M:%S.%ms"
+    The stare timestring is of the form "%Y-%m-%dT%H:%M:%S.%ms (f_res, b_res) (stare_type)"
+
+
+    Parameters
+    -----------
+    iso_strings: array-like of iso timestrings
+        iso 8601 timestring
+    forward_resolution: int. Valid range is 0..48
+        The forward resolution (c.f :func:`~coarsest_resolution_finer_or_equal_ms()`)
+    reverse_resolution: int. Valid range is 0..48
+        The reverse resolution (c.f. :func:`~coarsest_resolution_finer_or_equal_ms()`
+    stare_type: str
+        #TODO what is the stare_type?
+
+    Returns
+    ----------
+    stare_strings: list of strings
+        list of STARE timestrings
+
+    Examples
+    ---------
+    >>> iso_timestring = ['2021-01-09T17:47:56.154564']
+    >>> pystare.iso_to_stare_timestrings(iso_timestring, forward_resolution=45, reverse_resolution=12, stare_type=1)
+    ['2021-01-09T17:47:56.154 (45 12) (1)']
+    """
+    if not validate_iso8601_strings(iso_strings, has_ms=True, has_tz=False):
+        raise ValueError('malformatted. Iso strings should be of shape: "%Y-%m-%dT%H:%M:%S.%ms"')
+
+    suffix = ' ({f_res} {b_res}) ({type})'.format(f_res=forward_resolution, b_res=reverse_resolution, type=stare_type)
+    stare_strings = []
+    for iso_string in iso_strings:
+        stare_string = force_3ms(iso_string)
+        stare_string = stare_string + suffix
+        stare_strings.append(stare_string)
+    return stare_strings
+
+
+def from_iso_strings(iso_strings, forward_res=48, reverse_res=48, scale='TAI', stare_type=1):
+    """ Converts an iso strings to STARE temporal index values
+
+    Parameters
+    -----------
+    iso_strings: array-like of iso timestrings
+        iso 8601 timestring
+    forward_res: int. Valid range is 0..48
+        The forward resolution (c.f :func:`~coarsest_resolution_finer_or_equal_ms()`)
+    reverse_res: int. Valid range is 0..48
+        The reverse resolution (c.f. :func:`~coarsest_resolution_finer_or_equal_ms()`
+    scale: str
+        time scale. Currently only TAI
+    stare_type: str
+        #TODO what is the stare_type?
+
+    Returns
+    --------
+    tiv: 1D numpy array of ints
+        STARE temporal index values
+
+    Examples
+    ----------
+    >>> time_strings = ['2021-08-26T17:03:56.6']
+    >>> pystare.from_iso_strings(time_strings, forward_res=20, reverse_res=18, scale='TAI')
+    array([2276038620409631817])
+    """
+    stare_timestrings = iso_to_stare_timestrings(iso_strings, forward_res, reverse_res, stare_type)
+    tivs = from_stare_timestrings(stare_timestrings, scale)
     return tivs
 
 
-def to_tai_iso_strings(tivs):
-    tai_strings = pystare.core._to_tai_iso_strings(tivs)
-    return tai_strings
+def from_stare_timestrings(stare_timestrings, scale='TAI'):
+    """ Converts a STARE timestring to a STARE temporal index value
+    The stare timestring is of the form "%Y-%m-%dT%H:%M:%S.%ms (f_res, b_res) (stare_type)
+    
+    Parameters
+    -----------
+    stare_timestrings: array-like of iso timestrings
+        STARE timestring
+    scale: str
+        time scale. Currently only 'TAI'
+
+    Examples
+    ---------
+    >>> stare_ts = ['2021-01-09T17:47:56.154 (45 12) (1)']
+    >>> pystare.from_stare_timestrings(stare_ts, scale='TAI')
+    array([2275464722577272113])
+    """
+
+    if not validate_stare_timestrings(stare_timestrings):
+        raise pystare.exceptions.PyStareError()
+    
+    out_length = len(stare_timestrings)
+    tivs = numpy.zeros([out_length], dtype=numpy.int64)
+    if scale == 'TAI':
+        pystare.core._from_tai_iso_strings(stare_timestrings, tivs)
+        return tivs
+    else:
+        raise pystare.exceptions.PyStareError('only TAI is implemented')
+
+
+def to_stare_timestring(tivs, scale='TAI'):
+    """Converts a STARE temporal index value to a STARE timestring
+
+    Parameters
+    -------------
+    tivs: 1D array-like
+        collection of STARE temporal index values
+    scale: str
+        Temporal scale. Currently only 'TAI'
+
+    Returns
+    ---------
+    stare_string:
+        STARE timestring of the form "%Y-%m-%dT%H:%M:%S.%ms (f_res, b_res) (stare_type)"
+
+    Examples
+    ---------
+    >>> time_strings = ['2021-08-26T17:03:56.626 (48 48) (1)']
+    >>> tiv = pystare.from_stare_timestrings(time_strings, scale='TAI')
+    >>> pystare.to_stare_timestring(tiv) == time_strings
+    True
+    """
+    
+    if scale == 'TAI':
+        stare_string = pystare.core._to_tai_iso_strings(tivs)
+    else:
+        raise pystare.exceptions.PyStareError('only TAI is implemented')
+    return stare_string
 
 
 def to_temporal_triple_ms(tivs):

@@ -1,5 +1,4 @@
 import warnings
-
 import pystare.core
 import numpy
 

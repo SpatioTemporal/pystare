@@ -108,7 +108,7 @@ class MainTest(unittest.TestCase):
 
     def test_variable_res(self):
 
-        index = pystare.from_tai_iso_strings([
+        index = pystare.from_iso_strings([
             "2003-02-13T12:00:00.000 (12 12) (1)"
             ,"2004-02-13T12:00:00.000 (12 12) (1)"
             ,"2004-03-13T12:00:00.000"
@@ -152,7 +152,7 @@ class MainTest(unittest.TestCase):
         i_varres_str = []
         ni = len(index)
         for i in range(ni):
-             i_varres_str = i_varres_str + [pystare.to_tai_iso_strings( numpy.concatenate(pystare.to_temporal_triple_tai(index_with_variable_res[i:i+1]) ))]
+             i_varres_str = i_varres_str + [pystare.to_stare_timestring(numpy.concatenate(pystare.to_temporal_triple_tai(index_with_variable_res[i:i + 1])))]
 
         expected = [
             ['2003-02-13T11:59:59.999 (00 63) (1)', '2003-02-13T12:00:00.000 (12 48) (1)', '2004-02-13T12:00:00.000 (63 63) (1)']
