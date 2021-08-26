@@ -396,6 +396,13 @@ void _coarsest_resolution_finer_or_equal_milliseconds(double*  milliseconds, int
   }
 }
 
+void _milliseconds_at_resolution(int64_t* resolutions, int len, double* millisecond) {
+  TemporalIndex tIndex;
+  for(int i=0; i<len; ++i) {
+    millisecond[i] = tIndex.millisecondsAtResolution(resolutions[i]);
+  }
+}
+
 void _from_utc(int64_t *datetime, int len, int64_t *indices_out
 	      , int forward_resolution
 	      , int reverse_resolution

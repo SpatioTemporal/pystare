@@ -532,7 +532,8 @@ namespace std {
 }
 
 %apply (int64_t* in_array, int length, double* out_array) {
-    (int64_t* indices, int len,  double* areas)
+    (int64_t* indices, int len,  double* areas),
+    (int64_t* resolutions, int len, double* millisecond)
 }
 
 %apply (int64_t* in_array, int length, double* out_array1, double* out_array2) {

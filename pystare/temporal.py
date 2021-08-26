@@ -8,8 +8,6 @@ import re
 def from_ms_since_epoch_utc(ms_since_epoch_utc, forward_resolution=48, reverse_resolution=48):
     """ Converts an integer of milliseconds since unix epoch in UTC to TIV.
 
-
-
     Parameters
     -----------
     ms_since_epoch_utc: array-like of ints
@@ -145,6 +143,32 @@ def coarsest_resolution_finer_or_equal_ms(ms):
     """
     resolutions = pystare.core._coarsest_resolution_finer_or_equal_milliseconds(ms)
     return resolutions
+
+
+def milliseconds_at_resolution(resolution):
+    """ Returns milliseconds for a given resolution.
+    Inverse of :func:`~coarsest_resolution_finer_or_equal_ms()`
+
+    Parameters
+    ----------
+    resolution: int between 0 and 48
+        resolution to look milliseconds up fpr
+
+    Returns
+    -----------
+    milliseconds: int
+        the size of the resolution in milliseconds
+
+    Examples
+    ---------
+    >>> ms = 5 * 60 * 1000 # 5 mintes
+    >>> resolution = coarsest_resolution_finer_or_equal_ms([ms])
+    >>> resolution
+    array([30])
+    >>> pystare.milliseconds_at_resolution(resolution) / 60 / 1000 # Back to minutes
+    array([4.])
+    """
+    return pystare.core._milliseconds_at_resolution(resolution)
 
 
 def cmp_temporal(tivs1, tivs2, flatten=True):
@@ -371,7 +395,7 @@ def force_3ms(timestamp):
     return timestamp
 
 
-def iso_to_stare_timestrings(iso_strings, forward_resolution, reverse_resolution, stare_type):
+def iso_to_stare_timestrings(iso_strings, forward_res, reverse_res, stare_type):
     """ Converts an ISO 8601 timestring to a STARE timestring.
 
     The ISO 8601 timestring has to contain exactly 3 digits for milliseconds but no timezone.
@@ -383,9 +407,9 @@ def iso_to_stare_timestrings(iso_strings, forward_resolution, reverse_resolution
     -----------
     iso_strings: array-like of iso timestrings
         iso 8601 timestring
-    forward_resolution: int. Valid range is 0..48
+    forward_res: int. Valid range is 0..48
         The forward resolution (c.f :func:`~coarsest_resolution_finer_or_equal_ms()`)
-    reverse_resolution: int. Valid range is 0..48
+    reverse_res: int. Valid range is 0..48
         The reverse resolution (c.f. :func:`~coarsest_resolution_finer_or_equal_ms()`
     stare_type: str
         #TODO what is the stare_type?
@@ -398,13 +422,13 @@ def iso_to_stare_timestrings(iso_strings, forward_resolution, reverse_resolution
     Examples
     ---------
     >>> iso_timestring = ['2021-01-09T17:47:56.154564']
-    >>> pystare.iso_to_stare_timestrings(iso_timestring, forward_resolution=45, reverse_resolution=12, stare_type=1)
+    >>> pystare.iso_to_stare_timestrings(iso_timestring, forward_res=45, reverse_res=12, stare_type=1)
     ['2021-01-09T17:47:56.154 (45 12) (1)']
     """
     if not validate_iso8601_strings(iso_strings, has_ms=True, has_tz=False):
         raise ValueError('malformatted. Iso strings should be of shape: "%Y-%m-%dT%H:%M:%S.%ms"')
 
-    suffix = ' ({f_res} {b_res}) ({type})'.format(f_res=forward_resolution, b_res=reverse_resolution, type=stare_type)
+    suffix = ' ({f_res} {b_res}) ({type})'.format(f_res=forward_res, b_res=reverse_res, type=stare_type)
     stare_strings = []
     for iso_string in iso_strings:
         stare_string = force_3ms(iso_string)
@@ -497,7 +521,7 @@ def to_stare_timestring(tivs, scale='TAI'):
     >>> pystare.to_stare_timestring(tiv) == time_strings
     True
     """
-    
+
     if scale == 'TAI':
         stare_string = pystare.core._to_tai_iso_strings(tivs)
     else:
@@ -505,34 +529,110 @@ def to_stare_timestring(tivs, scale='TAI'):
     return stare_string
 
 
-def to_temporal_triple_ms(tivs):
-    ti_low = pystare.core.scidbLowerBoundMS(tivs)
-    ti_hi = pystare.core.scidbUpperBoundMS(tivs)
-    return (ti_low, tivs, ti_hi)
+def from_julian_tai(d1, d2):
+    """ Converts a two-part Julian Day
 
+    """
+    indices = numpy.zeros(d1.shape, dtype=numpy.int64)
+    pystare.core._from_JulianTAI(d1, d2, indices)
+    return indices
+
+
+def to_julian_tai(indices):
+    d1 = numpy.zeros(indices.shape, dtype=numpy.double)
+    d2 = numpy.zeros(indices.shape, dtype=numpy.double)
+    pystare.core._to_JulianTAI(indices, d1, d2)
+    return d1, d2
+
+
+def from_julian_utc(d1, d2):
+    indices = numpy.zeros(d1.shape, dtype=numpy.int64)
+    pystare.core._from_JulianUTC(d1, d2, indices)
+    return indices
+
+
+def to_julian_utc(indices):
+    d1 = numpy.zeros(indices.shape, dtype=numpy.double)
+    d2 = numpy.zeros(indices.shape, dtype=numpy.double)
+    pystare.core._to_JulianUTC(indices, d1, d2)
+    return d1, d2
+
+
+def set_reverse_resolution(indices, resolutions):
+    result = numpy.zeros(indices.shape, dtype=numpy.int64)
+    pystare.core._set_reverse_resolution(indices, resolutions, result)
+    return result
+
+
+def set_forward_resolution(indices, resolutions):
+    result = numpy.zeros(indices.shape, dtype=numpy.int64)
+    pystare.core._set_forward_resolution(indices, resolutions, result)
+    return result
+
+
+def reverse_resolution(indices):
+    result = numpy.zeros(indices.shape, dtype=numpy.int64)
+    pystare.core._reverse_resolution(indices, result)
+    return result
+
+
+def forward_resolution(indices):
+    result = numpy.zeros(indices.shape, dtype=numpy.int64)
+    pystare.core._forward_resolution(indices, result)
+    return result
+
+
+def coarsen(indices, reverse_increments, forward_increments):
+    """TODO: Not tested"""
+    result = numpy.zeros(indices.shape, dtype=numpy.int64)
+    pystare.core._coarsen(indices, reverse_increments, forward_increments, result)
+    return result
+
+
+def set_temporal_resolutions_from_sorted(sorted_indices, include_bounds=True):
+    pystare.core._set_temporal_resolutions_from_sorted_inplace(sorted_indices, include_bounds)
+    return sorted_indices
 
 def lower_bound_tai(tiv):
+    """
+    TODO
+    """
     tret = tiv.copy()
     pystare.core._scidbLowerBoundTAI(tiv, tret)
     return tret
 
 
 def upper_bound_tai(tiv):
+    """
+    TODO
+    """
     tret = tiv.copy()
     pystare.core._scidbUpperBoundTAI(tiv, tret)
     return tret
 
 
 def lower_bound_ms(tiv):
+    """
+    TODO
+    """
     tret = tiv.copy()
     pystare.core._scidbLowerBoundMS(tiv, tret)
     return tret
 
 
 def upper_bound_ms(tiv):
+    """
+    TODO
+    """
     tret = tiv.copy()
     pystare.core._scidbUpperBoundMS(tiv, tret)
     return tret
+
+
+def to_temporal_triple_ms(tivs):
+    ti_low = pystare.core.scidbLowerBoundMS(tivs)
+    ti_hi = pystare.core.scidbUpperBoundMS(tivs)
+    return (ti_low, tivs, ti_hi)
 
 
 def to_temporal_triple_tai(tiv):
@@ -607,64 +707,4 @@ def temporal_contains_instant(indices1, indices2):
     return cmp
 
 
-def to_julian_tai(indices):
-    d1 = numpy.zeros(indices.shape, dtype=numpy.double)
-    d2 = numpy.zeros(indices.shape, dtype=numpy.double)
-    pystare.core._to_JulianTAI(indices, d1, d2)
-    return d1, d2
-
-
-def from_julian_tai(d1, d2):
-    indices = numpy.zeros(d1.shape, dtype=numpy.int64)
-    pystare.core._from_JulianTAI(d1, d2, indices)
-    return indices
-
-
-def to_julian_utc(indices):
-    d1 = numpy.zeros(indices.shape, dtype=numpy.double)
-    d2 = numpy.zeros(indices.shape, dtype=numpy.double)
-    pystare.core._to_JulianUTC(indices, d1, d2)
-    return d1, d2
-
-
-def from_julian_utc(d1, d2):
-    indices = numpy.zeros(d1.shape, dtype=numpy.int64)
-    pystare.core._from_JulianUTC(d1, d2, indices)
-    return indices
-
-
-def set_reverse_resolution(indices, resolutions):
-    result = numpy.zeros(indices.shape, dtype=numpy.int64)
-    pystare.core._set_reverse_resolution(indices, resolutions, result)
-    return result
-
-
-def set_forward_resolution(indices, resolutions):
-    result = numpy.zeros(indices.shape, dtype=numpy.int64)
-    pystare.core._set_forward_resolution(indices, resolutions, result)
-    return result
-
-
-def reverse_resolution(indices):
-    result = numpy.zeros(indices.shape, dtype=numpy.int64)
-    pystare.core._reverse_resolution(indices, result)
-    return result
-
-
-def forward_resolution(indices):
-    result = numpy.zeros(indices.shape, dtype=numpy.int64)
-    pystare.core._forward_resolution(indices, result)
-    return result
-
-
-def coarsen(indices, reverse_increments, forward_increments):
-    """TODO: Not tested"""
-    result = numpy.zeros(indices.shape, dtype=numpy.int64)
-    pystare.core._coarsen(indices, reverse_increments, forward_increments, result)
-    return result
-
-
-def set_temporal_resolutions_from_sorted(sorted_indices, include_bounds=True):
-    pystare.core._set_temporal_resolutions_from_sorted_inplace(sorted_indices, include_bounds)
-    return sorted_indices
 

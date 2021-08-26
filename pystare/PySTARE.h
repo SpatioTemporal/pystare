@@ -62,6 +62,7 @@ void _from_utc_variable(int64_t *datetime, int len, int64_t *indices_out, int64_
 void _to_utc_approximate(int64_t* indices, int len, int64_t* datetime_out);
 void _cmp_temporal(int64_t* indices1, int len1, int64_t* indices2, int len2, int64_t* cmp, int len12);
 void _coarsest_resolution_finer_or_equal_milliseconds(double*  milliseconds, int len, int64_t* out_array);
+void _milliseconds_at_resolution(int64_t* resolutions, int len, double* millisecond);
 void _from_tai_iso_strings(char **taiStrings, int64_t* out_array, int out_length);
 char** _to_tai_iso_strings(int64_t* indices, int len);
 
