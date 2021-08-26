@@ -292,6 +292,11 @@ def expand_intervals(intervals, level, multi_resolution=False):
 
     Parameters
     -----------
+    intervals: array-like
+        intervals to expand
+    level: int
+
+    multi_resolution: bool
 
     Returns
     --------
@@ -301,7 +306,8 @@ def expand_intervals(intervals, level, multi_resolution=False):
     >>> import pystare
     >>>
     """
-    if level < 0 or level > 27:
+    if level < -1 or level > 27:
+        # Expand understands -1 to mean to use the level embedded in the index value.
         raise pystare.exceptions.PyStareLevelError()
     result = pystare.core._expand_intervals(intervals, level, multi_resolution)
     expanded_intervals = numpy.zeros([result.get_size_as_intervals()], dtype=numpy.int64)

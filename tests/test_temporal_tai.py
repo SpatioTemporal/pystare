@@ -130,7 +130,7 @@ class MainTest(unittest.TestCase):
         del tivs
         tivs = pystare.from_utc_variable(datetime.astype(np.int64),forward_res,reverse_res)
         print_(('tivs iso:    ',pystare.to_tai_iso_strings(tivs)),flag=global_flag)
-        dt_utc = np.array(pystare.to_utc_approximate(tivs),dtype='datetime64[ms]')
+        dt_utc = np.array(pystare.to_ms_since_epoch_utc(tivs), dtype='datetime64[ms]')
         print_(('dt_utc:      ',dt_utc.tolist()),flag=global_flag)
         print_(('dt_utc:      ',[np.datetime_as_string(i) for i in dt_utc]),flag=global_flag)
         print_(('dt_utc orig: ',[np.datetime_as_string(i) for i in datetime]),flag=global_flag)

@@ -4,28 +4,89 @@ import pystare
 import re
 
 
-def from_utc(datetime, forward_resolution, reverse_resolution):
-    return pystare.core._from_utc(datetime, forward_resolution, reverse_resolution)
+def from_ms_since_epoch_utc(ms_since_epoch_utc, forward_resolution=48, reverse_resolution=48):
+    """
+    Converts an integer of milliseconds since unix epoch in UTC to TIV.
+
+    Parameters
+    -----------
+    ms_since_epoch_utc: array-like of ints
+        milliseconds since unix epoch in UTC
+    forward_resolution: array-like of ints
+        The forward resolution
+    reverse_resolution: array-like of ints. Valid range is 14..64
+        The reverse resolution
+
+    Returns
+    --------
+    tivs: numpy array
+        temporal index values
+
+    Examples
+    ----------
+    >>> import numpy
+    >>> import pystare
+    >>> timestamps = numpy.array(['2021-01-03'], dtype='datetime64[ms]')
+    >>> ms_since_epoch = timestamps.astype(numpy.int64)
+    >>> pystare.from_ms_since_epoch_utc(ms_since_epoch_utc=ms_since_epoch, forward_resolution=48, reverse_resolution=48)
+    array([2275448110396223681])
+
+    See Also
+    --------
+    :func:`~to_utc_approximate()`
+
+    """
+    tivs = pystare.core._from_utc(ms_since_epoch_utc, forward_resolution, reverse_resolution)
+    return tivs
 
 
-def to_utc_approximate(indices):
-    return pystare.core._to_utc_approximate(indices)
+def to_ms_since_epoch_utc(tivs):
+    """
+    Converts TIVs into milliseconds since epoch in UTC
+
+    Parameters
+    -----------
+    tivs: array-like of ints
+        Temporal index values to convert
+
+    Returns
+    ---------
+    ms_since_epoch_utc: numpy array of ints
+        milliseconds since epoch in UTC
+
+    Examples
+    ---------
+    >>> import numpy
+    >>> import pystare
+    >>> tivs = [2275448110396223681]
+    >>> ts = pystare.to_ms_since_epoch_utc(tivs).astype('datetime64[ms]')
+    >>> numpy.datetime_as_string(ts)
+    array(['2021-01-03T00:00:00.000'], dtype='<U42')
+    """
+    ms_since_epoch_utc = pystare.core._to_utc_approximate(tivs)
+    return ms_since_epoch_utc
 
 
 def from_utc_variable(datetime, forward_resolution, reverse_resolution):
+    """ TODO: Yeah; What does this function do?
+    """
     return pystare.core._from_utc_variable(datetime, forward_resolution, reverse_resolution)
 
 
-def current_datetime():
+def now(forward_resolution=48, reverse_resolution=48):
+    """Get a tiv representing current point in time.
+    # TODO: Isn't this more of an example usecase code than anything useful
+
+    Examples
+    ---------
+    >>> import pystare
+    >>> now = pystare.now()
     """
-    Get a tiv from datetime.now().
-    To convert back use numpy.array(pystare.to_utc_approximate(i),dtype='datetime64[ms]'"
-    """
-    # bad: hard-coded resolution 48
-    now = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f")[0:-3]
-    now = numpy.array([now], dtype=numpy.datetime64)
+    now = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
+    now = numpy.array([now], dtype='datetime64[ms]')
     now = now.astype(numpy.int64)
-    return pystare.from_utc(now, 48, 48)
+    tiv = pystare.from_ms_since_epoch_utc(now, forward_resolution, reverse_resolution)[0]
+    return tiv
 
 
 def coarsest_resolution_finer_or_equal_ms(ms):
