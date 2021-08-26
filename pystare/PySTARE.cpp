@@ -618,16 +618,24 @@ void _to_JulianTAI   (int64_t* indices, int len, double* d1, int nd1, double* d2
     tIndex.toJulianTAI(d1[j],d2[j]);
   }
 }
-  // TODO Add resolution to the from_xxx routines?
-void _from_JulianTAI (double* d1, int nd1, double* d2, int nd2, int64_t* out_array, int out_length) {
+
+void _from_JulianTAI (double* d1, int nd1, double* d2, int nd2, int64_t* out_array, int out_length, int f_res, int r_res) {
   TemporalIndex tIndex;
   for( int j=0; j < nd1; ++j ) {
     // cout << "tIndex " << j << " . " << flush;
-    TemporalIndex tIndexResult = tIndex.fromJulianTAI( d1[j], d2[j] );
+    TemporalIndex tIndexResult = tIndex.fromJulianTAI( d1[j], d2[j], f_res, r_res);
     // cout << " result " << flush;
     out_array[j] = tIndexResult.scidbTemporalIndex();
     // cout << out_array[j] << flush << endl;
     // cout << endl << flush;
+  }
+}
+
+void _from_JulianUTC  (double* d1, int nd1, double* d2, int nd2, int64_t* out_array, int out_length, int f_res, int r_res) {
+  for( int j=0; j < nd1; ++j ) {
+    TemporalIndex tIndex;
+    TemporalIndex tIndexResult = tIndex.fromJulianUTC( d1[j], d2[j], f_res, r_res );
+    out_array[j] = tIndexResult.scidbTemporalIndex();
   }
 }
 void _to_JulianUTC   (int64_t* indices, int len, double* d1, int nd1, double* d2, int nd2) {
@@ -636,13 +644,7 @@ void _to_JulianUTC   (int64_t* indices, int len, double* d1, int nd1, double* d2
     tIndex.toJulianUTC(d1[j],d2[j]);
   }
 }
-void _from_JulianUTC  (double* d1, int nd1, double* d2, int nd2, int64_t* out_array, int out_length) {
-  for( int j=0; j < nd1; ++j ) {
-    TemporalIndex tIndex;
-    TemporalIndex tIndexResult = tIndex.fromJulianUTC( d1[j], d2[j] );
-    out_array[j] = tIndexResult.scidbTemporalIndex();
-  }
-}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 //
