@@ -529,7 +529,7 @@ def to_stare_timestring(tivs, scale='TAI'):
     return stare_string
 
 
-def from_julian_tai(d1, d2, forward_res=48, reverse_res=48):
+def from_julian(jd1, jd2, scale, forward_res=48, reverse_res=48, ):
     """ Converts two-part Julian Dates (JD) to SIVs.
 
     [astropy.time](https://docs.astropy.org/en/stable/time/index.html) provides a simple interface to convert between
@@ -554,10 +554,10 @@ def from_julian_tai(d1, d2, forward_res=48, reverse_res=48):
 
     Parameters
     -----------
-    d1: double
-        d1+d2 is Julian Date apportioned in any convenient
-    d2: double
-        d1+d2 is Julian Date apportioned in any convenient
+    jd1: double
+        jd1+jd2 is Julian Date apportioned in any convenient
+    jd2: double
+        jd1+jd2 is Julian Date apportioned in any convenient
     forward_res: int. Valid range is 0..48
         The forward resolution (c.f :func:`~coarsest_resolution_finer_or_equal_ms()`)
     reverse_res: int. Valid range is 0..48
@@ -572,13 +572,21 @@ def from_julian_tai(d1, d2, forward_res=48, reverse_res=48):
     ----------
     >>> jd1 = numpy.array([2459453.0])
     >>> jd2 = numpy.array([0.23387067236111114])
-    >>> tivs = pystare.from_julian_tai(jd1, jd2, 10, 10)
+    >>> tivs = pystare.from_julian(jd1=jd1, jd2=jd2, scale='tai', forward_res=10, reverse_res=10)
     >>> pystare.to_stare_timestring(tivs)
     ['2021-08-26T17:36:46.426 (10 10) (1)']
+    >>> tivs = pystare.from_julian(jd1=jd1, jd2=jd2, scale='utc', forward_res=10, reverse_res=10)
+    >>> pystare.to_stare_timestring(tivs)
+    ['2021-08-26T17:37:23.426 (10 10) (1)']
     """
 
-    tivs = numpy.zeros(d1.shape, dtype=numpy.int64)
-    pystare.core._from_JulianTAI(d1, d2, tivs, forward_res, reverse_res)
+    tivs = numpy.zeros(jd1.shape, dtype=numpy.int64)
+    if scale == 'tai':
+        pystare.core._from_JulianTAI(jd1, jd2, tivs, forward_res, reverse_res)
+    elif scale == 'utc':
+        pystare.core._from_JulianUTC(jd1, jd2, tivs, forward_res, reverse_res)
+    else:
+        pystare.exceptions.PyStareError('scale not implemented')
     return tivs
 
 
@@ -587,28 +595,6 @@ def to_julian_tai(indices):
     d2 = numpy.zeros(indices.shape, dtype=numpy.double)
     pystare.core._to_JulianTAI(indices, d1, d2)
     return d1, d2
-
-
-def from_julian_utc(d1, d2, forward_res=48, reverse_res=48):
-    """
-    Parameters
-    -----------
-    forward_res: int. Valid range is 0..48
-        The forward resolution (c.f :func:`~coarsest_resolution_finer_or_equal_ms()`)
-    reverse_res: int. Valid range is 0..48
-        The reverse resolution (c.f. :func:`~coarsest_resolution_finer_or_equal_ms()`
-
-    Examples
-    ----------
-    >>> jd1 = numpy.array([2459453.0])
-    >>> jd2 = numpy.array([0.23387067236111114])
-    >>> tivs = pystare.from_julian_utc(jd1, jd2, 10, 10)
-    >>> pystare.to_stare_timestring(tivs)
-    ['2021-08-26T17:37:23.426 (10 10) (1)']
-    """
-    indices = numpy.zeros(d1.shape, dtype=numpy.int64)
-    pystare.core._from_JulianUTC(d1, d2, indices, forward_res, reverse_res)
-    return indices
 
 
 def to_julian_utc(indices):
