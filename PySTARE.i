@@ -703,7 +703,7 @@ def cmp_spatial(indices1, indices2):
 
 def coarsest_resolution_finer_or_equal_ms(ms):
     resolutions = numpy.zeros(ms.shape,dtype=numpy.int64)
-    _coarsest_resolution_finer_or_equal_milliseconds(ms,resolutions)
+    resolutions[:] = _coarsest_resolution_finer_or_equal_milliseconds(ms)
     return resolutions
 
 def cmp_temporal(indices1, indices2):
