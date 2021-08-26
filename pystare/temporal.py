@@ -529,7 +529,7 @@ def to_stare_timestring(tivs, scale='TAI'):
     return stare_string
 
 
-def from_julian_tai(d1, d2, forward_res=48, revers_res=48):
+def from_julian_tai(d1, d2, forward_res=48, reverse_res=48):
     """ Converts two-part Julian Dates (JD) to SIVs.
 
     [astropy.time](https://docs.astropy.org/en/stable/time/index.html) provides a simple interface to convert between
@@ -558,9 +558,9 @@ def from_julian_tai(d1, d2, forward_res=48, revers_res=48):
         d1+d2 is Julian Date apportioned in any convenient
     d2: double
         d1+d2 is Julian Date apportioned in any convenient
-    forward_resolution: int. Valid range is 0..48
+    forward_res: int. Valid range is 0..48
         The forward resolution (c.f :func:`~coarsest_resolution_finer_or_equal_ms()`)
-    reverse_resolution: int. Valid range is 0..48
+    reverse_res: int. Valid range is 0..48
         The reverse resolution (c.f. :func:`~coarsest_resolution_finer_or_equal_ms()`
 
     Returns
@@ -578,7 +578,7 @@ def from_julian_tai(d1, d2, forward_res=48, revers_res=48):
     """
 
     tivs = numpy.zeros(d1.shape, dtype=numpy.int64)
-    pystare.core._from_JulianTAI(d1, d2, tivs, forward_res, revers_res)
+    pystare.core._from_JulianTAI(d1, d2, tivs, forward_res, reverse_res)
     return tivs
 
 
@@ -589,13 +589,13 @@ def to_julian_tai(indices):
     return d1, d2
 
 
-def from_julian_utc(d1, d2, forward_res=48, revers_res=48):
+def from_julian_utc(d1, d2, forward_res=48, reverse_res=48):
     """
     Parameters
     -----------
-    forward_resolution: int. Valid range is 0..48
+    forward_res: int. Valid range is 0..48
         The forward resolution (c.f :func:`~coarsest_resolution_finer_or_equal_ms()`)
-    reverse_resolution: int. Valid range is 0..48
+    reverse_res: int. Valid range is 0..48
         The reverse resolution (c.f. :func:`~coarsest_resolution_finer_or_equal_ms()`
 
     Examples
@@ -607,7 +607,7 @@ def from_julian_utc(d1, d2, forward_res=48, revers_res=48):
     ['2021-08-26T17:37:23.426 (10 10) (1)']
     """
     indices = numpy.zeros(d1.shape, dtype=numpy.int64)
-    pystare.core._from_JulianUTC(d1, d2, indices, forward_res, revers_res)
+    pystare.core._from_JulianUTC(d1, d2, indices, forward_res, reverse_res)
     return indices
 
 
