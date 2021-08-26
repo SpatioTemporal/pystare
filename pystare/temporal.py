@@ -68,7 +68,7 @@ def to_ms_since_epoch_utc(tivs):
 
 
 def from_utc_variable(datetime, forward_resolution, reverse_resolution):
-    """ TODO: Yeah; What does this function do?
+    """ TODO: What does this function do?
     """
     return pystare.core._from_utc_variable(datetime, forward_resolution, reverse_resolution)
 
@@ -90,15 +90,46 @@ def now(forward_resolution=48, reverse_resolution=48):
 
 
 def coarsest_resolution_finer_or_equal_ms(ms):
+    """TODO: What does this function do?
+    """
     resolutions = numpy.zeros(ms.shape, dtype=numpy.int64)
     pystare.core._coarsest_resolution_finer_or_equal_milliseconds(ms, resolutions)
     return resolutions
 
 
-def cmp_temporal(indices1, indices2):
-    out_length = len(indices1) * len(indices2)
+def cmp_temporal(tivs1, tivs2, flatten=True):
+    """Intersects tests between temporal index values.
+
+    Returns 1 for when two temporal index values overlap and 0 if they don't
+
+    Parameters
+    -----------
+    tivs1: 1D array-like
+        first set of temporal index values to compare
+    tivs2: 1D array-like
+        second set of temporal index values to compare
+    flatten: bool
+        if true, flatten the results. If false, return an array of size [len(tivs1), len(tivs2)]
+
+    Returns
+    --------
+    cmp: numpy.array. If flatten is True, 1D, otherwise 2D.
+        Temporal containment. -1 if tiv1 is contained in tiv2. 0 otherwise.
+
+    Examples
+    -----------
+    >>> ts1 = numpy.array(['2021-01-03T01', '1985-01-03T01'], dtype='datetime64[ms]').astype(numpy.int64)
+    >>> ts2 = numpy.array(['2021-05-01T10', '1986-10-01'], dtype='datetime64[ms]').astype(numpy.int64)
+    >>> tiv1 = pystare.from_ms_since_epoch_utc(ts1, 10, 10)
+    >>> tiv2 = pystare.from_ms_since_epoch_utc(ts2, 10, 10)
+    >>> pystare.cmp_temporal(tiv1, tiv2)
+    """
+    
+    out_length = len(tivs1) * len(tivs2)
     cmp = numpy.zeros([out_length], dtype=numpy.int64)
-    pystare.core._cmp_temporal(indices1, indices2, cmp)
+    pystare.core._cmp_temporal(tivs1, tivs2, cmp)
+    if not flatten:
+        cmp = cmp.reshape(len(tivs1), len(tivs2))
     return cmp
 
 
