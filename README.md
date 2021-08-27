@@ -59,9 +59,12 @@ To run tests of a specific module
 pytest /path/to/module.py
 ```
 
+## Documentation
+pystare uses sphinx
 
     
-    
+    pip install sphinx-markdown-tables sphinx-automodapi myst_parser nbsphinx numpydoc pydata-sphinx-theme
+
 ## Usage
 
 Once pystare is installed or made available via PYTHONPATH one may use it as described in the following sections.

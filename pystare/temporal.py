@@ -5,16 +5,16 @@ import pystare.exceptions
 import re
 
 
-def from_ms_since_epoch_utc(ms_since_epoch_utc, forward_resolution=48, reverse_resolution=48):
+def from_ms_since_epoch_utc(ms_since_epoch_utc, forward_res=48, reverse_res=48):
     """ Converts an integer of milliseconds since unix epoch in UTC to TIV.
 
     Parameters
     -----------
     ms_since_epoch_utc: array-like of ints
         milliseconds since unix epoch in UTC
-    forward_resolution: int. Valid range is 0..48
+    forward_res: int. Valid range is 0..48
         The forward resolution (c.f :func:`~coarsest_resolution_finer_or_equal_ms()`)
-    reverse_resolution: int. Valid range is 0..48
+    reverse_res: int. Valid range is 0..48
         The reverse resolution (c.f. :func:`~coarsest_resolution_finer_or_equal_ms()`
 
     Returns
@@ -28,15 +28,14 @@ def from_ms_since_epoch_utc(ms_since_epoch_utc, forward_resolution=48, reverse_r
     >>> import pystare
     >>> timestamps = numpy.array(['2021-01-03'], dtype='datetime64[ms]')
     >>> ms_since_epoch = timestamps.astype(numpy.int64)
-    >>> pystare.from_ms_since_epoch_utc(ms_since_epoch_utc=ms_since_epoch, forward_resolution=48, reverse_resolution=48)
+    >>> pystare.from_ms_since_epoch_utc(ms_since_epoch_utc=ms_since_epoch, forward_res=48, reverse_res=48)
     array([2275448110396223681])
 
     See Also
     --------
-    :func:`~to_ms_since_epoch_utc()`
 
     """
-    tivs = pystare.core._from_utc(ms_since_epoch_utc, forward_resolution, reverse_resolution)
+    tivs = pystare.core._from_utc(ms_since_epoch_utc, forward_res, reverse_res)
     return tivs
 
 
@@ -73,14 +72,14 @@ def from_utc_variable(datetime, forward_resolution, reverse_resolution):
     return pystare.core._from_utc_variable(datetime, forward_resolution, reverse_resolution)
 
 
-def now(forward_resolution=48, reverse_resolution=48):
+def now(forward_res=48, reverse_res=48):
     """Get a tiv representing current point in time.
 
     Parameters
     ------------
-    forward_resolution: int. Valid range is 0..48
+    forward_res: int. Valid range is 0..48
         The forward resolution (c.f :func:`~coarsest_resolution_finer_or_equal_ms()`)
-    reverse_resolution: int. Valid range is 0..48
+    reverse_res: int. Valid range is 0..48
         The reverse resolution (c.f. :func:`~coarsest_resolution_finer_or_equal_ms()`
 
     Examples
@@ -91,7 +90,7 @@ def now(forward_resolution=48, reverse_resolution=48):
     now = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
     now = numpy.array([now], dtype='datetime64[ms]')
     now = now.astype(numpy.int64)
-    tiv = pystare.from_ms_since_epoch_utc(now, forward_resolution, reverse_resolution)[0]
+    tiv = pystare.from_ms_since_epoch_utc(now, forward_res, reverse_res)[0]
     return tiv
 
 
@@ -102,21 +101,34 @@ def coarsest_resolution_finer_or_equal_ms(ms):
     Bits are numbered in the opposite direction.
     The biggest year bit is bit 62. The smallest millisecond bit is at bit 14. So we have:
 
-    Field | Resolutions | Start | End | Size | Unit
-    -- | -- | -- | -- | -- | --
-    0 | - | 0 | 1 | 2 | Calendar or Scaleindicator
-    1 | - | 2 | 7 | 6 | Reverse Neighborhood
-    2 | - | 8 | 13 | 6 | Forward Neighborhood
-    3 | 48-39 | 14 | 23 | 10 | Millisecond
-    4 | 38-33 | 24 | 29 | 6 | Second
-    5 | 32-27 | 30 | 35 | 6 | Minute
-    6 | 26-22 | 36 | 40 | 5 | Hour
-    7 | 21-19 | 41 | 43 | 3 | Day-of-week
-    8 | 18-17 | 44 | 45 | 2 | Week-of-month
-    9 | 16-13 | 46 | 49 | 4 | Month-of-year
-    10 | 12-0 | 50 | 62 | 13 | Year
-    11 | - | - | - | 1 | Before/After Epoch
-
+    .. tabularcolumns:: |r|r|r|r|r|c|
+    +----------+-------------+-------+-----+------+----------------------------+
+    |Field     | Resolutions | Start | End | Size | Unit                       |
+    +==========+=============+=======+=====+======+============================+
+    |0         | -           |  0    |  1  |  2   | Calendar or Scaleindicator |
+    +----------+-------------+-------+-----+------+----------------------------+
+    |1         | -           |  2    |  7  |  6   | Reverse Neighborhood       |
+    +----------+-------------+-------+-----+------+----------------------------+
+    |2         | -           |  8    | 13  |  6   | Forward Neighborhood       |
+    +----------+-------------+-------+-----+------+----------------------------+
+    |3         | 48-39       | 14    | 23  | 10   | Millisecond                |
+    +----------+-------------+-------+-----+------+----------------------------+
+    |4         | 38-33       | 24    | 29  |  6   | Second                     |
+    +----------+-------------+-------+-----+------+----------------------------+
+    |5         | 32-27       | 30    | 35  |  6   | Minute                     |
+    +----------+-------------+-------+-----+------+----------------------------+
+    |6         | 26-22       | 36    | 40  |  5   | Hour                       |
+    +----------+-------------+-------+-----+------+----------------------------+
+    |7         | 21-19       | 41    | 43  |  3   | Day-of-week                |
+    +----------+-------------+-------+-----+------+----------------------------+
+    |8         | 18-17       | 44    | 45  |  2   | Week-of-month              |
+    +----------+-------------+-------+-----+------+----------------------------+
+    |9         | 16-13       | 46    | 49  |  4   | Month-of-year              |
+    +----------+-------------+-------+-----+------+----------------------------+
+    |10        | 12-00       | 50    | 62  | 13   | Year                       |
+    +----------+-------------+-------+-----+------+----------------------------+
+    |11        | -           | -     | -   |  1   | Before/After Epoch         |
+    +----------+-------------+-------+-----+------+----------------------------+
 
     Arguments
     ----------
@@ -208,14 +220,12 @@ def cmp_temporal(tivs1, tivs2, flatten=True):
     return cmp
 
 
-regex_iso8601 = r'^(-?(?:[1-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])' \
-                r'T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\.[0-9]+)' \
-                r'?(Z|[+-](?:2[0-3]|[01][0-9]):[0-5][0-9])?$'
-match_iso8601 = re.compile(regex_iso8601).match
+
 
 
 def validate_iso8601_string(iso_string, has_ms=None, has_tz=None):
-    """Test if string is ISO 8601 timestring.
+    """
+    Test if string is ISO 8601 timestring.
     Also verify if string includes milliseconds and timezone
     https://en.wikipedia.org/wiki/ISO_8601
 
@@ -253,6 +263,11 @@ def validate_iso8601_string(iso_string, has_ms=None, has_tz=None):
     >>> validate_iso8601_string('Wolfgang') # Not a timestamp
     False
     """
+    regex_iso8601 = r'^(-?(?:[1-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])' \
+                    r'T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\.[0-9]+)' \
+                    r'?(Z|[+-](?:2[0-3]|[01][0-9]):[0-5][0-9])?$'
+    match_iso8601 = re.compile(regex_iso8601).match
+
     match = match_iso8601(iso_string)
     if match is None:
         return False
@@ -280,6 +295,11 @@ def analyze_iso8601_string(iso_string):
     >>> analyze_iso8601_string('2021-01-09T17:47:56.2435+05:00') # includes timezone
     'has_tz'
     """
+    regex_iso8601 = r'^(-?(?:[1-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])' \
+                    r'T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\.[0-9]+)' \
+                    r'?(Z|[+-](?:2[0-3]|[01][0-9]):[0-5][0-9])?$'
+    match_iso8601 = re.compile(regex_iso8601).match
+
     match = match_iso8601(iso_string)
     if match is None:
         return 'nat'
@@ -320,7 +340,8 @@ def validate_iso8601_strings(time_strings, has_ms=None, has_tz=None):
 
     See Also
     ---------
-    :func:`~validate_iso8601_string()`
+    validate_iso8601_string
+
     """
     for time_string in time_strings:
         if validate_iso8601_string(time_string, has_ms, has_tz) is not True:
@@ -328,10 +349,7 @@ def validate_iso8601_strings(time_strings, has_ms=None, has_tz=None):
     return True
 
 
-regex_stare = r'^(-?(?:[1-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])' \
-              r'T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])\.([0-9]{3})' \
-              r'?(\s\(([0-9]+)\s([0-9]+)\)\s\(([0-9])\))$'
-match_stare = re.compile(regex_stare).match
+
 
 
 def validate_stare_timestring(timestrings):
@@ -352,6 +370,11 @@ def validate_stare_timestring(timestrings):
     >>> pystare.validate_stare_timestring('2021-01-09T17:47:56.154564')
     False
     """
+    regex_stare = r'^(-?(?:[1-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])' \
+                  r'T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])\.([0-9]{3})' \
+                  r'?(\s\(([0-9]+)\s([0-9]+)\)\s\(([0-9])\))$'
+    match_stare = re.compile(regex_stare).match
+
     if match_stare(timestrings) is not None:
         return True
     else:
@@ -370,7 +393,7 @@ def validate_stare_timestrings(timestrings):
 
     See Also
     ---------
-    :func:`~validate_stare_timestring()`
+    validate_stare_timestring
 
     """
     for timestring in timestrings:
@@ -389,6 +412,11 @@ def force_3ms(timestamp):
     >>> pystare.force_3ms('2021-08-26T17:03:56.643365456345')
     '2021-08-26T17:03:56.643'
     """
+    regex_iso8601 = r'^(-?(?:[1-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])' \
+                    r'T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\.[0-9]+)' \
+                    r'?(Z|[+-](?:2[0-3]|[01][0-9]):[0-5][0-9])?$'
+    match_iso8601 = re.compile(regex_iso8601).match
+
     ms = match_iso8601(timestamp).groups()[6]
     ms3 = ms.ljust(4, '0')[0:4]
     timestamp = timestamp.replace(ms, ms3)

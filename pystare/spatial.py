@@ -42,7 +42,6 @@ def from_lonlat(lon, lat, level):
 
     Examples
     ----------
-    >>> import pystare
     >>> lats = [34.4]
     >>> lons = [-119.7]
     >>> pystare.from_lonlat(lon=lons, lat=lats, level=7)
@@ -66,7 +65,7 @@ def from_latlon_2d(lat, lon, level=None, adapt_level=False):
     lon: 2D array-like
         longitudes. Has to have same length as lat
     level: int (0<=level<=27)
-        level of the SIDs. If not set, level will me automatically adapted.
+        level of thfe SIDs. If not set, level will me automatically adapted.
         If set, adapt_level will be set to false.
     adapt_level: bool
         if True, level will adapted to match resolution of lat/lon. Will overwrite level.
@@ -78,7 +77,6 @@ def from_latlon_2d(lat, lon, level=None, adapt_level=False):
 
     Examples
     -----------
-    >>> import pystare
     >>> lats = numpy.array([[53.20177841, 53.20317078, 53.20351791], \
                             [53.29219437, 53.29222107, 53.29125977], \
                             [53.28958893, 53.29105759, 53.29147339]])
@@ -89,6 +87,7 @@ def from_latlon_2d(lat, lon, level=None, adapt_level=False):
     array([[4298473764500464809, 4298458168380511209, 4297394569014717897],
            [4298462872969244297, 4298459225563237225, 4297297422977447753],
            [4298462873435275369, 4298459227962358473, 4297297429637206121]])
+
     >>> pystare.from_latlon_2d(lats, lons, level=20, adapt_level=False)
     array([[4298473764500464820, 4298458168380511220, 4297394569014717908],
            [4298462872969244308, 4298459225563237236, 4297297422977447764],
@@ -414,10 +413,10 @@ def cover_from_hull(lat, lon, level):
 
 def to_nonconvex_hull_range_from_latlon(lat, lon, level):
     """
-    Deprecated. Use :func:`~cover_from_ring()` instead.
+    Depreciated alias to :func:`~cover_from_ring()` .
     """
     warnings.warn('Use cover_from_hull() instead', DeprecationWarning)
-    cover_from_ring(lat, lon, level)
+    return cover_from_ring(lat, lon, level)
 
 
 def cover_from_ring(lat, lon, level):
@@ -644,6 +643,10 @@ def intersects(cover, sids, method='binsearch'):
 
 
 def intersect(indices1, indices2, multi_resolution=True):
+    """
+    Depreciated alias to :func:`~intersection()`
+    """
+
     warnings.warn('Use intersection() instead', DeprecationWarning)
     return intersection(indices1, indices2, multi_resolution)
 
