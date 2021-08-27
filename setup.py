@@ -6,6 +6,7 @@ import os
 import numpy
 from setuptools import setup, Extension
 from setuptools.command.build_py import build_py as _build_py
+import versioneer
 
 LONG_DESCRIPTION = """ """
 
@@ -44,10 +45,15 @@ class BuildPy(_build_py):
         return super().run()
 
 
+version = versioneer.get_version()
+version = versioneer.get_version()
+cmdclass = versioneer.get_cmdclass()
+cmdclass['build_py'] = BuildPy
+
 setup(
     setup_requires=["numpy"],
     name='pystare',
-    version='0.8.0',
+    version=version,#'0.8.0',
     description="",
     cmdclass={'build_py': BuildPy},
     long_description=LONG_DESCRIPTION,
