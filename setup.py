@@ -55,7 +55,6 @@ setup(
     include_package_data=False,
     ext_modules=[pystare],    
     python_requires=">=3.5",
-    test_suite='tests',
     install_requires=INSTALL_REQUIRES
 ) 
 

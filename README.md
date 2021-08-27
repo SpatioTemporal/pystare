@@ -43,9 +43,21 @@ headers cannot be found.
     python3 setup.py build_ext --inplace 
     
 ## Tests
-pystare uses pytest. Simply run ```pytest``` to run all tests.
-Or 
+pystare uses [pytest](https://docs.pytest.org/en/6.2.x/). Pytest is configured in ```pytest.ini.```
+
+Run```pytest``` to run all tests.
+
+To run the doctest,
+
+```
 pytest --doctest-modules 
+```
+
+To run tests of a specific module
+
+```
+pytest /path/to/module.py
+```
 
 
     
