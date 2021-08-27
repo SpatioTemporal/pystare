@@ -139,7 +139,7 @@ class MainTest(unittest.TestCase):
         import tests.intervals as intervals
         src = numpy.array(intervals.src, dtype=numpy.int64)
         expected_expanded = numpy.array(intervals.expanded_src, dtype=numpy.int64)
-        resolution = 4
+        resolution = -1
         expanded = pystare.expand_intervals(src, resolution, multi_resolution=False)
         error_found = False
         for i in range(len(expanded)):
