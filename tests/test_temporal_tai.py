@@ -1,26 +1,33 @@
-
 import numpy as np
 import pystare
 import unittest
 
+
 def print_(x,flag=False):
     if flag:
         print(x)
+
 
 class MainTest(unittest.TestCase):
 
     def test_a(self):
 
         print_(('hello world'))
-        tivs = pystare.from_iso_strings([
-            "2003-02-13T12:00:00.000 (12 12) (1)"
-            ,"2004-02-13T12:00:00.000 (12 12) (1)"
-            ,"2004-03-13T12:00:00.000"
-            ,"2004-04-13T12:00:00"
+        index1 = pystare.from_stare_timestrings([
+            "2003-02-13T12:00:00.000 (12 12) (1)",
+            "2004-02-13T12:00:00.000 (12 12) (1)"
+             ])
+
+        index2 = pystare.from_iso_strings([
+            "2004-03-13T12:00:00.000",
+            "2004-04-13T12:00:00.0"
             ])
+
+        tivs = np.append(index1, index2)
+
         print_(('tivs:      ',[hex(i) for i in tivs]))
         print_(('type tivs: ',type(tivs)))
-        tais=pystare.to_stare_timestring(tivs)
+        tais = pystare.to_stare_timestring(tivs)
         print_(('tais:      ',tais))
         # print_(('list tais: ',list(tais)))
         t_triple = pystare.to_temporal_triple_tai(tivs)
@@ -32,12 +39,17 @@ class MainTest(unittest.TestCase):
                       ))
     
         del tivs
-        tivs = pystare.from_iso_strings([
-            "2003-02-13T12:00:00.000 (12 12) (1)"
-            ,"2004-02-13T12:00:00.000 (12 12) (1)"
-            ,"2004-03-13T12:00:00.000"
-            ,"2004-04-13T12:00:00"
+        index1 = pystare.from_stare_timestrings([
+            "2003-02-13T12:00:00.000 (12 12) (1)",
+            "2004-02-13T12:00:00.000 (12 12) (1)"
+             ])
+
+        index2 = pystare.from_iso_strings([
+            "2004-03-13T12:00:00.000",
+            "2004-04-13T12:00:00.0"
             ])
+
+        tivs = np.append(index1, index2)
         
         for i in range(len(t_triple[0])):
             print_((t_triple[1][i],tivs[i]))

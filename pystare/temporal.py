@@ -214,7 +214,7 @@ regex_iso8601 = r'^(-?(?:[1-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[1
 match_iso8601 = re.compile(regex_iso8601).match
 
 
-def validate_iso8601_string(iso_string, has_ms=True, has_tz=False):
+def validate_iso8601_string(iso_string, has_ms=None, has_tz=None):
     """Test if string is ISO 8601 timestring.
     Also verify if string includes milliseconds and timezone
     https://en.wikipedia.org/wiki/ISO_8601
@@ -258,9 +258,9 @@ def validate_iso8601_string(iso_string, has_ms=True, has_tz=False):
         return False
     else:
         groups = match.groups()
-        if (groups[7] is None) == has_tz:
+        if has_tz is not None and has_tz == (groups[7] is None):
             return False
-        elif (groups[6] is None) == has_ms:
+        elif has_ms is not None and has_ms == (groups[6] is None):
             return False
         else:
             return True
@@ -291,7 +291,7 @@ def analyze_iso8601_string(iso_string):
         return 'good'
 
 
-def validate_iso8601_strings(time_strings, has_ms, has_tz):
+def validate_iso8601_strings(time_strings, has_ms=None, has_tz=None):
     """Validate if collection of strings all are ISO8601.
      Also verify if timestamps includes milliseconds and  timezone.
 
@@ -425,12 +425,16 @@ def iso_to_stare_timestrings(iso_strings, forward_res, reverse_res, stare_type):
     >>> pystare.iso_to_stare_timestrings(iso_timestring, forward_res=45, reverse_res=12, stare_type=1)
     ['2021-01-09T17:47:56.154 (45 12) (1)']
     """
-    if not validate_iso8601_strings(iso_strings, has_ms=True, has_tz=False):
-        raise ValueError('malformatted. Iso strings should be of shape: "%Y-%m-%dT%H:%M:%S.%ms"')
+    
+    if validate_iso8601_strings(iso_strings, has_tz=True):
+        raise ValueError('malformatted. '
+                         'Iso strings should be of shape: "%Y-%m-%dT%H:%M:%S.%ms" and should not contain TZ')
 
     suffix = ' ({f_res} {b_res}) ({type})'.format(f_res=forward_res, b_res=reverse_res, type=stare_type)
     stare_strings = []
     for iso_string in iso_strings:
+        if validate_iso8601_string(iso_string, has_ms=False):
+            iso_string += '.0'
         stare_string = force_3ms(iso_string)
         stare_string = stare_string + suffix
         stare_strings.append(stare_string)

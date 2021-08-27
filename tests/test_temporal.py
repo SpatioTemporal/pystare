@@ -45,22 +45,22 @@ class MainTest(unittest.TestCase):
     def test_from_julian_tai(self):
         datetime_x1 = datetime.astype(numpy.int64)
         index = pystare.from_ms_since_epoch_utc(datetime_x1, 27, 27)
-        numpy.testing.assert_array_equal(index,numpy.array([0x1ec8000008001b6d, 0x1f40000020001b6d, 0x1f484ade232b1b6d, 0x1f800916a42b1b6d],dtype=numpy.int64))
-        j_tai1,j_tai2 = pystare.to_julian_tai(index)
+        numpy.testing.assert_array_equal(index, numpy.array([0x1ec8000008001b6d, 0x1f40000020001b6d, 0x1f484ade232b1b6d, 0x1f800916a42b1b6d],dtype=numpy.int64))
+        j_tai1, j_tai2 = pystare.to_julian_date(index, scale='tai')
         # [2440587.5 2451544.5 2452275.5 2457388.5]
         # [9.25925926e-05 3.70370370e-04 3.35809626e+01 4.72680755e+00]        
-        index1 = pystare.from_julian_tai(j_tai1, j_tai2)
-        numpy.testing.assert_array_equal(index1,numpy.array([0x1ec8000008000001, 0x1f40000020000001, 0x1f484ade232b0001, 0x1f800916a42b0001],dtype=numpy.int64))
+        index1 = pystare.from_julian_date(j_tai1, j_tai2, forward_res=0, reverse_res=0, scale='tai')
+        numpy.testing.assert_array_equal(index1 ,numpy.array([0x1ec8000008000001, 0x1f40000020000001, 0x1f484ade232b0001,0x1f800916a42b0001], dtype=numpy.int64))
 
     def test_from_julian_utc(self):
         datetime_x1 = datetime.astype(numpy.int64)
         index = pystare.from_ms_since_epoch_utc(datetime_x1, 27, 27)
         numpy.testing.assert_array_equal(index,numpy.array([0x1ec8000008001b6d, 0x1f40000020001b6d, 0x1f484ade232b1b6d, 0x1f800916a42b1b6d],dtype=numpy.int64))
-        j_utc1,j_utc2 = pystare.to_julian_utc(index)
+        j_utc1,j_utc2 = pystare.to_julian_date(index, scale='utc')
         # [2440587.5 2451544.5 2452275.5 2457388.5]
         # [-9.49073951e-10  1.61546124e-17  3.35805923e+01  4.72639088e+00]
-        index1 = pystare.from_julian_utc(j_utc1, j_utc2)
-        numpy.testing.assert_array_equal(index1,numpy.array([0x1ec8000008000001, 0x1f40000020000001, 0x1f484ade232b0001, 0x1f800916a42b0001],dtype=numpy.int64))
+        index1 = pystare.from_julian_date(j_utc1, j_utc2, forward_res=0, reverse_res=0, scale='utc')
+        numpy.testing.assert_array_equal(index1, numpy.array([0x1ec8000008000001, 0x1f40000020000001, 0x1f484ade232b0001, 0x1f800916a42b0001],dtype=numpy.int64))
 
     def test_resolutions(self):
         datetime_x1 = datetime.astype(numpy.int64)
@@ -108,13 +108,18 @@ class MainTest(unittest.TestCase):
 
     def test_variable_res(self):
 
-        index = pystare.from_iso_strings([
-            "2003-02-13T12:00:00.000 (12 12) (1)"
-            ,"2004-02-13T12:00:00.000 (12 12) (1)"
-            ,"2004-03-13T12:00:00.000"
-            ,"2004-04-13T12:00:00"
+        index1 = pystare.from_stare_timestrings([
+            "2003-02-13T12:00:00.000 (12 12) (1)",
+            "2004-02-13T12:00:00.000 (12 12) (1)"
+             ])
+
+        index2 = pystare.from_iso_strings([
+            "2004-03-13T12:00:00.000",
+            "2004-04-13T12:00:00.0"
             ])
-        
+
+        index = numpy.append(index1, index2)
+
         ### print("index sh:   ",index.shape)
         ### index_with_variable_res = numpy.zeros(index.shape,dtype=numpy.int64)
         ### print("index:      ",index)

@@ -207,8 +207,6 @@ def to_area(sids):
 
     Examples
     ---------
-    >>> import pystare
-    >>> import numpy
     >>> import math
     >>> sids = numpy.array([4151504989081014894, 4161865161846704590, 3643626718498217166])
     >>> pystare.to_area(sids)
@@ -236,8 +234,7 @@ def from_intervals(intervals):
 
     Examples
     --------
-    >>> import pystare
-    >>>
+
     """
     return pystare.core._from_intervals(intervals)
 
@@ -253,8 +250,7 @@ def to_neighbors(sids):
 
     Examples
     --------
-    >>> import pystare
-    >>>
+
     """
     result = pystare.core._to_neighbors(sids)
     range_indices = numpy.full([result.get_size_as_values()], -1, dtype=numpy.int64)
@@ -273,8 +269,7 @@ def to_compressed_range(sids):
 
     Examples
     --------
-    >>> import pystare
-    >>>
+
     """
     out_length = len(sids)
     range_indices = numpy.full([out_length], -1, dtype=numpy.int64)
@@ -288,22 +283,21 @@ def to_compressed_range(sids):
 
 def expand_intervals(intervals, level, multi_resolution=False):
     """
+    Expand intervals
 
     Parameters
     -----------
     intervals: array-like
         intervals to expand
     level: int
-
+        level to expand intervals to
     multi_resolution: bool
+        allow multiresolution
 
     Returns
     --------
 
-    Examples
-    --------
-    >>> import pystare
-    >>>
+
     """
     if level < -1 or level > 27:
         # Expand understands -1 to mean to use the level embedded in the index value.
@@ -315,7 +309,8 @@ def expand_intervals(intervals, level, multi_resolution=False):
 
 
 def adapt_resolution_to_proximity(sids):
-    """ Adapts the resolution of SIDs to match the geographical distanc between the SIDs.
+    """
+    Adapts the resolution of SIDs to match the geographical distanc between the SIDs.
 
     Parameters
     -----------
@@ -326,10 +321,9 @@ def adapt_resolution_to_proximity(sids):
     --------
     adapted_sids: 1D numpy array
         SIDs with adapted resolution
+
     Examples
     --------
-    >>> import pystare
-    >>> import numpy
     >>> sids = numpy.array([4298473764500464820, 4298458168380511220, 4297394569014717908])
     >>> pystare.to_level(sids)
     array([20, 20, 20], dtype=int32)
@@ -355,8 +349,7 @@ def to_hull_range(indices, level):
 
     Examples
     --------
-    >>> import pystare
-    >>>
+
     """
     if level < 0 or level > 27:
         raise pystare.exceptions.PyStareLevelError()
@@ -397,7 +390,7 @@ def cover_from_hull(lat, lon, level):
 
     See Also
     -----------
-    :func:`~range_from_ring()`
+
 
     Examples
     ----------
@@ -420,7 +413,10 @@ def cover_from_hull(lat, lon, level):
 
 
 def to_nonconvex_hull_range_from_latlon(lat, lon, level):
-    warnings.warn('Use range_from_hull() instead', DeprecationWarning)
+    """
+    Deprecated. Use :func:`~cover_from_ring()` instead.
+    """
+    warnings.warn('Use cover_from_hull() instead', DeprecationWarning)
     cover_from_ring(lat, lon, level)
 
 
@@ -448,11 +444,10 @@ def cover_from_ring(lat, lon, level):
 
     See Also
     -----------
-    :func:`~range_from_hull()`
+
 
     Examples
     ----------
-    >>> import pystare
     >>> lat = [53.75702912049104, 54.98310415304803, 53.69393219666267, 50.128051662794235, 49.01778351500333, \
                47.62058197691181, 47.467645575544, 50.266337795607285, 51.10667409932158, 53.75702912049104]
     >>> lon = [14.119686313542559, 9.921906365609118, 7.100424838905269, 6.043073357781111, 8.099278598674744, \
@@ -476,6 +471,7 @@ def cover_from_ring(lat, lon, level):
 
 def to_circular_cover(lat, lon, radius, level):
     """
+    Creates a circular cover
 
     Parameters
     -----------
@@ -483,10 +479,6 @@ def to_circular_cover(lat, lon, radius, level):
     Returns
     --------
 
-    Examples
-    --------
-    >>> import pystare
-    >>>
     """
     if level < 0 or level > 27:
         raise pystare.exceptions.PyStareLevelError()
@@ -507,10 +499,6 @@ def circular_cover_from(index, radius, level):
     Returns
     --------
 
-    Examples
-    --------
-    >>> import pystare
-    >>>
     """
 
     if level < 0 or level > 27:
@@ -531,7 +519,6 @@ def to_box_cover_from_latlon(lat, lon, resolution):
 
     Examples
     --------
-    >>> import pystare
     >>>
     """
     result = pystare.core._to_box_cover_from_latlon(lat, lon, resolution)
@@ -561,7 +548,6 @@ def to_vertices_latlon(sids):
 
     Examples
     ---------
-    >>> import pystare
     >>> pystare.to_vertices_latlon([4254212798004854789])
     (array([53.89745687, 56.8965353 , 56.93769843]),
     array([ 9.22866958, 13.23186479,  8.07137938]),
@@ -645,7 +631,6 @@ def intersects(cover, sids, method='binsearch'):
 
     Examples
     ----------
-    >>> import pystare
     >>> cover = numpy.array([4251398048237748227, 4269412446747230211, 4278419646001971203])
     >>> sids = numpy.array([1251398048237748227, 4269412446747230210])
     >>> pystare.intersects(cover, sids, method='binsearch')
