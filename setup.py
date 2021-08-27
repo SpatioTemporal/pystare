@@ -47,7 +47,7 @@ class BuildPy(_build_py):
 setup(
     setup_requires=["numpy"],
     name='pystare',
-    version='1.0.0',
+    version='0.8.0',
     description="",
     cmdclass={'build_py': BuildPy},
     long_description=LONG_DESCRIPTION,
