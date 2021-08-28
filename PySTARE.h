@@ -197,6 +197,7 @@ public:
   SpatialRange range;
   STARE_SpatialIntervals sis;
   STARE_ArrayIndexSpatialValues    sivs;
+  void print(){range.print();};
 
   void add_intersect(const srange& one, const srange& other,bool compress) {
     // cout << " compress " << compress << endl << flush;
@@ -225,7 +226,8 @@ public:
     SpatialRange *res = sr_intersect(one.range,other.range,compress);
     //    cout << 1100 << " 11 nr = " << res->range->range->nranges() << endl << flush;
     // srange result; result.set_tag(999);
-    range.addSpatialRange(*res);
+    if(res != NULL)
+      range.addSpatialRange(*res);
     // STARE_SpatialIntervals sis_res = res->toSpatialIntervals();
     //    cout << 1150 << endl << flush;
     // range.addSpatialIntervals(sis_res);
