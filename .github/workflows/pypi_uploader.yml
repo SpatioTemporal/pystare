@@ -19,10 +19,15 @@ jobs:
   Linux-build:
     runs-on: ubuntu-latest
     env:
-      TWINE_USERNAME: __token__
-      TWINE_PASSWORD: pypi-AgEIcHlwaS5vcmcCJGRkY2M2OGE1LTlhZjEtNGIzOS04OGY0LTE1MmJlYzllZDRjYgACJXsicGVybWlzc2lvbnMiOiAidXNlciIsICJ2ZXJzaW9uIjogMX0AAAYgnZ7auK04UlP_hHl98FDc3D0uIHGLZZ17g9i3aZGAS1Y
+      TWINE_USERNAME: ${{ secrets.TWINE_USERNAME }}
+      TWINE_PASSWORD: ${{ secrets.TWINE_PASSWORD }}
     steps:
       - uses: actions/checkout@v2
+      - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install flake8 pytest
+        pip install -r requirements.txt
       - name: build and upload manylinux wheels
         uses: Niraj-Kamdar/manylinux-wheel-builder@master
  
