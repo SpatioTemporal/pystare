@@ -50,8 +50,21 @@ version = versioneer.get_version()
 cmdclass = versioneer.get_cmdclass()
 cmdclass['build_py'] = BuildPy
 
+
+tests_require = ['matplotlib', 'cartopy']
+
+
 setup(
     setup_requires=["numpy"],
+    install_requires=INSTALL_REQUIRES,
+
+    # This would be used by python setup.py tests
+    tests_require=tests_require,
+    # This is used by tox
+    extras_require={
+        "test": [tests_require],
+        "docs": ["sphinx", "numpydoc"],
+    },
     name='pystare',
     version=version,#'0.8.0',
     description="",
@@ -61,7 +74,6 @@ setup(
     include_package_data=False,
     ext_modules=[pystare],    
     python_requires=">=3.5",
-    install_requires=INSTALL_REQUIRES
 ) 
 
 
