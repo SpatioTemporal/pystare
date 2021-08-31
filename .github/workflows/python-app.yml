@@ -59,6 +59,6 @@ jobs:
          pip3 install .
     - name: Test with pytest
       run: |
-        sudo apt-get install libgeos-dev
+        sudo apt-get install libgeos-dev proj-bin
         pip install .[test]
         pytest
