@@ -36,7 +36,7 @@ jobs:
         echo $GITHUB_WORKSPACE
         pwd
         ls
-        cd ~/work/STARE/
+        cd ~/STARE/
         set -x
         mkdir build
         cd build
@@ -46,12 +46,10 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install flake8 pytest
-        #pip install -r requirements.txt
+        pip install -r requirements.txt
     - name: build pystare
       run: | 
-         cd ~/pystare/
-         ls 
-         #python3 setup.py build_ext --inplace
+         python3 setup.py build_ext --inplace
          pip3 install .
     - name: Lint with flake8
       run: |
