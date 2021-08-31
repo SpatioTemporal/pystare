@@ -33,9 +33,10 @@ jobs:
     - name: Install STARE
       shell: bash
       run: |
+        echo $GITHUB_WORKSPACE
         pwd
         ls
-        cd ~/STARE/
+        cd ~/work/STARE/
         set -x
         mkdir build
         cd build
