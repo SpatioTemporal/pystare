@@ -64,6 +64,7 @@ setup(
         "docs": ["sphinx", "numpydoc"],
     },
     version=version,
+
     cmdclass={'build_py': BuildPy},
     include_package_data=False,
     ext_modules=[pystare],

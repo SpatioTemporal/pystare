@@ -41,7 +41,7 @@ def get_config():
     cfg = VersioneerConfig()
     cfg.VCS = "git"
     cfg.style = "pep440"
-    cfg.tag_prefix = "pystare"
+    cfg.tag_prefix = "v"
     cfg.parentdir_prefix = "pystare"
     cfg.versionfile_source = "pystare/_version.py"
     cfg.verbose = False
