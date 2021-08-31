@@ -1,4 +1,4 @@
-name: Testrunnner
+name: Build Wheel Manylinux and upload to PyPi
 
 on:
   push:
