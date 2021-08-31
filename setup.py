@@ -18,6 +18,7 @@ else:
 STARE_LIB_DIRS = [os.environ.get('STARE_LIB_DIR', '/usr/local/lib')]
 STARE_INCLUDE_DIRS = [os.environ.get('STARE_INCLUDE_DIR', '/usr/local/include')]
 
+
 if os.environ.get('PYTHON_INCLUDE_DIRS') is None:
     PYTHON_INCLUDE_DIRS = []
 else:
@@ -51,7 +52,7 @@ cmdclass = versioneer.get_cmdclass()
 cmdclass['build_py'] = BuildPy
 
 
-tests_require = ['matplotlib', 'cartopy']
+tests_require = ['matplotlib']
 
 
 setup(
