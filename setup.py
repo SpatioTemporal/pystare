@@ -46,14 +46,13 @@ class BuildPy(_build_py):
 
 
 version = versioneer.get_version()
-version = versioneer.get_version()
 cmdclass = versioneer.get_cmdclass()
 cmdclass['build_py'] = BuildPy
 
 setup(
     setup_requires=["numpy"],
     name='pystare',
-    version=version,#'0.8.0',
+    version=version,
     description="",
     cmdclass={'build_py': BuildPy},
     long_description=LONG_DESCRIPTION,
