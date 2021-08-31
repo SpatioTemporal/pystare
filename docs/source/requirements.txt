@@ -11,3 +11,4 @@ myst_parser
 nbsphinx
 numpydoc
 pydata-sphinx-theme
+git+https://github.com/SpatioTemporal/pystare.git@refactor

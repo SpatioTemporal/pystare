@@ -776,8 +776,8 @@ def triangulate_indices(indices):
 
     Usage
     ----------
-    >>> lons, lats, intmat = triangulate_indices(indices) # doctest: +SKIP
-    >>> triang = tri.Triangulation(lons,lats,intmat)     # doctest: +SKIP
+    >>> lons, lats, intmat = triangulate_indices(indices)   # doctest: +SKIP
+    >>> triang = tri.Triangulation(lons,lats,intmat)        # doctest: +SKIP
     >>> plt.triplot(triang,'r-',transform=transform,lw=1,markersize=3) # doctest: +SKIP
     """
 

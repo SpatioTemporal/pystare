@@ -565,13 +565,8 @@ def from_julian_date(jd1, jd2, scale, forward_res=48, reverse_res=48):
     """ Converts two-part Julian Dates (JD) to SIVs.
 
     [astropy.time](https://docs.astropy.org/en/stable/time/index.html) provides a simple interface to convert between
-    common datetime representations (e.g. numpy.datetime64, datetime, iso strings, etc. ) and two-part (JD)
-
-    E.g.
-    >>> from astropy import time
-    >>> t = time.Time('2021-08-26T17:36:46.426092', format='isot')
-    >>> t.jd1, t.jd2
-    (2459453.0, 0.23387067236111114)
+    common datetime representations (e.g. numpy.datetime64, datetime, iso strings, etc. ) and two-part (JD).
+    See in examples below
 
     from [Julian Day Wikipedia](https://en.wikipedia.org/wiki/Julian_day)
     "the Julian date (JD) of any instant is the Julian day number plus the
@@ -604,6 +599,11 @@ def from_julian_date(jd1, jd2, scale, forward_res=48, reverse_res=48):
 
     Examples
     ----------
+    >>> from astropy import time                                    # doctest: +SKIP
+    >>> t = time.Time('2021-08-26T17:36:46.426092', format='isot')  # doctest: +SKIP
+    >>> t.jd1, t.jd2                                                # doctest: +SKIP
+    (2459453.0, 0.23387067236111114)                                # doctest: +SKIP
+
     >>> jd1 = numpy.array([2459453.0])
     >>> jd2 = numpy.array([0.23387067236111114])
     >>> tivs = pystare.from_julian_date(jd1=jd1, jd2=jd2, scale='tai', forward_res=10, reverse_res=10)
