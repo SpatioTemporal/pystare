@@ -29,9 +29,11 @@ jobs:
       uses: actions/checkout@master
       with:
           repository: SpatioTemporal/STARE
+          path: STARE/
     - name: Install STARE
       shell: bash
       run: |
+        cd ~/STARE/
         set -x
         mkdir build
         cd build
@@ -44,9 +46,8 @@ jobs:
         #pip install -r requirements.txt
     - name: build pystare
       run: | 
-         pwd 
-         ls
-         cd /home/runner/work/pystare/pystare
+         cd ~/pystare/
+         ls 
          #python3 setup.py build_ext --inplace
          pip3 install .
     - name: Lint with flake8
