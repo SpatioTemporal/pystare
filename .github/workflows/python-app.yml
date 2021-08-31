@@ -25,6 +25,11 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: 3.9
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install flake8 pytest
+        pip install -r requirements.txt
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
@@ -48,16 +53,12 @@ jobs:
         make install
         STARE_LIB_DIR=~/stare/lib/
         STARE_INCLUDE_DIR=~/stare/include/
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install flake8 pytest
-        pip install -r requirements.txt
     - name: build pystare
       run: | 
          python3 setup.py build_ext --inplace
          pip3 install .
     - name: Test with pytest
       run: |
+        sudo apt-get install libgeos-dev proj-bin
         pip install .[test]
         pytest
