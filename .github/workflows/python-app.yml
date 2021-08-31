@@ -14,7 +14,7 @@ jobs:
 
     runs-on: ubuntu-latest
     env:
-      PWD_DIR: /home/runner
+      #PWD_DIR: /home/runner
       CPPFLAGS: "-I/usr/include -I/usr/local/include -I/home/runner/stare/include"
       LDFLAGS: "-L/home/runner/stare/lib"
         
@@ -44,8 +44,8 @@ jobs:
         #pip install -r requirements.txt
     - name: build pystare
       run: | 
-         #python3 setup.py build_ext --inplace
-         pip3 install .
+         python3 setup.py build_ext --inplace
+         #pip3 install .
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
