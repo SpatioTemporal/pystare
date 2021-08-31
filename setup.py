@@ -8,7 +8,6 @@ from setuptools import setup, Extension
 from setuptools.command.build_py import build_py as _build_py
 import versioneer
 
-LONG_DESCRIPTION = """ """
 
 if os.environ.get("READTHEDOCS", False) == "True":
     INSTALL_REQUIRES = []
@@ -29,8 +28,7 @@ INCLUDE_DIRS = STARE_INCLUDE_DIRS + PYTHON_INCLUDE_DIRS + [numpy.get_include()]
 
 pystare = Extension(name='pystare._core',
                     sources=['pystare/PySTARE.i', 'pystare/PySTARE.cpp'],
-                    depends=['pystare/PySTARE.h'],
-                    swig_opts=['-modern', '-c++'],
+                    swig_opts=['-c++'],
                     extra_compile_args=['-std=c++11'],
                     libraries=['STARE'],
                     library_dirs=STARE_LIB_DIRS,    # Location of libSTARE.a
@@ -46,7 +44,6 @@ class BuildPy(_build_py):
         return super().run()
 
 
-version = versioneer.get_version()
 version = versioneer.get_version()
 cmdclass = versioneer.get_cmdclass()
 cmdclass['build_py'] = BuildPy
@@ -66,15 +63,10 @@ setup(
         "test": [tests_require],
         "docs": ["sphinx", "numpydoc"],
     },
-    name='pystare',
-    version=version,#'0.8.0',
-    description="",
+    version=version,
     cmdclass={'build_py': BuildPy},
-    long_description=LONG_DESCRIPTION,
-    packages=["pystare"],
     include_package_data=False,
-    ext_modules=[pystare],    
-    python_requires=">=3.5",
+    ext_modules=[pystare],
 ) 
 
 
