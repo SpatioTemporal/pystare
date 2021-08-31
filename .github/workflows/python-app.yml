@@ -33,6 +33,8 @@ jobs:
     - name: Install STARE
       shell: bash
       run: |
+        pwd
+        ls
         cd ~/STARE/
         set -x
         mkdir build
