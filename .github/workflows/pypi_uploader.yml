@@ -1,0 +1,28 @@
+# This is a basic workflow to help you get started with Actions
+
+name: pypi deployer
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the master branch
+  push:
+    branches: [ master ]
+    tags:
+      - "v*" # Push events to matching v*, i.e. v1.0, v20.15.10
+  pull_request:
+    branches: [ master ]
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+
+jobs:
+  Linux-build:
+    runs-on: ubuntu-latest
+    env:
+      TWINE_USERNAME: __token__
+      TWINE_PASSWORD: pypi-AgEIcHlwaS5vcmcCJGRkY2M2OGE1LTlhZjEtNGIzOS04OGY0LTE1MmJlYzllZDRjYgACJXsicGVybWlzc2lvbnMiOiAidXNlciIsICJ2ZXJzaW9uIjogMX0AAAYgnZ7auK04UlP_hHl98FDc3D0uIHGLZZ17g9i3aZGAS1Y
+    steps:
+      - uses: actions/checkout@v2
+      - name: build and upload manylinux wheels
+        uses: Niraj-Kamdar/manylinux-wheel-builder@master
+ 
