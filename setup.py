@@ -47,7 +47,7 @@ cmdclass['build_ext'] = build_ext
 
 
 setup(
-    version="0.8.2" #version,
+    version="0.8.2", #version,
     cmdclass=cmdclass,
     include_package_data=False,
     ext_modules=[pystare],
