@@ -8,5 +8,5 @@ make
 make install
 STARE_LIB_DIR=~/stare/lib/
 STARE_INCLUDE_DIR=~/stare/include/
-CPPFLAGS: "-I/usr/include -I/usr/local/include -I/home/runner/stare/include"
-LDFLAGS: "-L/home/runner/stare/lib"
+#CPPFLAGS: "-I/usr/include -I/usr/local/include -I/home/runner/stare/include"
+#LDFLAGS: "-L/home/runner/stare/lib"
