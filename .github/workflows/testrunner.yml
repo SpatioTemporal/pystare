@@ -35,7 +35,7 @@ jobs:
       uses: actions/checkout@master
       with:
           repository: SpatioTemporal/STARE
-          path: STARE/
+          path: STARE/ # need to specify path, otherwise it would overwrite pystare
     - name: Install STARE
       shell: bash
       run: |

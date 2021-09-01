@@ -1,15 +1,15 @@
+# This script clones, builds and installs STARE
+
 git clone https://github.com/SpatioTemporal/STARE
 cd STARE
-set -x # Print commands and their arguments as they are executed.
+
+# Print commands and their arguments as they are executed.
+set -x 
+
 mkdir build
 cd build
-#cmake -DCMAKE_INSTALL_PREFIX=~/stare ..
-cmake ../
+
+# We install STARE to /usr/local/include/ and /usr/local/lib/ .. seems easist.
+cmake ../ 
 make
 make install
-
-# Set environment vars for setup.py
-#STARE_LIB_DIR=~/stare/lib/
-#STARE_INCLUDE_DIR=~/stare/include/
-#CPPFLAGS: "-I/usr/include -I/usr/local/include -I/home/runner/stare/include"
-#LDFLAGS: "-L/home/runner/stare/lib"
