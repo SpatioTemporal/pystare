@@ -3,8 +3,12 @@ name: Build Wheel Manylinux and upload to PyPi
 on:
   push:
     branches: [ master ]
+    tags: 
+      - v*
   pull_request:
     branches: [ master ]
+      - v*
+    
 
 jobs:
   build:
