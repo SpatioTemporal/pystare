@@ -10,10 +10,6 @@ from setuptools.command.build_ext import build_ext
 import versioneer
 
 
-if os.environ.get("READTHEDOCS", False) == "True":
-    INSTALL_REQUIRES = []
-else:
-    INSTALL_REQUIRES = ['numpy>=1.20.0']
 
 STARE_LIB_DIRS = [os.environ.get('STARE_LIB_DIR', '/usr/local/lib')]
 STARE_INCLUDE_DIRS = [os.environ.get('STARE_INCLUDE_DIR', '/usr/local/include')]
@@ -52,8 +48,7 @@ cmdclass['build_ext'] = build_ext
 
 
 setup(
-    install_requires=INSTALL_REQUIRES,
-    version=version,
+    version=0.8.2 #version,
     cmdclass=cmdclass,
     include_package_data=False,
     ext_modules=[pystare],

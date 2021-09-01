@@ -2,6 +2,6 @@
 requires = ["setuptools",
             "wheel",
             "numpy >= 1.15",
-            "Cython>=0.29",
-            "versioneer"]
+            "Cython>=0.29"]
 #build-backend = "setuptools.build_meta"
+
