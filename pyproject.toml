@@ -4,4 +4,4 @@ requires = ["setuptools",
             "numpy >= 1.15",
             "Cython>=0.29",
             "versioneer"]
-build-backend = "setuptools.build_meta"
+#build-backend = "setuptools.build_meta"

@@ -5,7 +5,8 @@
 import os
 import numpy
 from setuptools import setup, Extension
-from setuptools.command.build_py import build_py as _build_py
+from setuptools.command.build_py import build_py
+from setuptools.command.build_ext import build_ext
 import versioneer
 
 
@@ -36,36 +37,24 @@ pystare = Extension(name='pystare._core',
                     language='c++')
 
 
-class BuildPy(_build_py):
+class BuildPy(build_py):
 
     def run(self):
         # Making sure extension is built before getting copied
         self.run_command("build_ext")
         return super().run()
 
-
 version = versioneer.get_version()
+
 cmdclass = versioneer.get_cmdclass()
 cmdclass['build_py'] = BuildPy
-
-
-tests_require = ['matplotlib']
+cmdclass['build_ext'] = build_ext
 
 
 setup(
-    setup_requires=["numpy"],
     install_requires=INSTALL_REQUIRES,
-
-    # This would be used by python setup.py tests
-    tests_require=tests_require,
-    # This is used by tox
-    extras_require={
-        "test": [tests_require],
-        "docs": ["sphinx", "numpydoc"],
-    },
     version=version,
-
-    cmdclass={'build_py': BuildPy},
+    cmdclass=cmdclass,
     include_package_data=False,
     ext_modules=[pystare],
 ) 
