@@ -13,6 +13,7 @@ import versioneer
 STARE_LIB_DIRS = [os.environ.get('STARE_LIB_DIR', '/usr/local/lib')]
 STARE_INCLUDE_DIRS = [os.environ.get('STARE_INCLUDE_DIR', '/usr/local/include')]
 
+INCLUDE_DIRS = STARE_INCLUDE_DIRS + [numpy.get_include()]
 
 pystare = Extension(name='pystare._core',
                     sources=['pystare/PySTARE.i', 'pystare/PySTARE.cpp'],
@@ -20,7 +21,7 @@ pystare = Extension(name='pystare._core',
                     extra_compile_args=['-std=c++11'],
                     libraries=['STARE'],
                     library_dirs=STARE_LIB_DIRS,    # Location of libSTARE.a
-                    include_dirs=STARE_INCLUDE_DIRS,      # Location of STARE.h
+                    include_dirs=INCLUDE_DIRS,      # Location of STARE.h
                     language='c++')
 
 

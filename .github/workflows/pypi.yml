@@ -20,7 +20,7 @@ jobs:
       LDFLAGS: "-L/home/runner/stare/lib"
       TWINE_USERNAME: ${{ secrets.TWINE_USERNAME }}
       TWINE_PASSWORD: ${{ secrets.TWINE_PASSWORD}} 
-      TWINE_PASSWORD: ${{ secrets.TWINE_PASSWORD_TEST }} 
+      #TWINE_PASSWORD: ${{ secrets.TWINE_PASSWORD_TEST }} 
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python 3.9
@@ -40,5 +40,5 @@ jobs:
     - name: Publish wheels to PyPI
       run: |
         twine upload  dist/*-manylinux*.whl
-        twine upload --repository testpypi dist/*-manylinux*.whl
+        # twine upload --repository testpypi dist/*-manylinux*.whl
     
