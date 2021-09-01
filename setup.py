@@ -14,28 +14,22 @@ STARE_LIB_DIRS = [os.environ.get('STARE_LIB_DIR', '/usr/local/lib')]
 STARE_INCLUDE_DIRS = [os.environ.get('STARE_INCLUDE_DIR', '/usr/local/include')]
 
 
-if os.environ.get('PYTHON_INCLUDE_DIRS') is None:
-    PYTHON_INCLUDE_DIRS = []
-else:
-    PYTHON_INCLUDE_DIRS = os.environ.get('PYTHON_INCLUDE_DIRS').split(':')
-
-INCLUDE_DIRS = STARE_INCLUDE_DIRS + PYTHON_INCLUDE_DIRS + [numpy.get_include()]
-
-
 pystare = Extension(name='pystare._core',
                     sources=['pystare/PySTARE.i', 'pystare/PySTARE.cpp'],
                     swig_opts=['-c++'],
                     extra_compile_args=['-std=c++11'],
                     libraries=['STARE'],
                     library_dirs=STARE_LIB_DIRS,    # Location of libSTARE.a
-                    include_dirs=INCLUDE_DIRS,      # Location of STARE.h
+                    include_dirs=STARE_INCLUDE_DIRS,      # Location of STARE.h
                     language='c++')
 
 
 class BuildPy(build_py):
 
     def run(self):
-        # Making sure extension is built before getting copied
+        """ 
+        We need to overwrite run to make sure extension is built before getting copied
+        """
         self.run_command("build_ext")
         return super().run()
 
@@ -47,9 +41,9 @@ cmdclass['build_ext'] = build_ext
 
 
 setup(
-    version="0.8.2", #version,
-    cmdclass=cmdclass,
-    include_package_data=False,
+    #version="0.8.2",
+    version=version,
+    cmdclass=cmdclass,    
     ext_modules=[pystare],
 ) 
 
