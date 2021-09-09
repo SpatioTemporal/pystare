@@ -134,6 +134,7 @@ class StareResult {
   void                          copy             (int64_t* indices, int len);
   void                          copy_as_values   (int64_t* indices, int len);
   void                          copy_as_intervals(int64_t* indices, int len);
+  //void                          copy_as_list_list(int64_t* indices1, int len1, int64_t* indices2, int len2);
   void                          convert();
   bool                          converted = false;
   STARE_SpatialIntervals        sis;
@@ -171,7 +172,9 @@ public:
   virtual ~srange();
 
   void add_intervals(int64_t* indices, int len);
-  void add_range(const SpatialRange& r) { range.addSpatialRange(r); }
+  void add_range(const srange& r) {
+    range.addSpatialRange(r.range); 
+  }
   
   // bool contains(int64_t siv);
   bool contains(long long siv);
@@ -197,44 +200,26 @@ public:
   SpatialRange range;
   STARE_SpatialIntervals sis;
   STARE_ArrayIndexSpatialValues    sivs;
-  void print(){range.print();};
 
   void add_intersect(const srange& one, const srange& other,bool compress) {
-    // cout << " compress " << compress << endl << flush;
-    
-//   HstmRange *range1 = new HstmRange(range.range->range->RangeFromIntersection(other.range.range->range,compress)); // NOTE mlr Probably about the safest way to inst. SpatialRange.
-// // #define DIAG
-// #ifdef DIAG
-// 	KeyPair kp; 
-//     range1->reset(); 
-//     range1->getNext(kp);
-// 	cout << "sr_i range1,r->r,nr " << range1 << " " << range1->range << " " << range1->range->nranges() << " : "
-// 			<< setw(16) << setfill('0') << hex << kp.lo << " "
-// 			<< setw(16) << setfill('0') << hex << kp.hi << " "
-// 			<< dec
-// 			<< endl << flush;
-// 	EmbeddedLevelNameEncoding leftJustified;
-// 	leftJustified.setId(kp.lo); 
-//     cout << "kp.lo lj " << setw(16) << setfill('0') << hex << leftJustified.getSciDBLeftJustifiedFormat() << endl << flush;
-// 	leftJustified.setId(kp.hi); cout << "kp.hi lj " << setw(16) << setfill('0') << hex << leftJustified.getSciDBLeftJustifiedFormat() << endl << flush;
-// 	cout << " r-r-my_los " << hex << range1->range->my_los << endl << flush;
-// 	cout << dec;
-// #endif
-//    cout << 1000 << endl << flush;
-    // SpatialRange *res = new SpatialRange(range1);
-    // Yay! Works: SpatialRange *res = (one.range & other.range);
     SpatialRange *res = sr_intersect(one.range,other.range,compress);
-    //    cout << 1100 << " 11 nr = " << res->range->range->nranges() << endl << flush;
-    // srange result; result.set_tag(999);
-    if(res != NULL)
-      range.addSpatialRange(*res);
-    // STARE_SpatialIntervals sis_res = res->toSpatialIntervals();
-    //    cout << 1150 << endl << flush;
-    // range.addSpatialIntervals(sis_res);
-    // cout << 1200 << " 12 nr = " << range.range->range->nranges() << endl << flush;
-    // res->purge();
-    // delete res;
-    //    cout << 1300 << endl << flush;
+    if(res != NULL){
+      range.addSpatialRange(*res); 
+      //res->print();
+      range.purge();
+    }
+  }
+  std::list<list<STARE_ENCODE>>* leftJoin(SpatialRange* sp){//srange
+    return range.leftJoin(sp);//2D numpy array
+  }
+  std::list<list<STARE_ENCODE>>* innerJoin(SpatialRange* sp){//srange
+    return range.innerJoin(sp);
+  }
+  std::list<list<STARE_ENCODE>>* fullJoin(SpatialRange* sp){//srange
+    return range.fullJoin(sp);
+  }
+  void print(){
+    range.print();
   }
 };
 
