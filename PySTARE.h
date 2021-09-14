@@ -118,7 +118,8 @@ void _set_temporal_resolutions_from_sorted_inplace (int64_t* indices_inplace, in
 
 /****/
 
-enum StareResultCase { SpatialIntervals, ArrayIndexSpatialValues };
+typedef std::vector<int> STARE_ArrayIndexes;
+enum StareResultCase { SpatialIntervals, ArrayIndexSpatialValues, ArrayIndexes };
 
 class StareResult {
  public:
@@ -134,9 +135,20 @@ class StareResult {
   void                          copy             (int64_t* indices, int len);
   void                          copy_as_values   (int64_t* indices, int len);
   void                          copy_as_intervals(int64_t* indices, int len);
-  //void                          copy_as_list_list(int64_t* indices1, int len1, int64_t* indices2, int len2);
+  void                          copy_as_list_list(int64_t* indices1, int len1, int64_t* indices2, int len2);
   void                          convert();
   bool                          converted = false;
+  //For join
+  void addJoinResults(STARE_ArrayIndexSpatialValues values, std::vector<int> indexes){
+    this->listValues = values;
+    this->listIndexes = indexes;
+    this->sCase = ArrayIndexes;
+  }
+  int get_listValues_size(){ return listValues.size();}
+  int get_listIndexes_size(){ return listIndexes.size();}
+  STARE_ArrayIndexSpatialValues listValues;
+  STARE_ArrayIndexes            listIndexes;
+  //
   STARE_SpatialIntervals        sis;
   STARE_ArrayIndexSpatialValues sisvs;
   StareResultCase               sCase;
@@ -209,19 +221,13 @@ public:
       range.purge();
     }
   }
-  std::list<list<STARE_ENCODE>>* leftJoin(SpatialRange* sp){//srange
-    return range.leftJoin(sp);//2D numpy array
-  }
-  std::list<list<STARE_ENCODE>>* innerJoin(SpatialRange* sp){//srange
-    return range.innerJoin(sp);
-  }
-  std::list<list<STARE_ENCODE>>* fullJoin(SpatialRange* sp){//srange
-    return range.fullJoin(sp);
-  }
   void print(){
     range.print();
   }
 };
 
+StareResult _leftJoin(srange& one, srange& other);
+StareResult _innerJoin(srange& one, srange& other);
+StareResult _fullJoin(srange& one, srange& other);
 #endif
 

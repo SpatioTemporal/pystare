@@ -175,7 +175,36 @@ StareResult _expand_intervals(int64_t* indices, int len, int resolution, bool mu
   result.add_indexValues(expandIntervalsMultiRes(si,resolution, multi_resolution));
   return result;
 }
+StareResult _convert_Join_Result(std::list<list<STARE_ENCODE>>* temp){
+  StareResult result;
+  STARE_ArrayIndexSpatialValues listValues;
+  STARE_ArrayIndexes            listIndexes;
+  int index = 0;
+  std::list<list<STARE_ENCODE>>::iterator it;
+  for(it = temp->begin(); it != temp->end(); ++it){
+    listIndexes.push_back(index);
+    std::list<STARE_ENCODE>::iterator it_j;
+    for(it_j = it->begin(); it_j != it->end(); ++it_j){
+        listValues.push_back(*it_j);
+        index += 1;
+    }
+  }
+  result.addJoinResults(listValues, listIndexes);
+  return result;
 
+}
+StareResult _leftJoin(srange& one, srange& other){
+  std::list<list<STARE_ENCODE>>* temp = one.range.leftJoin(&(other.range));
+  return _convert_Join_Result(temp);
+}
+StareResult _innerJoin(srange& one, srange& other){
+  std::list<list<STARE_ENCODE>>* temp = one.range.innerJoin(&(other.range));
+  return _convert_Join_Result(temp);
+}
+StareResult _fullJoin(srange& one, srange& other){
+  std::list<list<STARE_ENCODE>>* temp = one.range.fullJoin(&(other.range));
+  return _convert_Join_Result(temp);
+}
 StareResult _to_neighbors(int64_t* indices, int len) { 
   STARE_ArrayIndexSpatialValues sivs(indices, indices+len);
   StareResult result;
@@ -722,6 +751,14 @@ void StareResult::copy             (int64_t* indices, int len) {
   case SpatialIntervals :
     copy_as_intervals(indices,len);
     ; break;
+  }
+}
+void StareResult::copy_as_list_list(int64_t* indices1, int len1, int64_t* indices2, int len2){
+  for(int i = 0; i < min(len1,(int)listValues.size()); ++i) {
+    indices1[i] = listValues[i];
+  }
+  for(int i = 0; i < min(len2,(int)listIndexes.size()); ++i) {
+    indices2[i] = listIndexes[i];
   }
 }
 void StareResult::copy_as_values   (int64_t* indices, int len) {

@@ -606,6 +606,27 @@ def expand_intervals(intervals, resolution, multi_resolution=False):
     result.copy_as_values(expanded_intervals)
     return expanded_intervals
 
+def leftJoin(one, other):
+    result = _leftJoin(one,other)
+    values = numpy.zeros([result.get_listValues_size()],dtype=numpy.int64)
+    indexes = numpy.zeros([result.get_listIndexes_size()],dtype=numpy.int64)
+    result.copy_as_list_list(values, indexes)
+    return values, indexes
+
+def innerJoin(one, other):
+    result = _innerJoin(one,other)
+    values = numpy.zeros([result.get_listValues_size()],dtype=numpy.int64)
+    indexes = numpy.zeros([result.get_listIndexes_size()],dtype=numpy.int64)
+    result.copy_as_list_list(values, indexes)
+    return values, indexes
+
+def fullJoin(one, other):
+    result = _fullJoin(one,other)
+    values = numpy.zeros([result.get_listValues_size()],dtype=numpy.int64)
+    indexes = numpy.zeros([result.get_listIndexes_size()],dtype=numpy.int64)
+    result.copy_as_list_list(values, indexes)
+    return values, indexes
+
 #    result      = numpy.full([result_size_limit],-1,dtype=numpy.int64)
 #    result_size = numpy.full([1],-1,dtype=numpy.int64)
 #    _expand_intervals(intervals,resolution,result,result_size)
