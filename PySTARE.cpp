@@ -720,7 +720,20 @@ void _coarsen(int64_t* indices, int len,
 
 ////////////////////////////////////////////////////////////////////////////////
 //
-StareResult::~StareResult() {}
+StareResult::~StareResult() {
+  //if(!listValues.empty()){
+    listValues.clear();
+  //}
+  //if(!listIndexes.empty()){
+    listIndexes.clear(); 
+  //}
+  //if(!sis.empty()){
+    sis.clear();
+  //}
+  //if(!sisvs.empty()){
+    sisvs.clear();
+  //}
+}
 int  StareResult::get_size() {
   switch( sCase ) {
   case ArrayIndexSpatialValues : return get_size_as_values();
@@ -812,7 +825,14 @@ srange::srange(int64_t* indices, int len) {
   range.addSpatialIntervals(sis);
 }
 
-srange::~srange() {}
+srange::~srange() {
+  //if(!sis.empty()){
+    sis.clear();
+  //}
+  //if(!sivs.empty()){
+    sivs.clear();
+  //}
+}
 
 void srange::add_intervals(int64_t* indices, int len) {
   STARE_SpatialIntervals sis(indices, indices+len);

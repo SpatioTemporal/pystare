@@ -218,7 +218,8 @@ public:
     if(res != NULL){
       range.addSpatialRange(*res); 
       //res->print();
-      range.purge();
+      //range.purge();
+      delete res;
     }
   }
   void print(){
