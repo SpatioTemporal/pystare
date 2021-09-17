@@ -101,7 +101,7 @@ def coarsest_resolution_finer_or_equal_ms(ms):
     Bits are numbered in the opposite direction.
     The biggest year bit is bit 62. The smallest millisecond bit is at bit 14. So we have:
 
-    .. tabularcolumns:: |r|r|r|r|r|c|
+    .. tabularcolumns:: |R|R|R|R|R|R|
     +----------+-------------+-------+-----+------+----------------------------+
     |Field     | Resolutions | Start | End | Size | Unit                       |
     +==========+=============+=======+=====+======+============================+
@@ -218,9 +218,6 @@ def cmp_temporal(tivs1, tivs2, flatten=True):
     if not flatten:
         cmp = cmp.reshape(len(tivs1), len(tivs2))
     return cmp
-
-
-
 
 
 def validate_iso8601_string(iso_string, has_ms=None, has_tz=None):
@@ -347,9 +344,6 @@ def validate_iso8601_strings(time_strings, has_ms=None, has_tz=None):
         if validate_iso8601_string(time_string, has_ms, has_tz) is not True:
             return False
     return True
-
-
-
 
 
 def validate_stare_timestring(timestrings):
