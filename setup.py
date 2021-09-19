@@ -15,8 +15,8 @@ if os.environ.get("READTHEDOCS", False) == "True":
 else:
     INSTALL_REQUIRES = ['numpy>=1.20.0']
 
-STARE_LIB_DIRS = [os.environ.get('STARE_LIB_DIR', '/usr/local/lib')]
-STARE_INCLUDE_DIRS = [os.environ.get('STARE_INCLUDE_DIR', '/usr/local/include')]
+STARE_LIB_DIRS = [os.environ.get('STARE_LIB_DIR', '/home/jovyan/users_conda_envs/work/lib')]
+STARE_INCLUDE_DIRS = [os.environ.get('STARE_INCLUDE_DIR','/home/jovyan/users_conda_envs/work/include')]
 
 if os.environ.get('PYTHON_INCLUDE_DIRS') is None:
     PYTHON_INCLUDE_DIRS = []
@@ -30,8 +30,8 @@ pystare = Extension(name='pystare._core',
                     sources=['pystare/PySTARE.i', 'pystare/PySTARE.cpp'],
                     depends=['pystare/PySTARE.h'],
                     swig_opts=['-modern', '-c++'],
-                    extra_compile_args=['-std=c++11'],
-                    libraries=['STARE'],
+                    extra_compile_args=['-std=c++11','-fopenmp'],
+                    libraries=['STARE','gomp'],
                     library_dirs=STARE_LIB_DIRS,    # Location of libSTARE.a
                     include_dirs=INCLUDE_DIRS,      # Location of STARE.h
                     language='c++')
