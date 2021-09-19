@@ -34,7 +34,7 @@ CC              = 'cc'       if os.environ.get('CC') is None else os.environ.get
 OMP_CFLAGS      = '-fopenmp' if os.environ.get('OMP_CFLAGS') is None else os.environ.get("OMP_CFLAGS")
 OMP_INCLUDE_DIR = None       if os.environ.get('OMP_INCLUDE_DIR') is None else os.environ.get('OMP_INCLUDE_DIR')
 OMP_LIB_DIR     = None       if os.environ.get('OMP_LIB_DIR') is None else os.environ.get('OMP_LIB_DIR')
-OMP_LIBRARY     = 'gomp'     if os.environ.get('OMP_LIBRARY') is None else os.environ.get('OMP_LIBRARY')
+OMP_LIBRARY     = 'omp'     if os.environ.get('OMP_LIBRARY') is None else os.environ.get('OMP_LIBRARY')
 
 OMP_LDFLAGS = [] if OMP_LIB_DIR is None else ['-L'+OMP_LIB_DIR]
 OMP_LDFLAGS = OMP_LDFLAGS + ['-l'+OMP_LIBRARY]
