@@ -814,10 +814,17 @@ void StareResult::convert() {
 //
 
 srange::srange() {}
+srange::srange(bool _isGroupLeaves) {
+  range.tree->isGroupLeaves = _isGroupLeaves;
+}
 
 srange::srange(int64_t* indices, int len) {
   STARE_ArrayIndexSpatialValues sis(indices, indices+len);
   range.addSpatialIntervals(sis);
+}
+srange::srange(int64_t* indices, int len, bool isGroupLeaves) {
+  STARE_ArrayIndexSpatialValues sis(indices, indices+len);
+  range.addSpatialIntervals(sis, isGroupLeaves);
 }
 
 srange::~srange() {

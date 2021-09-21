@@ -180,7 +180,9 @@ void _adapt_resolution_to_proximity(int64_t* indices, int len, int64_t* range_in
 class srange {
 public:
   srange();
+  srange(bool isGroupLeaves);
   srange(int64_t* indices, int len);
+  srange(int64_t* indices, int len, bool isGroupLeaves);
   virtual ~srange();
 
   void add_intervals(int64_t* indices, int len);
@@ -211,10 +213,19 @@ public:
 
   SpatialRange range;
   STARE_SpatialIntervals sis;
-  STARE_ArrayIndexSpatialValues    sivs;
+  STARE_ArrayIndexSpatialValues    sivs; 
 
   void add_intersect(const srange& one, const srange& other,bool compress) {
     SpatialRange *res = sr_intersect(one.range,other.range,compress);
+    if(res != NULL){
+      range.addSpatialRange(*res); 
+      //res->print();
+      //range.purge();
+      delete res;
+    }
+  }
+  void add_intersect(const srange& one, const srange& other,bool compress, bool isGroupLeaves) {
+    SpatialRange *res = sr_intersect(one.range,other.range,compress, isGroupLeaves);
     if(res != NULL){
       range.addSpatialRange(*res); 
       //res->print();
