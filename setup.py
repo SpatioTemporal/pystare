@@ -34,6 +34,7 @@ class BuildPy(build_py):
         self.run_command("build_ext")
         return super().run()
 
+
 version = versioneer.get_version()
 
 cmdclass = versioneer.get_cmdclass()
@@ -42,7 +43,6 @@ cmdclass['build_ext'] = build_ext
 
 
 setup(
-    #version="0.8.2",
     version=version,
     cmdclass=cmdclass,    
     ext_modules=[pystare],
