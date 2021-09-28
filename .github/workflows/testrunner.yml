@@ -43,11 +43,11 @@ jobs:
         set -x
         mkdir build
         cd build
-        cmake -DCMAKE_INSTALL_PREFIX=~/stare ..
+        cmake -DCMAKE_INSTALL_PREFIX=~/stare -DBUILD_SHARED_LIBS=NO ..
         make
         make install
-        STARE_LIB_DIR=~/stare/lib/
-        STARE_INCLUDE_DIR=~/stare/include/
+        STARE_LIB_DIR=~/stare/lib/OFF/
+        STARE_INCLUDE_DIR=~/stare/include/STARE/
     - name: build pystare
       run: | 
          python3 setup.py build_ext --inplace
