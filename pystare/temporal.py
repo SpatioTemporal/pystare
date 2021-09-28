@@ -101,7 +101,7 @@ def coarsest_resolution_finer_or_equal_ms(ms):
     Bits are numbered in the opposite direction.
     The biggest year bit is bit 62. The smallest millisecond bit is at bit 14. So we have:
 
-    .. tabularcolumns:: |r|r|r|r|r|c|
+    .. tabularcolumns:: |R|R|R|R|R|R|
     +----------+-------------+-------+-----+------+----------------------------+
     |Field     | Resolutions | Start | End | Size | Unit                       |
     +==========+=============+=======+=====+======+============================+
@@ -218,9 +218,6 @@ def cmp_temporal(tivs1, tivs2, flatten=True):
     if not flatten:
         cmp = cmp.reshape(len(tivs1), len(tivs2))
     return cmp
-
-
-
 
 
 def validate_iso8601_string(iso_string, has_ms=None, has_tz=None):
@@ -347,9 +344,6 @@ def validate_iso8601_strings(time_strings, has_ms=None, has_tz=None):
         if validate_iso8601_string(time_string, has_ms, has_tz) is not True:
             return False
     return True
-
-
-
 
 
 def validate_stare_timestring(timestrings):
@@ -565,13 +559,8 @@ def from_julian_date(jd1, jd2, scale, forward_res=48, reverse_res=48):
     """ Converts two-part Julian Dates (JD) to SIVs.
 
     [astropy.time](https://docs.astropy.org/en/stable/time/index.html) provides a simple interface to convert between
-    common datetime representations (e.g. numpy.datetime64, datetime, iso strings, etc. ) and two-part (JD)
-
-    E.g.
-    >>> from astropy import time
-    >>> t = time.Time('2021-08-26T17:36:46.426092', format='isot')
-    >>> t.jd1, t.jd2
-    (2459453.0, 0.23387067236111114)
+    common datetime representations (e.g. numpy.datetime64, datetime, iso strings, etc. ) and two-part (JD).
+    See in examples below
 
     from [Julian Day Wikipedia](https://en.wikipedia.org/wiki/Julian_day)
     "the Julian date (JD) of any instant is the Julian day number plus the
@@ -604,6 +593,11 @@ def from_julian_date(jd1, jd2, scale, forward_res=48, reverse_res=48):
 
     Examples
     ----------
+    >>> from astropy import time                                    # doctest: +SKIP
+    >>> t = time.Time('2021-08-26T17:36:46.426092', format='isot')  # doctest: +SKIP
+    >>> t.jd1, t.jd2                                                # doctest: +SKIP
+    (2459453.0, 0.23387067236111114)                                # doctest: +SKIP
+
     >>> jd1 = numpy.array([2459453.0])
     >>> jd2 = numpy.array([0.23387067236111114])
     >>> tivs = pystare.from_julian_date(jd1=jd1, jd2=jd2, scale='tai', forward_res=10, reverse_res=10)

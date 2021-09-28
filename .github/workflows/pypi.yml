@@ -1,0 +1,42 @@
+name: Build Wheel Manylinux and upload to PyPi
+
+on:
+  push:
+    tags: 
+      - v*
+  pull_request:
+    tags:
+      - v*
+    
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    env:
+      CPPFLAGS: "-I/usr/include -I/usr/local/include -I/home/runner/stare/include"
+      LDFLAGS: "-L/home/runner/stare/lib"
+      TWINE_USERNAME: ${{ secrets.TWINE_USERNAME }}
+      TWINE_PASSWORD: ${{ secrets.TWINE_PASSWORD}} 
+      #TWINE_PASSWORD: ${{ secrets.TWINE_PASSWORD_TEST }} 
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install twine 
+    - name: Build manylinux Python wheels
+      uses: RalfG/python-wheels-manylinux-build@v0.3.4-manylinux2010_x86_64
+      with:
+        python-versions: 'cp36-cp36m cp37-cp37m cp38-cp38 cp39-cp39'        
+        pre-build-command: 'sh .github/workflows/prebuild.sh' # This script clones, builds, and installs STARE
+        build-requirements: 'cython numpy'
+    - name: Publish wheels to PyPI
+      run: |
+        twine upload  dist/*-manylinux*.whl
+        # twine upload --repository testpypi dist/*-manylinux*.whl
+    

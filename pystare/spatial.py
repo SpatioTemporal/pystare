@@ -65,7 +65,7 @@ def from_latlon_2d(lat, lon, level=None, adapt_level=False):
     lon: 2D array-like
         longitudes. Has to have same length as lat
     level: int (0<=level<=27)
-        level of thfe SIDs. If not set, level will me automatically adapted.
+        level of the SIDs. If not set, level will me automatically adapted.
         If set, adapt_level will be set to false.
     adapt_level: bool
         if True, level will adapted to match resolution of lat/lon. Will overwrite level.
@@ -97,6 +97,8 @@ def from_latlon_2d(lat, lon, level=None, adapt_level=False):
         adapt_level = True
     elif level < 0 or level > 27:
         raise pystare.exceptions.PyStareLevelError()
+    elif adapt_level is True:
+        raise pystare.exception.PyStareError('Cannot set level AND adapt level')
     else:
         adapt_level = False
 
@@ -693,20 +695,135 @@ def intersection(sids1, sids2, multi_resolution=True):
     return intersection
 
 
+def int2bin(sids):
+    """
+    Converts 64 bit integer to binary
+
+    Examples
+    ----------
+    >>> sids = numpy.array([3458764513820540928])
+    >>> int2bin(sids)
+     ['0011000000000000000000000000000000000000000000000000000000000000']
+    """
+    if hasattr(sids, "__len__"):
+        return ['{0:064b}'.format(sid) for sid in sids]
+    else:
+        return '{0:064b}'.format(sids)
+
+
+def int2hex(sids):
+    """ Converts int sids to hex sids
+
+    Parameters
+    -----------
+    sids: array-like or int64
+        int representations of SIDs
+
+    Returns
+    --------
+    sid: array-like or str
+        hex representations of SIDs
+
+    Examples
+    -----------
+    >>> sid = 3458764513820540928
+    >>> pystare.int2hex(sid)
+    '0x3000000000000000'
+    """
+
+    if hasattr(sids, "__len__"):
+        return ["0x%016x" % sid for sid in sids]
+    else:
+        return "0x%016x" % sids
+
+
+def hex2int(sids):
+    """ Converts hex SIDs to int SIDs
+
+    Parameters
+    -----------
+    sids: array-like or str
+        hex representations of SIDs
+
+    Returns
+    ----------
+    sid: array-like or int64
+        int representation of SIDs
+
+
+    Examples
+    -----------
+    >>> sid = '0x3000000000000000'
+    >>> pystare.hex2int(sid)
+    3458764513820540928
+
+    >>> sid = ['0x3000000000000000']
+    >>> pystare.hex2int(sid)
+    [3458764513820540928]
+    """
+
+    if isinstance(sids, str):
+        return int(sids, 16)
+    else:
+        return [int(sid, 16) for sid in sids]
+
+
+def spatial_resolution(sids):
+    """
+    Returns the spatial resolution of an sid
+
+    Parameters
+    ------------
+    sids: int or array-like
+        STARE index value
+
+    Returns
+    ---------
+    resolution: int
+        Resolution of the SID
+
+    Examples
+    ---------
+    >>> sid = pystare.hex2int('0x3000000000000004')
+    >>> pystare.spatial_resolution(sid)
+    4
+
+    >>> sids = pystare.hex2int(['0x3000000000000004', '0x3000000000000005'])
+    >>> pystare.spatial_resolution(sids)
+    array([4, 5])
+
+    >>> sid = numpy.array(sids)
+    >>> pystare.spatial_resolution(sid)
+    array([4, 5])
+    """
+    sids = numpy.array(sids)
+    resolutions = sids & 31  # levelMaskSciDB
+    return resolutions
+
+
 def spatial_increment_from_level(level):
     if level < 0 or level > 27:
         raise pystare.exceptions.PyStareLevelError()
     return 1 << (59 - 2 * level)
 
 
-def spatial_resolution(sid):
-    return sid & 31  # levelMaskSciDB
+def spatial_terminator_mask(levels):
+    """ Creates a STARE mask for a given STARE resolution.
 
+    Examples
+    ---------
+    >>> mask = pystare.spatial_terminator_mask(0)
+    >>> '{0:064b}'.format(mask)
+    '0000011111111111111111111111111111111111111111111111111111111111'
 
-def spatial_terminator_mask(level):
-    if level < 0 or level > 27:
+    >>> pystare.spatial_terminator_mask([0, 10])
+     array([576460752303423487,       549755813887])
+
+    """
+    levels = numpy.array(levels)
+    if (levels < 0).any() or (levels > 27).any():
         raise pystare.exceptions.PyStareLevelError()
-    return (1 << (1 + 58 - 2 * level)) - 1
+    return (1 << (1 + 58 - 2 * levels)) - 1
 
 
 def spatial_terminator(sid):
@@ -717,10 +834,28 @@ def spatial_coerce_resolution(sid, resolution):
     return (sid & ~31) | resolution
 
 
-def spatial_clear_to_resolution(sid):
-    resolution = sid & 31
-    mask = spatial_terminator_mask(spatial_resolution(sid))
-    return (sid & ~mask) + resolution
+def spatial_clear_to_resolution(sids):
+    """
+    Clears the SID location bits up to the encoded spatial resolution
+
+    Parameters
+    -------------
+    sid: int
+        the spatial ID to be cleared
+
+    Examples
+    ----------
+    >>> sid = 2299437706637111721
+    >>> spatial_clear_to_resolution(sid)
+    2299437254470270985
+
+    >>> sids = pystare.hex2int(['0x097cf40fd3132507', '0x097cf40fd3132505'])
+    >>> pystare.int2hex(spatial_clear_to_resolution(sids))
+    ['0x097ce00000000007', '0x097c000000000005']
+    """
+    resolution = spatial_resolution(sids)
+    mask = spatial_terminator_mask(resolution)
+    return (sids & ~mask) + resolution
 
 
 def shiftarg_lon(lon):
@@ -776,13 +911,11 @@ def triangulate_indices(indices):
 
     Usage
     ----------
-    >>> lons, lats, intmat = triangulate_indices(indices) # doctest: +SKIP
-    >>> triang = tri.Triangulation(lons,lats,intmat)     # doctest: +SKIP
+    >>> lons, lats, intmat = triangulate_indices(indices)   # doctest: +SKIP
+    >>> triang = tri.Triangulation(lons,lats,intmat)        # doctest: +SKIP
     >>> plt.triplot(triang,'r-',transform=transform,lw=1,markersize=3) # doctest: +SKIP
     """
 
     latv, lonv, lat_center, lon_center = to_vertices_latlon(indices)
     lons, lats, intmat = triangulate(latv, lonv)
     return lons, lats, intmat
-
-

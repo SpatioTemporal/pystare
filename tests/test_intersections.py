@@ -21,7 +21,7 @@ def triangulate(i0, i1, i2):
     i0lat, i0lon = pystare.to_latlon(i0)
     i1lat, i1lon = pystare.to_latlon(i1)
     i2lat, i2lon = pystare.to_latlon(i2)
-    lats = numpy.zeros([3*len(i0lat)], dtype=numpu.double)
+    lats = numpy.zeros([3*len(i0lat)], dtype=numpy.double)
     lons = numpy.zeros([3*len(i0lat)], dtype=numpy.double)
     intmat = []
     k = 0
