@@ -8,17 +8,14 @@ on:
     tags:
       - v*
     
-
 jobs:
   build:
-
     runs-on: ubuntu-latest
     env:
       CPPFLAGS: "-I/usr/include -I/usr/local/include -I/home/runner/stare/include"
       LDFLAGS: "-L/home/runner/stare/lib"
       TWINE_USERNAME: ${{ secrets.TWINE_USERNAME }}
-      TWINE_PASSWORD: ${{ secrets.TWINE_PASSWORD}} 
-      #TWINE_PASSWORD: ${{ secrets.TWINE_PASSWORD_TEST }} 
+      TWINE_PASSWORD: ${{ secrets.TWINE_PASSWORD}}       
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python 3.9
