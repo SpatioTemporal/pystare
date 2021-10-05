@@ -130,7 +130,7 @@ def coarsest_resolution_finer_or_equal_ms(ms):
     |11        | -           | -     | -   |  1   | Before/After Epoch         |
     +----------+-------------+-------+-----+------+----------------------------+
 
-    Arguments
+    Parameters
     ----------
     ms: 1D array of ints
         resolution in milliseconds
