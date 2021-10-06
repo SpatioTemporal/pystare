@@ -1,8 +1,4 @@
 import pystare
-import matplotlib as mpl
-import matplotlib.pyplot as plt
-import matplotlib.tri as tri
-import cartopy.crs as ccrs
 import numpy
 
 
