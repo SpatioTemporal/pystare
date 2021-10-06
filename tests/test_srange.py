@@ -1,6 +1,7 @@
 import numpy
 import pystare 
 import unittest
+import tests.data.srange_data
 
 
 class MainTest(unittest.TestCase):
@@ -11,20 +12,11 @@ class MainTest(unittest.TestCase):
         numpy.testing.assert_array_equal(sids, pystare.to_compressed_range(sids))
     
     def test_make_srange1000(self):
-        try:
-            from tests.data.sids import sids
-        except:
-            from tests.data.sids import sids
-            pass
-        sids = sids[0:1000]
+        sids = tests.data.srange_data.sids[0:1000]
         srange = pystare.core.srange(sids)
         
     def test_make_srange10000(self):
-        try:
-            from tests.data.sids import sids
-        except:
-            from tests.data.sids import sids
-            pass
+        sids = tests.data.srange_data.sids[0:1000]
         sids = sids[0:10000]
         srange = pystare.core.srange(sids)
         

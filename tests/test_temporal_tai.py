@@ -154,6 +154,3 @@ class MainTest(unittest.TestCase):
         for s in zip(['1970-01-01T00:00:08.000', '2000-01-01T00:00:32.000', '2002-02-03T13:56:35.172', '2016-01-05T17:26:36.172'],
                      pystare.to_stare_timestring(tivs)):
             self.assertEqual(s[0],s[1][0:-12])
-            
-if __name__ == '__main__':
-    unittest.main()
