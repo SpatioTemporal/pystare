@@ -491,7 +491,7 @@ def to_circular_cover(lat, lon, radius, level):
     return range_indices
 
 
-def circular_cover_from(index, radius, level):
+def from_circular_cover(index, radius, level):
     """
     TODO
     """
