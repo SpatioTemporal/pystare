@@ -5,58 +5,73 @@ PySTARE exposes the STARE library to python.
 
 
 ## Requirements:
-By default, pystare requires STARE to be installed i.e. expects libSTARE.a in /usr/local/lib/ and STARE.h in /usr/local/include/
-
-    git clone https://github.com/SpatioTemporal/STARE
-    cd STARE
-    cmake .
-    make
-    make install
-
-If no rights for make install are present, the location of libSTARE.a and STARE.h can be specified in setup.py
-
-    library_dirs=[],       # Location of libSTARE.a
-    include_dirs=[],       # Location of STARE.h
-
-or by shell environment variables (e.g. in bash):
+Pystare requires STARE to be installed.
+It expects either 
+    - libSTARE.a in /usr/local/lib/ and STARE.h in /usr/local/include/ or
+    - the variables STARE_LIB_DIR and STARE_INCLUDE_DIR to be set e.g. with:
 
     export STARE_INCLUDE_DIR=/path/to/directory-containing-stare.h/
     export STARE_LIB_DIR=/path/to/directory-containing-stare.a/
 
+
+Build and install STARE e.g. with:
+
+    git clone https://github.com/SpatioTemporal/STARE
+    cd STARE
+    mkdir build
+    cd build
+    cmake ../
+    make
+    sudo make install
+
+
 It may be necessary to set PYTHON_INCLUDE_DIRS, if, for example, numpy
 headers cannot be found.
 
-STARE version 0.16.0 or greater is required.
-
 ## Installation
+Wheels for manylinux exist on pypi
+ 
+    pip install pystare==0.8.1
 
-    mkvirtualenv --python=/usr/bin/python3 $PROJECT_ENV    
-    pip3 install git+git://github.com/SpatioTemporal/pystare.git
+### Or install from source:
 
-### Or from local copy
-
-    git clone https://github.com/SpatioTemporal/pystare $pystare
-    pip3 install --editable $pystare
+    export STARE_INCLUDE_DIR=/path/to/directory-containing-stare.h/
+    export STARE_LIB_DIR=/path/to/directory-containing-stare.a/
+        
+    git clone https://github.com/SpatioTemporal/pystare 
+    pip3 install pystare/
     
 ### Manual build
     
-    python3 setup.py build_ext --inplace
-    python3 setup.py build --force
+    python3 setup.py build_ext --inplace 
+    python3 setup.py bdist_wheel
+    python3 setup.py sdist
     
     
 ## Tests
-    python3 setup.py test
+pystare uses [pytest](https://docs.pytest.org/en/6.2.x/). Pytest is configured in ```pytest.ini.```
+
+Run```pytest``` to run all tests.
+
+To run the doctest,
+
+```
+pytest --doctest-modules 
+```
+
+To run tests of a specific module
+
+```
+pytest /path/to/module.py
+```
+
+## Documentation
+pystare uses sphinx
+
     
-    
+    pip install sphinx-markdown-tables sphinx-automodapi myst_parser nbsphinx numpydoc pydata-sphinx-theme
+
 ## Usage
-
-Once pystare is installed or made available via PYTHONPATH one may use it as described in the following sections.
-
-### Example scripts
-
-Examples are provided in the examples directory and may be run as follows.
-
-    python3 examples/test_intersect_single_res.py
 
 ### Spatial
 

@@ -1,0 +1,14 @@
+Sphinx
+sphinx-automodapi
+sphinxcontrib-applehelp
+sphinxcontrib-devhelp
+sphinxcontrib-htmlhelp
+sphinxcontrib-jsmath
+sphinxcontrib-qthelp
+sphinxcontrib-serializinghtml
+sphinx-markdown-tables
+myst_parser
+nbsphinx
+numpydoc
+pydata-sphinx-theme
+pystare

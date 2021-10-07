@@ -32,38 +32,37 @@ static STARE stare;
 const char* stare_version();
 
 // Spatial
-void from_latlon(double* lat, int len_lat,  double * lon, int len_lon, int64_t* indices, int level);
+void _from_latlon(double* lat, int len_lat,
+                  double * lon, int len_lon,
+                  int64_t* indices, int level);
 
 void _from_latlon2D(double* lat, int lalen1, int lalen2, 
                     double* lon, int lolen1, int lolen2, 
                     int64_t* indices, int len1, int len2, 
                     int level, bool adapt_resolution);
 
-void to_latlon(int64_t* indices, int len, double* lat, double* lon);
-void to_latlonlevel(int64_t* indices, int len, double* lat, double* lon, int* levels);
-void to_level(int64_t* indices, int len,  int* levels);
+void _to_latlon(int64_t* indices, int len, double* lat, double* lon);
+void _to_latlonlevel(int64_t* indices, int len, double* lat, double* lon, int* levels);
+void _to_level(int64_t* indices, int len,  int* levels);
+void _to_area(int64_t* indices, int len, double* areas);
+void _from_intervals(int64_t* intervals, int len, int64_t* indices_starts, int64_t* indices_terminators );
+
 // Broken or dangerous. void to_vertices(int64_t* indices, int len, int64_t* vertices0, int64_t* vertices1, int64_t* vertices2, int64_t* centroid);
 void _to_vertices_latlon(int64_t* indices, int len, double* triangle_info_lats, int dmy1, double* triangle_info_lons, int dmy2 );
-void to_area(int64_t* indices, int len, double* areas);
-
 
 void _to_compressed_range(int64_t* indices, int len, int64_t* range_indices, int len_ri);
-
-void from_intervals(int64_t* intervals, int len, int64_t* indices_starts, int64_t* indices_terminators );
-
 void _intersect(int64_t* indices1, int len1, int64_t* indices2, int len2, int64_t* intersection, int leni);
 void _intersect_multiresolution(int64_t* indices1, int len1, int64_t* indices2, int len2, int64_t* intersection, int leni);
 void _cmp_spatial(int64_t* indices1, int len1, int64_t* indices2, int len2, int64_t* cmp, int len12);
 void _intersects(int64_t* indices1, int len1, int64_t* indices2, int len2, int* intersects, int method=0);
 
 // Temporal
-void from_utc(int64_t *datetime, int len, int64_t *indices_out, int forward_resolution, int reverse_resolution);
-void from_utc_variable(int64_t *datetime, int len, int64_t *indices_out, int64_t* forward_resolution, int lenf, int64_t* reverse_resolution, int lenr);
-void to_utc_approximate(int64_t* indices, int len, int64_t* datetime_out);
+void _from_utc(int64_t *datetime, int len, int64_t *indices_out, int forward_resolution, int reverse_resolution);
+void _from_utc_variable(int64_t *datetime, int len, int64_t *indices_out, int64_t* forward_resolution, int lenf, int64_t* reverse_resolution, int lenr);
+void _to_utc_approximate(int64_t* indices, int len, int64_t* datetime_out);
 void _cmp_temporal(int64_t* indices1, int len1, int64_t* indices2, int len2, int64_t* cmp, int len12);
-
 void _coarsest_resolution_finer_or_equal_milliseconds(double*  milliseconds, int len, int64_t* out_array);
-
+void _milliseconds_at_resolution(int64_t* resolutions, int len, double* millisecond);
 void _from_tai_iso_strings(char **taiStrings, int64_t* out_array, int out_length);
 char** _to_tai_iso_strings(int64_t* indices, int len);
 
@@ -77,6 +76,7 @@ void _set_reverse_resolution(int64_t* indices, int len,
                              int64_t* reverse_resolution, int lenr,
                              int64_t* out_array, int out_length
                              );
+
 void _set_forward_resolution(int64_t* indices, int len,
                              int64_t* forward_resolution, int lenf,
                              int64_t* out_array, int out_length
@@ -109,11 +109,12 @@ void _scidbUpperBoundMS(int64_t* indices, int len, int64_t* out_array, int out_l
 void _scidbLowerBoundMS(int64_t* indices, int len, int64_t* out_array, int out_length);
 void _scidbNewTemporalValue(int64_t* indices, int len, int64_t* new_indices, bool include_bounds);
 
+void _from_JulianTAI (double* d1, int nd1, double* d2, int nd2, int64_t* out_array, int out_length, int f_res, int r_res);
 void _to_JulianTAI   (int64_t* indices, int len, double* d1, int nd1, double* d2, int nd2);
-void _from_JulianTAI (double* d1, int nd1, double* d2, int nd2, int64_t* out_array, int out_length);
 
+void _from_JulianUTC (double* d1, int nd1, double* d2, int nd2, int64_t* out_array, int out_length, int f_res, int r_res);
 void _to_JulianUTC   (int64_t* indices, int len, double* d1, int nd1, double* d2, int nd2);
-void _from_JulianUTC (double* d1, int nd1, double* d2, int nd2, int64_t* out_array, int out_length);
+
 void _set_temporal_resolutions_from_sorted_inplace (int64_t* indices_inplace, int len, bool include_bounds);
 
 /****/
@@ -213,7 +214,7 @@ public:
 
   SpatialRange range;
   STARE_SpatialIntervals sis;
-  STARE_ArrayIndexSpatialValues    sivs; 
+  STARE_ArrayIndexSpatialValues sivs;
 
   void add_intersect(const srange& one, const srange& other,bool compress) {
     SpatialRange *res = sr_intersect(one.range,other.range,compress);
