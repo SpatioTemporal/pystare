@@ -493,13 +493,7 @@ def to_circular_cover(lat, lon, radius, level):
 
 def circular_cover_from(index, radius, level):
     """
-
-    Parameters
-    -----------
-
-    Returns
-    --------
-
+    TODO
     """
 
     if level < 0 or level > 27:
@@ -909,7 +903,7 @@ def triangulate_indices(indices):
     """
     Prepare data for matplotlib.tri.Triangulate.
 
-    Usage
+    Examples
     ----------
     >>> lons, lats, intmat = triangulate_indices(indices)   # doctest: +SKIP
     >>> triang = tri.Triangulation(lons,lats,intmat)        # doctest: +SKIP
@@ -919,3 +913,70 @@ def triangulate_indices(indices):
     latv, lonv, lat_center, lon_center = to_vertices_latlon(indices)
     lons, lats, intmat = triangulate(latv, lonv)
     return lons, lats, intmat
+
+
+def left_join(left, right):
+    """ Performs a left join
+
+    Parameters
+    ------------
+    left: array-like
+        left set of SIDs to join
+    right: array-like
+        right set of SIDs to join
+
+    Examples
+    ----------
+    >>> import numpy
+
+    """
+    result = pystare.core._left_join(left, right)
+    values = numpy.zeros([result.get_listValues_size()], dtype=numpy.int64)
+    indexes = numpy.zeros([result.get_listIndexes_size()], dtype=numpy.int64)
+    result.copy_as_list_list(values, indexes)
+    return values, indexes
+
+
+def inner_join(left, right):
+    """ Performs an inner join
+
+      Parameters
+      ------------
+      left: array-like
+          left set of SIDs to join
+      right: array-like
+          right set of SIDs to join
+
+      Examples
+      ----------
+      >>> import numpy
+
+      """
+    result = pystare.core._inner_join(left, right)
+    values = numpy.zeros([result.get_listValues_size()], dtype=numpy.int64)
+    indexes = numpy.zeros([result.get_listIndexes_size()], dtype=numpy.int64)
+    result.copy_as_list_list(values, indexes)
+    return values, indexes
+
+
+def full_join(left, right):
+    """ Performs a full/outer join
+
+      Parameters
+      ------------
+      left: array-like
+          left set of SIDs to join
+      right: array-like
+          right set of SIDs to join
+
+      Examples
+      ----------
+      >>> import numpy
+
+      """
+    result = pystare.core._full_join(left, right)
+    values = numpy.zeros([result.get_listValues_size()], dtype=numpy.int64)
+    indexes = numpy.zeros([result.get_listIndexes_size()], dtype=numpy.int64)
+    result.copy_as_list_list(values, indexes)
+    return values, indexes
+

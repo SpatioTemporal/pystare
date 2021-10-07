@@ -19,8 +19,8 @@ Build and install STARE e.g. with:
     git clone https://github.com/SpatioTemporal/STARE
     cd STARE
     mkdir build
-    cd build
-    cmake ../
+    cd build    
+    cmake -DCMAKE_INSTALL_PREFIX=~/stare -DSTARE_INSTALL_LIBDIR=lib -DBUILD_SHARED_LIBS=NO ..
     make
     sudo make install
 

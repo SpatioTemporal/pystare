@@ -193,15 +193,15 @@ StareResult _convert_Join_Result(std::list<list<STARE_ENCODE>>* temp){
   return result;
 
 }
-StareResult _leftJoin(srange& one, srange& other){
+StareResult _left_join(srange& one, srange& other){
   std::list<list<STARE_ENCODE>>* temp = one.range.leftJoin(&(other.range));
   return _convert_Join_Result(temp);
 }
-StareResult _innerJoin(srange& one, srange& other){
+StareResult _inner_join(srange& one, srange& other){
   std::list<list<STARE_ENCODE>>* temp = one.range.innerJoin(&(other.range));
   return _convert_Join_Result(temp);
 }
-StareResult _fullJoin(srange& one, srange& other){
+StareResult _full_join(srange& one, srange& other){
   std::list<list<STARE_ENCODE>>* temp = one.range.fullJoin(&(other.range));
   return _convert_Join_Result(temp);
 }

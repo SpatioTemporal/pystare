@@ -239,8 +239,8 @@ public:
   }
 };
 
-StareResult _leftJoin(srange& one, srange& other);
-StareResult _innerJoin(srange& one, srange& other);
-StareResult _fullJoin(srange& one, srange& other);
+StareResult _left_join(srange& one, srange& other);
+StareResult _inner_join(srange& one, srange& other);
+StareResult _full_join(srange& one, srange& other);
 #endif
 
