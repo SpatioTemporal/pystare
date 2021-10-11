@@ -648,6 +648,13 @@ def to_julian_date(tivs, scale):
     (array([2459215.5]), array([237.71107206]))
     >>> pystare.to_julian_date(tiv, scale='utc')
     (array([2459215.5]), array([237.71064382]))
+
+    >>> timestamps = ['2021-09-26T17:16:46.426092', '2020-09-26T17:16:46.426092']
+    >>> t = time.Time(timestamps, format='isot')
+    >>> tivs = pystare.from_julian_date(t.jd1, t.jd2, scale='tai')
+    >>> jds = pystare.to_julian_date(tivs, scale='tai')
+    >>> t = time.Time(jds[0], jds[1], format='jd', scale='tai')
+    ['2021-09-26T17:16:46.426' '2020-09-26T17:16:46.426']
     """
     jd1 = numpy.zeros(tivs.shape, dtype=numpy.double)
     jd2 = numpy.zeros(tivs.shape, dtype=numpy.double)
