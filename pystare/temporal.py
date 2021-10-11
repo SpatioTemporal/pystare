@@ -593,10 +593,10 @@ def from_julian_date(jd1, jd2, scale, forward_res=48, reverse_res=48):
 
     Examples
     ----------
-    >>> from astropy import time                                    # doctest: +SKIP
-    >>> t = time.Time('2021-08-26T17:36:46.426092', format='isot')  # doctest: +SKIP
-    >>> t.jd1, t.jd2                                                # doctest: +SKIP
-    (2459453.0, 0.23387067236111114)                                # doctest: +SKIP
+    >>> from astropy import time
+    >>> t = time.Time('2021-08-26T17:36:46.426092', format='isot')
+    >>> t.jd1, t.jd2
+    (2459453.0, 0.23387067236111114)
 
     >>> jd1 = numpy.array([2459453.0])
     >>> jd2 = numpy.array([0.23387067236111114])
@@ -649,12 +649,14 @@ def to_julian_date(tivs, scale):
     >>> pystare.to_julian_date(tiv, scale='utc')
     (array([2459215.5]), array([237.71064382]))
 
+    >>> from astropy import time
     >>> timestamps = ['2021-09-26T17:16:46.426092', '2020-09-26T17:16:46.426092']
     >>> t = time.Time(timestamps, format='isot')
     >>> tivs = pystare.from_julian_date(t.jd1, t.jd2, scale='tai')
     >>> jds = pystare.to_julian_date(tivs, scale='tai')
     >>> t = time.Time(jds[0], jds[1], format='jd', scale='tai')
-    ['2021-09-26T17:16:46.426' '2020-09-26T17:16:46.426']
+    >>> t.isot
+    array(['2021-09-26T17:16:46.426', '2020-09-26T17:16:46.426'], dtype='<U23')
     """
     jd1 = numpy.zeros(tivs.shape, dtype=numpy.double)
     jd2 = numpy.zeros(tivs.shape, dtype=numpy.double)
