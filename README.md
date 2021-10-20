@@ -20,8 +20,8 @@ Build and install STARE e.g. with:
     cd STARE
     mkdir build
     cd build
-    cmake ../
-    make
+    cmake -DSTARE_INSTALL_LIBDIR=lib -DBUILD_SHARED_LIBS=NO ../
+    make -j4
     sudo make install
 
 
