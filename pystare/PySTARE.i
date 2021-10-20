@@ -563,6 +563,8 @@ namespace std {
 %}
 */
 
+
 %pythoncode %{%}
+
 
 %include "PySTARE.h"

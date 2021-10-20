@@ -175,7 +175,36 @@ StareResult _expand_intervals(int64_t* indices, int len, int resolution, bool mu
   result.add_indexValues(expandIntervalsMultiRes(si,resolution, multi_resolution));
   return result;
 }
+StareResult _convert_Join_Result(std::list<list<STARE_ENCODE>>* temp){
+  StareResult result;
+  STARE_ArrayIndexSpatialValues listValues;
+  STARE_ArrayIndexes            listIndexes;
+  int index = 0;
+  std::list<list<STARE_ENCODE>>::iterator it;
+  for(it = temp->begin(); it != temp->end(); ++it){
+    listIndexes.push_back(index);
+    std::list<STARE_ENCODE>::iterator it_j;
+    for(it_j = it->begin(); it_j != it->end(); ++it_j){
+        listValues.push_back(*it_j);
+        index += 1;
+    }
+  }
+  result.addJoinResults(listValues, listIndexes);
+  return result;
 
+}
+StareResult _left_join(srange& one, srange& other){
+  std::list<list<STARE_ENCODE>>* temp = one.range.leftJoin(&(other.range));
+  return _convert_Join_Result(temp);
+}
+StareResult _inner_join(srange& one, srange& other){
+  std::list<list<STARE_ENCODE>>* temp = one.range.innerJoin(&(other.range));
+  return _convert_Join_Result(temp);
+}
+StareResult _full_join(srange& one, srange& other){
+  std::list<list<STARE_ENCODE>>* temp = one.range.fullJoin(&(other.range));
+  return _convert_Join_Result(temp);
+}
 StareResult _to_neighbors(int64_t* indices, int len) { 
   STARE_ArrayIndexSpatialValues sivs(indices, indices+len);
   StareResult result;
@@ -291,10 +320,11 @@ void _intersects(int64_t* indices1, int len1, int64_t* indices2, int len2, int* 
       intersects[i] = 0;
       int istat = r1.intersects(indices2[i]);
       if( istat != 0 ) {
-	intersects[i] = 1;
+	      intersects[i] = 1;
       }
     }
-  } else if( method == 1 ) {
+  } 
+  else if( method == 1 ) {
     // Binary sort and search
     sort(indices1,indices1+len1);
     for(int i=0; i<len2; ++i) {
@@ -305,47 +335,49 @@ void _intersects(int64_t* indices1, int len1, int64_t* indices2, int len2, int* 
       int m = (start+end)/2;
       bool done = false;
       while( !done ) {
-	m = (start+end)/2;
-	if(indices1[m] < test_siv) {
-	  start = m+1;
-	  done = start > end;
-	} else if(indices1[m] > test_siv) {
-	  end = m-1;
-	  done = start > end;
-	} else {
-	  intersects[i] = 1; done = true;
-	}
+        m = (start+end)/2;
+        if(indices1[m] < test_siv) {
+          start = m+1;
+          done = start > end;
+        } 
+        else if(indices1[m] > test_siv) {
+          end = m-1;
+          done = start > end;
+        } 
+        else {
+          intersects[i] = 1; done = true;
+        }
       }
       if( intersects[i] == 0 ) {
-	if( (end >= 0) || (start < len1) ) {
-	  if( 0 <= m-1 ) {
-	    if( cmpSpatial(indices1[m-1],test_siv) != 0 ) {
-	      intersects[i] = 1;
-	    }
-	  }
-	  if( (0 <= m) && (m < len1) ) {
-	    if( cmpSpatial(indices1[m],test_siv) != 0 ) {
-	      intersects[i] = 1;
-	    }
-	  }
-	  if( m+1 < len1 ) {
-	    if( cmpSpatial(indices1[m+1],test_siv) != 0 ) {
-	      intersects[i] = 1;
-	    }
-	  }
-	}
+        if( (end >= 0) || (start < len1) ) {
+          if( 0 <= m-1 ) {
+            if( cmpSpatial(indices1[m-1],test_siv) != 0 ) {
+              intersects[i] = 1;
+            }
+          }
+          if( (0 <= m) && (m < len1) ) {
+            if( cmpSpatial(indices1[m],test_siv) != 0 ) {
+              intersects[i] = 1;
+            }
+          }
+          if( m+1 < len1 ) {
+            if( cmpSpatial(indices1[m+1],test_siv) != 0 ) {
+              intersects[i] = 1;
+            }
+          }
+        }
       }
     }    
-  } else {
+  } 
+  else {
     // Fall-through
-
     for(int i=0; i<len2; ++i) {        
       intersects[i] = 0;
       for(int j=0; j<len1; ++j) {
-	if (cmpSpatial(indices2[i], indices1[j]) != 0) {
-	  intersects[i] = 1;
-	  break;
-	}            
+        if (cmpSpatial(indices2[i], indices1[j]) != 0) {
+          intersects[i] = 1;
+          break;
+        }            
       }
     }
   } 
@@ -700,7 +732,12 @@ void _coarsen(int64_t* indices, int len,
 
 ////////////////////////////////////////////////////////////////////////////////
 //
-StareResult::~StareResult() {}
+StareResult::~StareResult() {
+    listValues.clear();
+    listIndexes.clear(); 
+    sis.clear();
+    sisvs.clear();
+}
 int  StareResult::get_size() {
   switch( sCase ) {
   case ArrayIndexSpatialValues : return get_size_as_values();
@@ -731,6 +768,14 @@ void StareResult::copy             (int64_t* indices, int len) {
   case SpatialIntervals :
     copy_as_intervals(indices,len);
     ; break;
+  }
+}
+void StareResult::copy_as_list_list(int64_t* indices1, int len1, int64_t* indices2, int len2){
+  for(int i = 0; i < min(len1,(int)listValues.size()); ++i) {
+    indices1[i] = listValues[i];
+  }
+  for(int i = 0; i < min(len2,(int)listIndexes.size()); ++i) {
+    indices2[i] = listIndexes[i];
   }
 }
 void StareResult::copy_as_values   (int64_t* indices, int len) {
@@ -778,13 +823,23 @@ void StareResult::convert() {
 //
 
 srange::srange() {}
+srange::srange(bool _isGroupLeaves) {
+  range.tree->isGroupLeaves = _isGroupLeaves;
+}
 
 srange::srange(int64_t* indices, int len) {
   STARE_ArrayIndexSpatialValues sis(indices, indices+len);
   range.addSpatialIntervals(sis);
 }
+srange::srange(int64_t* indices, int len, bool isGroupLeaves) {
+  STARE_ArrayIndexSpatialValues sis(indices, indices+len);
+  range.addSpatialIntervals(sis, isGroupLeaves);
+}
 
-srange::~srange() {}
+srange::~srange() {
+    sis.clear();
+    sivs.clear();
+}
 
 void srange::add_intervals(int64_t* indices, int len) {
   STARE_SpatialIntervals sis(indices, indices+len);
