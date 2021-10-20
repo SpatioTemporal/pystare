@@ -1,4 +1,3 @@
-#!/usr/bin/env/python
 import os
 import numpy
 from setuptools import setup, Extension
