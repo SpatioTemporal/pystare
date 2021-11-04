@@ -1,10 +1,9 @@
-import numpy 
+import numpy
 import pystare 
 import unittest
 
 
 class MainTest(unittest.TestCase):
-
 
     def test_bug38(self):
         #https://github.com/SpatioTemporal/pystare/issues/38
@@ -13,18 +12,18 @@ class MainTest(unittest.TestCase):
     
     def test_make_srange1000(self):
         try:
-            from sids import sids
+            from tests.data.sids import sids
         except:
-            from tests.sids import sids
+            from tests.data.sids import sids
             pass
         sids = sids[0:1000]
         srange = pystare.core.srange(sids)
         
     def test_make_srange10000(self):
         try:
-            from sids import sids
+            from tests.data.sids import sids
         except:
-            from tests.sids import sids
+            from tests.data.sids import sids
             pass
         sids = sids[0:10000]
         srange = pystare.core.srange(sids)
@@ -80,7 +79,5 @@ class MainTest(unittest.TestCase):
             self.assertEqual(ivs.size, 1)
         with self.subTest():    
             self.assertEqual(hex(ivs[0]), '0x300a300000000009')
-        
-if __name__ == "__main__":
-    unittest.main()
+
 

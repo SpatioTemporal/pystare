@@ -1,7 +1,6 @@
 # Visualize test_intersect_single_res seen in test_intersections.py
 
 import pystare
-import matplotlib.tri
 import numpy
 
 
@@ -12,68 +11,35 @@ def test_intersect_single_res():
     lon0 = numpy.array([-30, -20, 60, 10], dtype=numpy.double)
     hull0 = pystare.cover_from_hull(lat0, lon0, resolution0)
 
-    lons0, lats0, intmat0 = pystare.triangulate_indices(hull0)
-    triang0 = matplotlib.tri.Triangulation(lons0, lats0, intmat0)
-
     resolution1 = 6
     lat1 = numpy.array([10, 20, 30, 20], dtype=numpy.double)
     lon1 = numpy.array([-60, 60, 60, -60], dtype=numpy.double)
     hull1 = pystare.cover_from_hull(lat1, lon1, resolution1)
 
-    lons1, lats1, intmat1 = pystare.triangulate_indices(hull1)
-    triang1 = matplotlib.tri.Triangulation(lons1, lats1, intmat1)
+    r0 = pystare.core.srange()
+    r0.add_intervals(hull0)
 
-    intersectedFalse = pystare.intersection(hull0, hull1, multi_resolution=False)
-    intersectedTrue = pystare.intersection(hull0, hull1, multi_resolution=True)
+    r1 = pystare.core.srange()
+    r1.add_intervals(hull1)
 
-    lonsF, latsF, intmatF = pystare.triangulate_indices(intersectedFalse)
-    triangF = matplotlib.tri.Triangulation(lonsF, latsF, intmatF)
+    r01 = pystare.core.srange()
+    r01.add_intersect(r0, r1, False)
+    n01 = r01.get_size_as_values()
 
-    lonsT, latsT, intmatT = pystare.triangulate_indices(intersectedTrue)
-    triangT = matplotlib.tri.Triangulation(lonsT, latsT, intmatT)
+    assert n01 == 77
 
-    if True:
-        r0 = pystare.core.srange()
-        r0.add_intervals(hull0)
+    intersected = numpy.zeros([n01], dtype=numpy.int64)
+    r01.copy_values(intersected)
 
-        r1 = pystare.core.srange()
-        r1.add_intervals(hull1)
+    assert len(intersected) == 77
 
-        r01 = pystare.core.srange()
-        r01.add_intersect(r0, r1, False)
-        n01 = r01.get_size_as_values()
+    r01.purge()
+    n01 = r01.get_size_as_values()
 
-        assert n01 == 77
+    assert 0 == n01
 
-        intersected = numpy.zeros([n01], dtype=numpy.int64)
-        r01.copy_values(intersected)
-        # See examples/test_intersect_single_res.py
+    r01.reset()
+    r01.add_intersect(r0, r1, True)
 
-        assert len(intersected) == 77
-
-        r01.purge()
-        n01 = r01.get_size_as_values()
-
-        assert 0 == n01
-
-        r01.reset()
-        r01.add_intersect(r0, r1, True)
-
-        n01 = r01.get_size_as_values()
-        assert n01 == 79
-
-        intersected = numpy.zeros([n01], dtype=numpy.int64)
-        r01.copy_values(intersected)
-
-        lonsRT, latsRT, intmatRT = pystare.triangulate_indices(intersected)
-        triangRT = matplotlib.tri.Triangulation(lonsRT, latsRT, intmatRT)
-
-
-        lonsRT_, latsRT_, intmatRT_ = pystare.triangulate_indices(intersected[51:55])
-        triangRT_ = matplotlib.tri.Triangulation(lonsRT_, latsRT_, intmatRT_)
-
-
-
-
-
-
+    n01 = r01.get_size_as_values()
+    assert n01 == 79

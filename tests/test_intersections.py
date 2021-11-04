@@ -6,14 +6,6 @@ lat = numpy.array([30, 45, 60], dtype=numpy.double)
 lon = numpy.array([45, 60, 10], dtype=numpy.double)
 
 
-def shiftarg_lon(lon):
-    "If lon is outside +/-180, then correct back."
-    if lon > 180:
-        return ((lon + 180.0) % 360.0)-180.0
-    else:
-        return lon
-
-
 def triangulate(i0, i1, i2):
     "Prepare data structures for tri.Triangulate."
     # print('triangulating...')
@@ -35,7 +27,7 @@ def triangulate(i0, i1, i2):
         intmat.append([k, k+1, k+2])
         k=k+3
     for i in range(len(lons)):
-        lons[i] = shiftarg_lon(lons[i])
+        lons[i] = pystare.lon_wrap_180(lons[i])
         # print('triangulating done.')      
     return lons, lats, intmat
 
@@ -50,7 +42,7 @@ def triangulate1(lats,lons):
         intmat.append([k, k+1, k+2])
         k = k+3
     for i in range(len(lons)):
-        lons[i] = shiftarg_lon(lons[i])
+        lons[i] = pystare.lon_wrap_180(lons[i])
     # print('triangulating1 done.')      
     return lons, lats, intmat
 

@@ -12,3 +12,6 @@ nbsphinx
 numpydoc
 pydata-sphinx-theme
 pystare
+pyerfa
+astropy
+matplotlib

@@ -858,23 +858,38 @@ def spatial_clear_to_resolution(sids):
     return (sids & ~mask) + resolution
 
 
-def shiftarg_lon(lon):
-    """ Corrects longitudes. If lon is outside +/-180, then correct back.
+def lon_wrap_180(lon):
+    """ Wrap angle in degrees to [-180 180]
 
+    Wraps angles (in degrees) to the interval [–180, 180] such that
+
+    - 90 maps to 90
+    - –90 maps to –90
+    - 360 maps to 0
+    - 270 maps to -90
+
+    Notes
+    --------
+    - 180 wraps to -180 but -180 to -180
+    - lon_wrap_180() casts to floats
+    - This method is not intended to correct illformated longitudes outside the interval [-180, 360]
+
+    Examples
+    -----------
+    >>> lon_wrap_180(90.0)
+    90.0
+    >>> lon_wrap_180(-90.0)
+    -90.0
+    >>> lon_wrap_180(360.0)
+    0.0
+    >>> lon_wrap_180(270.0)
+    -90.0
+    >>> lon_wrap_180(180.0)
+    -180.0
+    >>> lon_wrap_180(-180.0)
+    -180.0
     """
-    if (lon > 180):
-        return ((lon + 180.0) % 360.0) - 180.0
-    else:
-        return lon
-
-
-def shiftarg_lat(lat):
-    """ Corrects latitudes; If lat is outside +/-90, then correct back.
-    """
-    if (lat > 90):
-        return ((lat + 90.0) % 180.0) - 90.0
-    else:
-        return lat
+    return ((lon + 180.0) % 360.0) - 180.0
 
 
 def spatial_resolution_from_km(km, return_int=True):
@@ -901,7 +916,7 @@ def triangulate(lats, lons):
         intmat.append([k, k + 1, k + 2])
         k = k + 3
     for i in range(len(lons)):
-        lons[i] = shiftarg_lon(lons[i])
+        lons[i] = lon_wrap_180(lons[i])
     return lons, lats, intmat
 
 
@@ -909,8 +924,8 @@ def triangulate_indices(indices):
     """
     Prepare data for matplotlib.tri.Triangulate.
 
-    Usage
-    ----------
+    Examples
+    --------
     >>> lons, lats, intmat = triangulate_indices(indices)   # doctest: +SKIP
     >>> triang = tri.Triangulation(lons,lats,intmat)        # doctest: +SKIP
     >>> plt.triplot(triang,'r-',transform=transform,lw=1,markersize=3) # doctest: +SKIP
