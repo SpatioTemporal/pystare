@@ -1,6 +1,4 @@
 #!/usr/bin/env/python
-"""Installation script
-"""
 
 import os
 import numpy
