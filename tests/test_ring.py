@@ -153,12 +153,12 @@ sids_hull_false = numpy.array(
        3392929846358179852])
 
 
-def test_ring():
+def test_issue80_ring():
     sids = pystare.cover_from_ring(lat=lat, lon=lon, level=12)
     assert numpy.array_equal(sids, sids_ring_correct)
 
 
-def test_hull():
+def test_issue80_hull():
     sids = pystare.cover_from_hull(lat=lat, lon=lon, level=12)
     assert numpy.array_equal(sids, sids_hull_correct)
 
