@@ -205,6 +205,23 @@ StareResult _full_join(srange& one, srange& other){
   std::list<list<STARE_ENCODE>>* temp = one.range.fullJoin(&(other.range));
   return _convert_Join_Result(temp);
 }
+
+StareResult _merge_list(int64_t* indices1, int len1, int64_t* indices2, int len2){
+  STARE_ArrayIndexSpatialValues a(indices1, len1 + indices1);
+  STARE_ArrayIndexSpatialValues b(indices2, len2 + indices2);
+  STARE_ArrayIndexSpatialValues res;
+  StareResult result;
+  int index = 0;
+  std::list<STARE_ENCODE> *temp = mergeList(a, b);
+  std::list<STARE_ENCODE>::iterator it;
+  for(it = temp->begin(); it != temp->end(); ++it)
+    res.push_back(*it);
+  temp->clear();
+  delete temp;
+  result.add_indexValues(res);
+  return result;
+}
+
 StareResult _to_neighbors(int64_t* indices, int len) { 
   STARE_ArrayIndexSpatialValues sivs(indices, indices+len);
   StareResult result;

@@ -980,3 +980,20 @@ def full_join(left, right):
     result.copy_as_list_list(values, indexes)
     return values, indexes
 
+def merge_list(a, b):
+    """
+
+    Parameters
+    -----------
+
+    Returns
+    --------
+
+    Examples
+    --------
+
+    """
+    result = pystare.core._merge_list(a, b)
+    range_indices = numpy.full([result.get_size_as_values()], -1, dtype=numpy.int64)
+    result.copy_as_values(range_indices)
+    return range_indices

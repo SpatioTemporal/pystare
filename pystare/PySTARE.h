@@ -235,12 +235,13 @@ public:
     }
   }
   void print(){
-    range.print();
+    //range.print();
   }
 };
 
 StareResult _left_join(srange& one, srange& other);
 StareResult _inner_join(srange& one, srange& other);
 StareResult _full_join(srange& one, srange& other);
+StareResult _merge_list(int64_t* indices1, int len1, int64_t* indices2, int len2);
 #endif
 
