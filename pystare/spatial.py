@@ -470,16 +470,25 @@ def cover_from_ring(lat, lon, level):
     return range_indices
 
 
-def to_circular_cover(lat, lon, radius, level):
+def latlon2circular_cover(lat, lon, radius, level):
     """
-    Creates a circular cover
+    Creates a circular cover around  a lat/lon center
 
     Parameters
     -----------
+    lat: float
+        lat of center
+    lon: float
+        lon of center
+    radius: float
+        radius of the circular cover
+    level: int
+        cover stare resolution
 
     Returns
     --------
-
+    stare_cover: 1D array
+        the circular cover
     """
     if level < 0 or level > 27:
         raise pystare.exceptions.PyStareLevelError()
@@ -491,22 +500,29 @@ def to_circular_cover(lat, lon, radius, level):
     return range_indices
 
 
-def circular_cover_from(index, radius, level):
+def sid2circular_cover(index, radius, level):
     """
+    Creates a circular cover around  an SID center
 
     Parameters
     -----------
+    index: int64
+        SID of the center
+    radius: float
+        radius of the circular cover
+    level: int
 
     Returns
     --------
-
+    stare_cover: 1D array
+        the circular cover
     """
 
     if level < 0 or level > 27:
         raise pystare.exceptions.PyStareLevelError()
 
     latsv, lonsv, lat_center, lon_center = to_vertices_latlon([index])
-    return to_circular_cover(lat_center[0], lon_center[0], radius, level)
+    return latlon2circular_cover(lat_center[0], lon_center[0], radius, level)
 
 
 def to_box_cover_from_latlon(lat, lon, resolution):
@@ -836,6 +852,7 @@ def spatial_coerce_resolution(sid, resolution):
 
 def spatial_clear_to_resolution(sids):
     """
+    Clears the SID location bits up to the encoded spatial resolution
     Clears the SID location bits up to the encoded spatial resolution
 
     Parameters

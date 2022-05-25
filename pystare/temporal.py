@@ -593,8 +593,8 @@ def from_julian_date(jd1, jd2, scale, forward_res=48, reverse_res=48):
 
     Examples
     ----------
-    >>> from astropy import time
-    >>> t = time.Time('2021-08-26T17:36:46.426092', format='isot')
+    >>> import astropy
+    >>> t = astropy.time.Time('2021-08-26T17:36:46.426092', format='isot')
     >>> t.jd1, t.jd2
     (2459453.0, 0.23387067236111114)
 
@@ -608,11 +608,15 @@ def from_julian_date(jd1, jd2, scale, forward_res=48, reverse_res=48):
     ['2021-08-26T17:37:23.426 (10 10) (1)']
     """
 
-    tivs = numpy.zeros(jd1.shape, dtype=numpy.int64)
+    if isinstance(jd1, float):
+        # So we can accept scalars
+        jd1 = numpy.array([jd1])
+        jd2 = numpy.array([jd2])
+
     if scale == 'tai':
-        pystare.core._from_JulianTAI(jd1, jd2, tivs, forward_res, reverse_res)
+        tivs = pystare.core._from_JulianTAI(jd1, jd2, forward_res, reverse_res)
     elif scale == 'utc':
-        pystare.core._from_JulianUTC(jd1, jd2, tivs, forward_res, reverse_res)
+        tivs = pystare.core._from_JulianUTC(jd1, jd2, forward_res, reverse_res)
     else:
         pystare.exceptions.PyStareError('scale not implemented')
     return tivs
@@ -649,21 +653,23 @@ def to_julian_date(tivs, scale):
     >>> pystare.to_julian_date(tiv, scale='utc')
     (array([2459215.5]), array([237.71064382]))
 
-    >>> from astropy import time
+    >>> import astropy
     >>> timestamps = ['2021-09-26T17:16:46.426092', '2020-09-26T17:16:46.426092']
-    >>> t = time.Time(timestamps, format='isot')
+    >>> t = astropy.time.Time(timestamps, format='isot')
     >>> tivs = pystare.from_julian_date(t.jd1, t.jd2, scale='tai')
     >>> jds = pystare.to_julian_date(tivs, scale='tai')
-    >>> t = time.Time(jds[0], jds[1], format='jd', scale='tai')
+    >>> t = astropy.time.Time(jds[0], jds[1], format='jd', scale='tai')
     >>> t.isot
     array(['2021-09-26T17:16:46.426', '2020-09-26T17:16:46.426'], dtype='<U23')
     """
-    jd1 = numpy.zeros(tivs.shape, dtype=numpy.double)
-    jd2 = numpy.zeros(tivs.shape, dtype=numpy.double)
+    # So we can accept scalars
+    if isinstance(tivs, (int, numpy.int64)):
+        tivs = numpy.array([tivs])
+
     if scale == 'tai':
-        pystare.core._to_JulianTAI(tivs, jd1, jd2)
+        jd1, jd2 = pystare.core._to_JulianTAI(tivs)
     elif scale == 'utc':
-        pystare.core._to_JulianUTC(tivs, jd1, jd2)
+        jd1, jd2 = pystare.core._to_JulianUTC(tivs)
     return jd1, jd2
 
 
