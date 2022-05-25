@@ -109,11 +109,11 @@ void _scidbUpperBoundMS(int64_t* indices, int len, int64_t* out_array, int out_l
 void _scidbLowerBoundMS(int64_t* indices, int len, int64_t* out_array, int out_length);
 void _scidbNewTemporalValue(int64_t* indices, int len, int64_t* new_indices, bool include_bounds);
 
-void _from_JulianTAI (double* d1, int nd1, double* d2, int nd2, int64_t* out_array, int out_length, int f_res, int r_res);
-void _to_JulianTAI   (int64_t* indices, int len, double* d1, int nd1, double* d2, int nd2);
+void _from_JulianTAI (double* d1, int nd1, double* d2, int nd2, int64_t* indices, int f_res, int r_res);
+void _to_JulianTAI   (int64_t* indices, int len, double* d1, double* d2);
 
-void _from_JulianUTC (double* d1, int nd1, double* d2, int nd2, int64_t* out_array, int out_length, int f_res, int r_res);
-void _to_JulianUTC   (int64_t* indices, int len, double* d1, int nd1, double* d2, int nd2);
+void _from_JulianUTC (double* d1, int nd1, double* d2, int nd2, int64_t* indices, int f_res, int r_res);
+void _to_JulianUTC   (int64_t* indices, int len, double* d1, double* d2);
 
 void _set_temporal_resolutions_from_sorted_inplace (int64_t* indices_inplace, int len, bool include_bounds);
 

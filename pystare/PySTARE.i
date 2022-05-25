@@ -474,14 +474,18 @@ namespace std {
     (double* lon, int lolen1, int lolen2)
 }
 
+
 %apply (int64_t * INPLACE_ARRAY2, int DIM1, int DIM2) {
     (int64_t* indices, int len1, int len2)
 }
 
 %apply (double * IN_ARRAY1, int DIM1) {
     (double* lat, int len_lat),
-    (double* lon, int len_lon)
+    (double* lon, int len_lon),
+    (double* d1, int nd1),
+    (double* d2, int nd2)
 }
+
 
 %apply (int64_t * IN_ARRAY1, int DIM1) {
     (int64_t* datetime, int len),
@@ -505,9 +509,7 @@ namespace std {
 
 %apply (double * INPLACE_ARRAY1, int DIM1) {
   (double* triangle_info_lats, int dmy1),
-  (double* triangle_info_lons, int dmy2),
-  (double* d1, int nd1),
-  (double* d2, int nd2)
+  (double* triangle_info_lons, int dmy2)
 }
 
 # %apply (int64_t * ARGOUT_ARRAY1, int DIM1 ) {
@@ -517,8 +519,11 @@ namespace std {
 
 %apply (double* in_array, int length, int64_t* out_array) {
   (double* lon, int len_lon, int64_t* indices),
+  (double* d2, int nd2, int64_t* indices),
   (double* milliseconds, int len, int64_t* out_array)
 }
+
+
 
 %apply (int64_t* in_array, int length, int* out_array) {
   (int64_t* indices, int len,  int* levels), 
@@ -537,7 +542,8 @@ namespace std {
 }
 
 %apply (int64_t* in_array, int length, double* out_array1, double* out_array2) {
-    (int64_t* indices, int len, double* lat, double* lon)
+    (int64_t* indices, int len, double* lat, double* lon),
+    (int64_t* indices, int len, double* d1, double* d2)
 }
 
 %apply (int64_t* in_array, int length, double* out_array1, double* out_array2, int* out_array3) {
