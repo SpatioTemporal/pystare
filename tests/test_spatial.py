@@ -154,7 +154,7 @@ class MainTest(unittest.TestCase):
                     (590, 4430626891765907470),
                     (885, 4430691958372958222),
                     (1180, 4430869121478950926)]
-        cover = pystare.to_circular_cover(1.5, 0.5, 0.25, 14)
+        cover = pystare.latlon2circular_cover(1.5, 0.5, 0.25, 14)
         for i in list(expected):
             self.assertEqual(i[1], cover[i[0]])
 
