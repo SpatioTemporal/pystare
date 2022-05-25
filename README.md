@@ -127,6 +127,9 @@ print([hex(i) for i in index])
 
 
     
+### Common issues when building
+`undefined symbol`
 
-
-
+1. STARE and pystare out of sync. Are we building against the correct STARE version?
+2. Stale pystare targets. `python setup.py clean` might help
+3. Missing function headers in PySTARE.h
