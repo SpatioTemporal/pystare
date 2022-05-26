@@ -21,9 +21,9 @@ jobs:
     - name: Set up Python 3.9
       uses: actions/setup-python@v2
       with:
-        python-version: 3.x
+        python-version: 3.9
     - name: LS
-      - run: |
+      run: |
           ls -l
           python -c "import versioneer; print(versioneer.get_version())"
     - name: Install dependencies
