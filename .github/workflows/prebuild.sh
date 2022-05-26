@@ -1,8 +1,10 @@
 # This script clones, builds and installs STARE
+git config --global --add safe.directory "*"
 git clone https://github.com/SpatioTemporal/STARE
 
+
 cd STARE
-git config --global --add safe.directory .
+
 
 # Print commands and their arguments as they are executed.
 set -x 
@@ -14,3 +16,6 @@ cd build
 cmake -DSTARE_INSTALL_LIBDIR=lib -DBUILD_SHARED_LIBS=NO ..
 make -j4
 make install
+
+cd
+git config --global --add safe.directory "*"
