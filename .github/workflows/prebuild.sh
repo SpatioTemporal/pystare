@@ -2,7 +2,6 @@
 git clone https://github.com/SpatioTemporal/STARE
 cd STARE
 
-
 # Print commands and their arguments as they are executed.
 set -x 
 
@@ -15,4 +14,8 @@ make -j4
 make install
 
 cd
+
+# To fix git security enhancement, we need to add pystare as a safe directory
+# https://github.blog/2022-04-12-git-security-vulnerability-announced/
+# https://github.com/multi-build/multibuild/issues/470
 git config --global --add safe.directory "*"
