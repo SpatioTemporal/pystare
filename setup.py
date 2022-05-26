@@ -7,8 +7,6 @@ from setuptools.command.build_py import build_py
 from setuptools.command.build_ext import build_ext
 import versioneer
 
-
-
 STARE_LIB_DIRS = [os.environ.get('STARE_LIB_DIR', '/usr/local/lib/')]
 STARE_INCLUDE_DIRS = [os.environ.get('STARE_INCLUDE_DIR', '/usr/local/include/STARE/')]
 
