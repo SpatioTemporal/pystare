@@ -13,5 +13,3 @@ cd build
 cmake -DSTARE_INSTALL_LIBDIR=lib -DBUILD_SHARED_LIBS=NO ..
 make -j4
 make install
-
-cd
