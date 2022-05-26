@@ -36,7 +36,7 @@ jobs:
       with:
         python-versions: 'cp37-cp37m'
         pre-build-command: 'sh .github/workflows/prebuild.sh' # This script clones, builds, and installs STARE
-        build-requirements: 'cython numpy versioneer'
+        build-requirements: 'cython numpy'
     - name: LS
       run: |
         ls -l
