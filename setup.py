@@ -5,7 +5,11 @@ import numpy
 from setuptools import setup, Extension
 from setuptools.command.build_py import build_py
 from setuptools.command.build_ext import build_ext
+
+import sys
+sys.path.insert(0, ".")
 import versioneer
+
 
 
 STARE_LIB_DIRS = [os.environ.get('STARE_LIB_DIR', '/usr/local/lib/')]
