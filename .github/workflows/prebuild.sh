@@ -1,7 +1,5 @@
 # This script clones, builds and installs STARE
 git clone https://github.com/SpatioTemporal/STARE
-
-
 cd STARE
 
 
