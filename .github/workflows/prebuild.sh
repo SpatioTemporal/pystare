@@ -1,5 +1,5 @@
 # This script clones, builds and installs STARE
-
+git config --global --add safe.directory .
 git clone https://github.com/SpatioTemporal/STARE
 cd STARE
 
