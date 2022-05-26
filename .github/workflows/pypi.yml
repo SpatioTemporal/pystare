@@ -33,9 +33,13 @@ jobs:
     - name: Build manylinux Python wheels
       uses: RalfG/python-wheels-manylinux-build@v0.4.2
       with:
-        python-versions: 'cp37-cp37m cp38-cp38 cp39-cp39 cp310-cp310'
+        python-versions: 'cp37-cp37m'
         pre-build-command: 'sh .github/workflows/prebuild.sh' # This script clones, builds, and installs STARE
         build-requirements: 'cython numpy'
+      - name: LS
+        run: |
+            ls -l
+            python -c "import versioneer; print(versioneer.get_version())"
     - name: Publish wheels to PyPI
       run: |
         twine upload  dist/*-manylinux*.whl

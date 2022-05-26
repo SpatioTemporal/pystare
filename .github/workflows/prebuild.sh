@@ -15,4 +15,5 @@ make -j4
 make install
 
 cd
+ls
 
