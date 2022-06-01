@@ -3,8 +3,8 @@
 import os
 import numpy
 from setuptools import setup, Extension
-from setuptools.command.build_py import build_py
-from setuptools.command.build_ext import build_ext
+from setuptools.command.build_py import build_py as _build_py
+from setuptools.command.build_ext import build_ext as build_ext
 import versioneer
 
 STARE_LIB_DIRS = [os.environ.get('STARE_LIB_DIR', '/usr/local/lib/')]
@@ -22,7 +22,7 @@ pystare = Extension(name='pystare._core',
                     language='c++')
 
 
-class BuildPy(build_py):
+class build_py(_build_py):
 
     def run(self):
         """ 
@@ -33,10 +33,9 @@ class BuildPy(build_py):
 
 
 version = versioneer.get_version()
-
 cmdclass = versioneer.get_cmdclass()
-cmdclass['build_py'] = BuildPy
-cmdclass['build_ext'] = build_ext
+#cmdclass['build_py'] = build_py
+#cmdclass['build_ext'] = build_ext
 
 
 setup(

@@ -67,7 +67,9 @@ def to_ms_since_epoch_utc(tivs):
 
 
 def from_utc_variable(datetime, forward_resolution, reverse_resolution):
-    """ TODO: What does this function do?
+    """
+    This function takes an array of datetimes and constructs temporal index values from them
+    with forward and reverse resolutions as given in the arrays passed in.
     """
     return pystare.core._from_utc_variable(datetime, forward_resolution, reverse_resolution)
 
