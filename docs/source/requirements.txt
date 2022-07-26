@@ -14,4 +14,4 @@ pydata-sphinx-theme
 pyerfa
 astropy
 matplotlib
-git+https://github.com/SpatioTemporal/pystare@master
+pystare

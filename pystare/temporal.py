@@ -154,7 +154,7 @@ def coarsest_resolution_finer_or_equal_ms(ms):
     >>> times = numpy.array([millisecond, second, minute, hour, day, year], dtype=numpy.int64)
     >>> pystare.coarsest_resolution_finer_or_equal_ms(times)
     array([48, 38, 32, 26, 21, 12])
-    
+
     """
     resolutions = pystare.core._coarsest_resolution_finer_or_equal_milliseconds(ms)
     return resolutions
