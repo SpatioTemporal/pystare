@@ -11,7 +11,7 @@ myst_parser
 nbsphinx
 numpydoc
 pydata-sphinx-theme
-pystare
 pyerfa
 astropy
 matplotlib
+git+https://github.com/SpatioTemporal/pystare@master
