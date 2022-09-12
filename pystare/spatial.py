@@ -481,7 +481,7 @@ def latlon2circular_cover(lat, lon, radius, level):
     lon: float
         lon of center
     radius: float
-        radius of the circular cover
+        radius of the circular cover in degrees
     level: int
         cover stare resolution
 
@@ -509,7 +509,7 @@ def sid2circular_cover(index, radius, level):
     index: int64
         SID of the center
     radius: float
-        radius of the circular cover
+        radius of the circular cover in degrees
     level: int
 
     Returns
