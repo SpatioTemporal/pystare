@@ -98,7 +98,7 @@ def from_latlon_2d(lat, lon, level=None, adapt_level=False):
     elif level < 0 or level > 27:
         raise pystare.exceptions.PyStareLevelError()
     elif adapt_level is True:
-        raise pystare.exception.PyStareError('Cannot set level AND adapt level')
+        raise pystare.exceptions.PyStareError('Cannot set level AND adapt level. (level,adapt_level) = (%s,%s)'%(level,adapt_level))
     else:
         adapt_level = False
 
@@ -272,14 +272,20 @@ def to_compressed_range(sids):
     --------
 
     """
+    print('tcr-start')
     out_length = len(sids)
+    print('tcr-outlen',out_length)    
     range_indices = numpy.full([out_length], -1, dtype=numpy.int64)
     pystare.core._to_compressed_range(sids, range_indices)
     end_arg = 0
+    print('tcr-a')
     while (end_arg < out_length) and (range_indices[end_arg] >= 0):
         end_arg = end_arg + 1
-    range_indices = range_indices[:end_arg]
-    return range_indices
+    print('tcr-b end_arg',end_arg)
+    ret = range_indices[:end_arg]
+    print('tcr-done',len(ret),type(ret),ret,list(map(hex,ret)))
+    print('tcr-done',list(map(hex,ret)))
+    return ret
 
 
 def expand_intervals(intervals, level, multi_resolution=False):
