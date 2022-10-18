@@ -51,7 +51,7 @@ def from_lonlat(lon, lat, level):
     return sids
 
 
-def from_latlon_2d(lat, lon, level=None, adapt_level=False):
+def from_latlon_2d(lat, lon, level=None, adapt_level=False, fill_value_in=None, fill_value_out=None):
     """Coverts latitudes and longitudes to SIDs.
     In contrary to :func:`~from_latlon`, this function accepts 2D arrays as latitude and longitude inputs.
     This is e.g. convenient to convert the geolocation of Level1/2 swath granules to SIDs.
@@ -69,6 +69,8 @@ def from_latlon_2d(lat, lon, level=None, adapt_level=False):
         If set, adapt_level will be set to false.
     adapt_level: bool
         if True, level will adapted to match resolution of lat/lon. Will overwrite level.
+    fill_value_in: STARE indices are not calculated for lat/lon of this value
+    fill_value_out: set indices to this value where lat/lon is fill_value_in
 
     Returns
     ---------
@@ -102,10 +104,20 @@ def from_latlon_2d(lat, lon, level=None, adapt_level=False):
     else:
         adapt_level = False
 
+    if fill_value_in is not None:
+        fill_value_enabled = True
+        if fill_value_out is None:
+            raise ValueError('fill_value_out must be specified if fill_value_in is specified.')
+    else:
+        fill_value_in  = -999.0
+        fill_value_out = -999
+        
     if adapt_level:
         level = 27
     sids = numpy.full(lon.shape, -1, dtype=numpy.int64)
-    pystare.core._from_latlon2D(lat, lon, sids, level, adapt_level)
+
+    pystare.core._from_latlon2D(lat, lon, sids, level, adapt_level,
+                                fill_value_enabled, fill_value_in, fill_value_out)
     return sids
 
 

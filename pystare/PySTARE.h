@@ -39,7 +39,11 @@ void _from_latlon(double* lat, int len_lat,
 void _from_latlon2D(double* lat, int lalen1, int lalen2, 
                     double* lon, int lolen1, int lolen2, 
                     int64_t* indices, int len1, int len2, 
-                    int level, bool adapt_resolution);
+                    int level, bool adapt_resolution,
+		    bool fill_value_enabled,
+		    double fill_value_in,
+		    int fill_value_out // Careful with the cast
+		    );
 
 void _to_latlon(int64_t* indices, int len, double* lat, double* lon);
 void _to_latlonlevel(int64_t* indices, int len, double* lat, double* lon, int* levels);
