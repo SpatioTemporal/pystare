@@ -109,6 +109,7 @@ def from_latlon_2d(lat, lon, level=None, adapt_level=False, fill_value_in=None, 
         if fill_value_out is None:
             raise ValueError('fill_value_out must be specified if fill_value_in is specified.')
     else:
+        fill_value_enabled = False
         fill_value_in  = -999.0
         fill_value_out = -999
         
