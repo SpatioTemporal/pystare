@@ -12,6 +12,9 @@
 
 #include <algorithm>
 
+#undef FMTX
+#define FMTX(x) " 0x" << setfill('0') << setw(16) << hex << x << dec
+
 // Info
 const char* stare_version() { return STARE_version(); }
 
@@ -23,27 +26,63 @@ void _from_latlon(double* lat, int len_lat, double * lon, int len_lon, int64_t* 
 }
 
 void _from_latlon2D(double* lat, int lalen1, int lalen2, 
-                 double* lon, int lolen1, int lolen2, 
-                 int64_t* indices, int len1, int len2, int level, bool adapt_resolution) {
+		    double* lon, int lolen1, int lolen2, 
+		    int64_t* indices, int len1, int len2, int level, bool adapt_resolution,
+		    bool fill_value_enabled,
+		    double fill_value_in,
+		    int fill_value_out // would prefer int64_t, but it doesn't work.
+		    ) {
     int n;   
     static EmbeddedLevelNameEncoding lj;       // Use this to get the mask
     int lvl;
-    
-    for (int i=0; i<lalen1; i++) {        
+
+    if (!fill_value_enabled) {
+      for (int i=0; i<lalen1; i++) {        
         for (int j=0; j<lalen2; j++) {   
-            n = i * lalen2 + j;
-            indices[n] = stare.ValueFromLatLonDegrees(lat[n], lon[n], level);   
-            if (adapt_resolution) {
-                if (j==0) {        
-                    indices[n+1] = stare.ValueFromLatLonDegrees(lat[n+1], lon[n+1], level);            
-                    lvl = stare.cmpSpatialResolutionEstimateI(indices[n], indices[n+1]);
-                    indices[n] = (indices[n]& ~lj.levelMaskSciDB) | lvl;
-                } else {                    
-                    lvl = stare.cmpSpatialResolutionEstimateI(indices[n-1], indices[n]);
-                    indices[n] = (indices[n]& ~lj.levelMaskSciDB) | lvl;
-                }
-            }
+	  n = i * lalen2 + j;
+	  indices[n] = stare.ValueFromLatLonDegrees(lat[n], lon[n], level);   
+	  if (adapt_resolution) {
+	    if (j==0) {        
+	      indices[n+1] = stare.ValueFromLatLonDegrees(lat[n+1], lon[n+1], level);
+	      lvl = stare.cmpSpatialResolutionEstimateI(indices[n], indices[n+1]);
+	      indices[n] = (indices[n]& ~lj.levelMaskSciDB) | lvl;
+	    } else {                    
+	      lvl = stare.cmpSpatialResolutionEstimateI(indices[n-1], indices[n]);
+	      indices[n] = (indices[n]& ~lj.levelMaskSciDB) | lvl;
+	    }
+	  }
         }
+      }
+    } else {
+      for (int i=0; i<lalen1; i++) {
+	bool skipped = true;
+        for (int j=0; j<lalen2; j++) {   
+	  n = i * lalen2 + j;
+	  if (lat[n] == fill_value_in || lon[n] == fill_value_in) {
+	    skipped = true;
+	    indices[n] = fill_value_out;
+	  } else {
+	    indices[n] = stare.ValueFromLatLonDegrees(lat[n], lon[n], level);
+	    if (adapt_resolution) {
+	      if (skipped) {
+		if (lat[n+1] == fill_value_in || lon[n+1] == fill_value_in) {
+		  indices[n+1] = fill_value_out; // still skipped
+		} else {
+		  skipped = false;
+		  indices[n+1] = stare.ValueFromLatLonDegrees(lat[n+1], lon[n+1], level);
+		  lvl = stare.cmpSpatialResolutionEstimateI(indices[n], indices[n+1]);
+		  indices[n] = (indices[n]& ~lj.levelMaskSciDB) | lvl;
+		}
+	      } else {
+		if (indices[n-1] != fill_value_out && indices[n] != fill_value_out) {
+		  lvl = stare.cmpSpatialResolutionEstimateI(indices[n-1], indices[n]);
+		  indices[n] = (indices[n]& ~lj.levelMaskSciDB) | lvl;
+		}
+	      }
+	    }
+	  }
+	}
+      }
     }
 }
 
