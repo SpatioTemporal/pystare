@@ -11,3 +11,7 @@ myst_parser
 nbsphinx
 numpydoc
 pydata-sphinx-theme
+pyerfa
+astropy
+matplotlib
+pystare

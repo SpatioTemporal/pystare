@@ -67,7 +67,9 @@ def to_ms_since_epoch_utc(tivs):
 
 
 def from_utc_variable(datetime, forward_resolution, reverse_resolution):
-    """ TODO: What does this function do?
+    """
+    This function takes an array of datetimes and constructs temporal index values from them
+    with forward and reverse resolutions as given in the arrays passed in.
     """
     return pystare.core._from_utc_variable(datetime, forward_resolution, reverse_resolution)
 
@@ -101,7 +103,7 @@ def coarsest_resolution_finer_or_equal_ms(ms):
     Bits are numbered in the opposite direction.
     The biggest year bit is bit 62. The smallest millisecond bit is at bit 14. So we have:
 
-    .. tabularcolumns:: |r|r|r|r|r|c|
+    .. tabularcolumns:: |R|R|R|R|R|R|
     +----------+-------------+-------+-----+------+----------------------------+
     |Field     | Resolutions | Start | End | Size | Unit                       |
     +==========+=============+=======+=====+======+============================+
@@ -130,7 +132,7 @@ def coarsest_resolution_finer_or_equal_ms(ms):
     |11        | -           | -     | -   |  1   | Before/After Epoch         |
     +----------+-------------+-------+-----+------+----------------------------+
 
-    Arguments
+    Parameters
     ----------
     ms: 1D array of ints
         resolution in milliseconds
@@ -152,6 +154,7 @@ def coarsest_resolution_finer_or_equal_ms(ms):
     >>> times = numpy.array([millisecond, second, minute, hour, day, year], dtype=numpy.int64)
     >>> pystare.coarsest_resolution_finer_or_equal_ms(times)
     array([48, 38, 32, 26, 21, 12])
+
     """
     resolutions = pystare.core._coarsest_resolution_finer_or_equal_milliseconds(ms)
     return resolutions
@@ -218,9 +221,6 @@ def cmp_temporal(tivs1, tivs2, flatten=True):
     if not flatten:
         cmp = cmp.reshape(len(tivs1), len(tivs2))
     return cmp
-
-
-
 
 
 def validate_iso8601_string(iso_string, has_ms=None, has_tz=None):
@@ -347,9 +347,6 @@ def validate_iso8601_strings(time_strings, has_ms=None, has_tz=None):
         if validate_iso8601_string(time_string, has_ms, has_tz) is not True:
             return False
     return True
-
-
-
 
 
 def validate_stare_timestring(timestrings):
@@ -565,13 +562,8 @@ def from_julian_date(jd1, jd2, scale, forward_res=48, reverse_res=48):
     """ Converts two-part Julian Dates (JD) to SIVs.
 
     [astropy.time](https://docs.astropy.org/en/stable/time/index.html) provides a simple interface to convert between
-    common datetime representations (e.g. numpy.datetime64, datetime, iso strings, etc. ) and two-part (JD)
-
-    E.g.
-    >>> from astropy import time
-    >>> t = time.Time('2021-08-26T17:36:46.426092', format='isot')
-    >>> t.jd1, t.jd2
-    (2459453.0, 0.23387067236111114)
+    common datetime representations (e.g. numpy.datetime64, datetime, iso strings, etc. ) and two-part (JD).
+    See in examples below
 
     from [Julian Day Wikipedia](https://en.wikipedia.org/wiki/Julian_day)
     "the Julian date (JD) of any instant is the Julian day number plus the
@@ -604,6 +596,11 @@ def from_julian_date(jd1, jd2, scale, forward_res=48, reverse_res=48):
 
     Examples
     ----------
+    >>> import astropy
+    >>> t = astropy.time.Time('2021-08-26T17:36:46.426092', format='isot')
+    >>> t.jd1, t.jd2
+    (2459453.0, 0.23387067236111114)
+
     >>> jd1 = numpy.array([2459453.0])
     >>> jd2 = numpy.array([0.23387067236111114])
     >>> tivs = pystare.from_julian_date(jd1=jd1, jd2=jd2, scale='tai', forward_res=10, reverse_res=10)
@@ -614,11 +611,15 @@ def from_julian_date(jd1, jd2, scale, forward_res=48, reverse_res=48):
     ['2021-08-26T17:37:23.426 (10 10) (1)']
     """
 
-    tivs = numpy.zeros(jd1.shape, dtype=numpy.int64)
+    if isinstance(jd1, float):
+        # So we can accept scalars
+        jd1 = numpy.array([jd1])
+        jd2 = numpy.array([jd2])
+
     if scale == 'tai':
-        pystare.core._from_JulianTAI(jd1, jd2, tivs, forward_res, reverse_res)
+        tivs = pystare.core._from_JulianTAI(jd1, jd2, forward_res, reverse_res)
     elif scale == 'utc':
-        pystare.core._from_JulianUTC(jd1, jd2, tivs, forward_res, reverse_res)
+        tivs = pystare.core._from_JulianUTC(jd1, jd2, forward_res, reverse_res)
     else:
         pystare.exceptions.PyStareError('scale not implemented')
     return tivs
@@ -654,13 +655,24 @@ def to_julian_date(tivs, scale):
     (array([2459215.5]), array([237.71107206]))
     >>> pystare.to_julian_date(tiv, scale='utc')
     (array([2459215.5]), array([237.71064382]))
+
+    >>> import astropy
+    >>> timestamps = ['2021-09-26T17:16:46.426092', '2020-09-26T17:16:46.426092']
+    >>> t = astropy.time.Time(timestamps, format='isot')
+    >>> tivs = pystare.from_julian_date(t.jd1, t.jd2, scale='tai')
+    >>> jds = pystare.to_julian_date(tivs, scale='tai')
+    >>> t = astropy.time.Time(jds[0], jds[1], format='jd', scale='tai')
+    >>> t.isot
+    array(['2021-09-26T17:16:46.426', '2020-09-26T17:16:46.426'], dtype='<U23')
     """
-    jd1 = numpy.zeros(tivs.shape, dtype=numpy.double)
-    jd2 = numpy.zeros(tivs.shape, dtype=numpy.double)
+    # So we can accept scalars
+    if isinstance(tivs, (int, numpy.int64)):
+        tivs = numpy.array([tivs])
+
     if scale == 'tai':
-        pystare.core._to_JulianTAI(tivs, jd1, jd2)
+        jd1, jd2 = pystare.core._to_JulianTAI(tivs)
     elif scale == 'utc':
-        pystare.core._to_JulianUTC(tivs, jd1, jd2)
+        jd1, jd2 = pystare.core._to_JulianUTC(tivs)
     return jd1, jd2
 
 
@@ -890,6 +902,5 @@ def temporal_contains_instant(indices1, indices2):
     cmp = numpy.zeros(indices1.shape, dtype=numpy.int64)
     pystare.core._scidbContainsInstant(indices1, indices2, cmp)
     return cmp
-
 
 

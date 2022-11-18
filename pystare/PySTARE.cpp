@@ -12,7 +12,11 @@
 
 #include <algorithm>
 
+
 #include <omp.h>
+#undef FMTX
+#define FMTX(x) " 0x" << setfill('0') << setw(16) << hex << x << dec
+
 
 // Info
 const char* stare_version() { return STARE_version(); }
@@ -24,28 +28,66 @@ void _from_latlon(double* lat, int len_lat, double * lon, int len_lon, int64_t* 
     }
 }
 
-void _from_latlon2D(double* lat, int lalen1, int lalen2, 
-                 double* lon, int lolen1, int lolen2, 
-                 int64_t* indices, int len1, int len2, int level, bool adapt_resolution) {
-    static EmbeddedLevelNameEncoding lj;       // Use this to get the mask
-    int64_t not_levelMask = ~lj.levelMaskSciDB;
 
-    for (int i=0; i<lalen1; i++) {        
-#pragma omp parallel for
-        for (int j=0; j<lalen2; j++) {   
-            int n = i * lalen2 + j;
-            indices[n] = stare.ValueFromLatLonDegrees(lat[n], lon[n], level);   
-            if (adapt_resolution) {
-                if (j==0) {
-                    indices[n+1] = stare.ValueFromLatLonDegrees(lat[n+1], lon[n+1], level);            
-                    int lvl = stare.cmpSpatialResolutionEstimateI(indices[n], indices[n+1]);
-                    indices[n] = (indices[n]& not_levelMask) | lvl;
-                } else {                    
-                    int lvl = stare.cmpSpatialResolutionEstimateI(indices[n-1], indices[n]);
-                    indices[n] = (indices[n]& not_levelMask) | lvl;
-                }
+void _from_latlon2D(double* lat, int lalen1, int lalen2,
+		            double* lon, int lolen1, int lolen2,
+		            int64_t* indices, int len1, int len2, int level, bool adapt_resolution,
+		            bool fill_value_enabled,
+		            double fill_value_in,
+		            int fill_value_out // would prefer int64_t, but it doesn't work.
+        		    ) {
+    int n;   
+    static EmbeddedLevelNameEncoding lj;       // Use this to get the mask
+    int lvl;
+
+    if (!fill_value_enabled) {
+        for (int i=0; i<lalen1; i++) {
+        #pragma omp parallel for
+            for (int j=0; j<lalen2; j++) {
+	            n = i * lalen2 + j;
+	            indices[n] = stare.ValueFromLatLonDegrees(lat[n], lon[n], level);
+	            if (adapt_resolution) {
+	                if (j==0) {
+	                    indices[n+1] = stare.ValueFromLatLonDegrees(lat[n+1], lon[n+1], level);
+	                    lvl = stare.cmpSpatialResolutionEstimateI(indices[n], indices[n+1]);
+	                    indices[n] = (indices[n]& ~lj.levelMaskSciDB) | lvl;
+	                } else {
+	                    lvl = stare.cmpSpatialResolutionEstimateI(indices[n-1], indices[n]);
+	                    indices[n] = (indices[n]& ~lj.levelMaskSciDB) | lvl;
+	                }
+	            }
             }
         }
+    } else {
+      for (int i=0; i<lalen1; i++) {
+	bool skipped = true;
+        for (int j=0; j<lalen2; j++) {   
+	  n = i * lalen2 + j;
+	  if (lat[n] == fill_value_in || lon[n] == fill_value_in) {
+	    skipped = true;
+	    indices[n] = fill_value_out;
+	  } else {
+	    indices[n] = stare.ValueFromLatLonDegrees(lat[n], lon[n], level);
+	    if (adapt_resolution) {
+	      if (skipped) {
+		if (lat[n+1] == fill_value_in || lon[n+1] == fill_value_in) {
+		  indices[n+1] = fill_value_out; // still skipped
+		} else {
+		  skipped = false;
+		  indices[n+1] = stare.ValueFromLatLonDegrees(lat[n+1], lon[n+1], level);
+		  lvl = stare.cmpSpatialResolutionEstimateI(indices[n], indices[n+1]);
+		  indices[n] = (indices[n]& ~lj.levelMaskSciDB) | lvl;
+		}
+	      } else {
+		if (indices[n-1] != fill_value_out && indices[n] != fill_value_out) {
+		  lvl = stare.cmpSpatialResolutionEstimateI(indices[n-1], indices[n]);
+		  indices[n] = (indices[n]& ~lj.levelMaskSciDB) | lvl;
+		}
+	      }
+	    }
+	  }
+	}
+      }
     }
 }
 
@@ -614,36 +656,35 @@ void _scidbContainsInstant                    (int64_t* indices1, int len1, int6
     cmp[i] = scidbContainsInstant(indices1[i],indices2[i]) ? 1 : 0;
   }
 }
-void _to_JulianTAI   (int64_t* indices, int len, double* d1, int nd1, double* d2, int nd2) {
+
+void _to_JulianTAI(int64_t* indices, int len, double* d1, double* d2) {
   for( int j=0; j < len; ++j ) {
     TemporalIndex tIndex(indices[j]);
     tIndex.toJulianTAI(d1[j],d2[j]);
   }
 }
 
-void _from_JulianTAI (double* d1, int nd1, double* d2, int nd2, int64_t* out_array, int out_length, int f_res, int r_res) {
-  TemporalIndex tIndex;
-  for( int j=0; j < nd1; ++j ) {
-    // cout << "tIndex " << j << " . " << flush;
-    TemporalIndex tIndexResult = tIndex.fromJulianTAI( d1[j], d2[j], f_res, r_res);
-    // cout << " result " << flush;
-    out_array[j] = tIndexResult.scidbTemporalIndex();
-    // cout << out_array[j] << flush << endl;
-    // cout << endl << flush;
-  }
-}
-
-void _from_JulianUTC  (double* d1, int nd1, double* d2, int nd2, int64_t* out_array, int out_length, int f_res, int r_res) {
-  for( int j=0; j < nd1; ++j ) {
-    TemporalIndex tIndex;
-    TemporalIndex tIndexResult = tIndex.fromJulianUTC( d1[j], d2[j], f_res, r_res );
-    out_array[j] = tIndexResult.scidbTemporalIndex();
-  }
-}
-void _to_JulianUTC   (int64_t* indices, int len, double* d1, int nd1, double* d2, int nd2) {
+void _to_JulianUTC   (int64_t* indices, int len, double* d1, double* d2) {
   for( int j=0; j < len; ++j ) {
     TemporalIndex tIndex(indices[j]);
     tIndex.toJulianUTC(d1[j],d2[j]);
+  }
+}
+
+
+void _from_JulianTAI(double* d1, int nd1, double* d2, int nd2, int64_t* indices, int f_res, int r_res) {
+  TemporalIndex tIndex;
+  for( int j=0; j < nd1; ++j ) {
+    TemporalIndex tIndexResult = tIndex.fromJulianTAI( d1[j], d2[j], f_res, r_res);
+    indices[j] = tIndexResult.scidbTemporalIndex();
+  }
+}
+
+void _from_JulianUTC (double* d1, int nd1, double* d2, int nd2, int64_t* indices, int f_res, int r_res) {
+  for( int j=0; j < nd1; ++j ) {
+    TemporalIndex tIndex;
+    TemporalIndex tIndexResult = tIndex.fromJulianUTC( d1[j], d2[j], f_res, r_res );
+    indices[j] = tIndexResult.scidbTemporalIndex();
   }
 }
 

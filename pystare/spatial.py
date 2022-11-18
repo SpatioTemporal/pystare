@@ -51,7 +51,7 @@ def from_lonlat(lon, lat, level):
     return sids
 
 
-def from_latlon_2d(lat, lon, level=None, adapt_level=False):
+def from_latlon_2d(lat, lon, level=None, adapt_level=False, fill_value_in=None, fill_value_out=None):
     """Coverts latitudes and longitudes to SIDs.
     In contrary to :func:`~from_latlon`, this function accepts 2D arrays as latitude and longitude inputs.
     This is e.g. convenient to convert the geolocation of Level1/2 swath granules to SIDs.
@@ -65,10 +65,12 @@ def from_latlon_2d(lat, lon, level=None, adapt_level=False):
     lon: 2D array-like
         longitudes. Has to have same length as lat
     level: int (0<=level<=27)
-        level of thfe SIDs. If not set, level will me automatically adapted.
+        level of the SIDs. If not set, level will me automatically adapted.
         If set, adapt_level will be set to false.
     adapt_level: bool
         if True, level will adapted to match resolution of lat/lon. Will overwrite level.
+    fill_value_in: STARE indices are not calculated for lat/lon of this value
+    fill_value_out: set indices to this value where lat/lon is fill_value_in
 
     Returns
     ---------
@@ -97,13 +99,26 @@ def from_latlon_2d(lat, lon, level=None, adapt_level=False):
         adapt_level = True
     elif level < 0 or level > 27:
         raise pystare.exceptions.PyStareLevelError()
+    elif adapt_level is True:
+        raise pystare.exceptions.PyStareError('Cannot set level AND adapt level. (level,adapt_level) = (%s,%s)'%(level,adapt_level))
     else:
         adapt_level = False
 
+    if fill_value_in is not None:
+        fill_value_enabled = True
+        if fill_value_out is None:
+            raise ValueError('fill_value_out must be specified if fill_value_in is specified.')
+    else:
+        fill_value_enabled = False
+        fill_value_in  = -999.0
+        fill_value_out = -999
+        
     if adapt_level:
         level = 27
     sids = numpy.full(lon.shape, -1, dtype=numpy.int64)
-    pystare.core._from_latlon2D(lat, lon, sids, level, adapt_level)
+
+    pystare.core._from_latlon2D(lat, lon, sids, level, adapt_level,
+                                fill_value_enabled, fill_value_in, fill_value_out)
     return sids
 
 
@@ -468,16 +483,25 @@ def cover_from_ring(lat, lon, level):
     return range_indices
 
 
-def to_circular_cover(lat, lon, radius, level):
+def latlon2circular_cover(lat, lon, radius, level):
     """
-    Creates a circular cover
+    Creates a circular cover around  a lat/lon center
 
     Parameters
     -----------
+    lat: float
+        lat of center
+    lon: float
+        lon of center
+    radius: float
+        radius of the circular cover in degrees
+    level: int
+        cover stare resolution
 
     Returns
     --------
-
+    stare_cover: 1D array
+        the circular cover
     """
     if level < 0 or level > 27:
         raise pystare.exceptions.PyStareLevelError()
@@ -489,22 +513,29 @@ def to_circular_cover(lat, lon, radius, level):
     return range_indices
 
 
-def circular_cover_from(index, radius, level):
+def sid2circular_cover(index, radius, level):
     """
+    Creates a circular cover around  an SID center
 
     Parameters
     -----------
+    index: int64
+        SID of the center
+    radius: float
+        radius of the circular cover in degrees
+    level: int
 
     Returns
     --------
-
+    stare_cover: 1D array
+        the circular cover
     """
 
     if level < 0 or level > 27:
         raise pystare.exceptions.PyStareLevelError()
 
     latsv, lonsv, lat_center, lon_center = to_vertices_latlon([index])
-    return to_circular_cover(lat_center[0], lon_center[0], radius, level)
+    return latlon2circular_cover(lat_center[0], lon_center[0], radius, level)
 
 
 def to_box_cover_from_latlon(lat, lon, resolution):
@@ -693,20 +724,135 @@ def intersection(sids1, sids2, multi_resolution=True):
     return intersection
 
 
+def int2bin(sids):
+    """
+    Converts 64 bit integer to binary
+
+    Examples
+    ----------
+    >>> sids = numpy.array([3458764513820540928])
+    >>> int2bin(sids)
+     ['0011000000000000000000000000000000000000000000000000000000000000']
+    """
+    if hasattr(sids, "__len__"):
+        return ['{0:064b}'.format(sid) for sid in sids]
+    else:
+        return '{0:064b}'.format(sids)
+
+
+def int2hex(sids):
+    """ Converts int sids to hex sids
+
+    Parameters
+    -----------
+    sids: array-like or int64
+        int representations of SIDs
+
+    Returns
+    --------
+    sid: array-like or str
+        hex representations of SIDs
+
+    Examples
+    -----------
+    >>> sid = 3458764513820540928
+    >>> pystare.int2hex(sid)
+    '0x3000000000000000'
+    """
+
+    if hasattr(sids, "__len__"):
+        return ["0x%016x" % sid for sid in sids]
+    else:
+        return "0x%016x" % sids
+
+
+def hex2int(sids):
+    """ Converts hex SIDs to int SIDs
+
+    Parameters
+    -----------
+    sids: array-like or str
+        hex representations of SIDs
+
+    Returns
+    ----------
+    sid: array-like or int64
+        int representation of SIDs
+
+
+    Examples
+    -----------
+    >>> sid = '0x3000000000000000'
+    >>> pystare.hex2int(sid)
+    3458764513820540928
+
+    >>> sid = ['0x3000000000000000']
+    >>> pystare.hex2int(sid)
+    [3458764513820540928]
+    """
+
+    if isinstance(sids, str):
+        return int(sids, 16)
+    else:
+        return [int(sid, 16) for sid in sids]
+
+
+def spatial_resolution(sids):
+    """
+    Returns the spatial resolution of an sid
+
+    Parameters
+    ------------
+    sids: int or array-like
+        STARE index value
+
+    Returns
+    ---------
+    resolution: int
+        Resolution of the SID
+
+    Examples
+    ---------
+    >>> sid = pystare.hex2int('0x3000000000000004')
+    >>> pystare.spatial_resolution(sid)
+    4
+
+    >>> sids = pystare.hex2int(['0x3000000000000004', '0x3000000000000005'])
+    >>> pystare.spatial_resolution(sids)
+    array([4, 5])
+
+    >>> sid = numpy.array(sids)
+    >>> pystare.spatial_resolution(sid)
+    array([4, 5])
+    """
+    sids = numpy.array(sids)
+    resolutions = sids & 31  # levelMaskSciDB
+    return resolutions
+
+
 def spatial_increment_from_level(level):
     if level < 0 or level > 27:
         raise pystare.exceptions.PyStareLevelError()
     return 1 << (59 - 2 * level)
 
 
-def spatial_resolution(sid):
-    return sid & 31  # levelMaskSciDB
+def spatial_terminator_mask(levels):
+    """ Creates a STARE mask for a given STARE resolution.
 
+    Examples
+    ---------
+    >>> mask = pystare.spatial_terminator_mask(0)
+    >>> '{0:064b}'.format(mask)
+    '0000011111111111111111111111111111111111111111111111111111111111'
 
-def spatial_terminator_mask(level):
-    if level < 0 or level > 27:
+    >>> pystare.spatial_terminator_mask([0, 10])
+     array([576460752303423487,       549755813887])
+
+    """
+    levels = numpy.array(levels)
+    if (levels < 0).any() or (levels > 27).any():
         raise pystare.exceptions.PyStareLevelError()
-    return (1 << (1 + 58 - 2 * level)) - 1
+    return (1 << (1 + 58 - 2 * levels)) - 1
 
 
 def spatial_terminator(sid):
@@ -717,29 +863,63 @@ def spatial_coerce_resolution(sid, resolution):
     return (sid & ~31) | resolution
 
 
-def spatial_clear_to_resolution(sid):
-    resolution = sid & 31
-    mask = spatial_terminator_mask(spatial_resolution(sid))
-    return (sid & ~mask) + resolution
-
-
-def shiftarg_lon(lon):
-    """ Corrects longitudes. If lon is outside +/-180, then correct back.
-
+def spatial_clear_to_resolution(sids):
     """
-    if (lon > 180):
-        return ((lon + 180.0) % 360.0) - 180.0
-    else:
-        return lon
+    Clears the SID location bits up to the encoded spatial resolution
+    Clears the SID location bits up to the encoded spatial resolution
 
+    Parameters
+    -------------
+    sid: int
+        the spatial ID to be cleared
 
-def shiftarg_lat(lat):
-    """ Corrects latitudes; If lat is outside +/-90, then correct back.
+    Examples
+    ----------
+    >>> sid = 2299437706637111721
+    >>> spatial_clear_to_resolution(sid)
+    2299437254470270985
+
+    >>> sids = pystare.hex2int(['0x097cf40fd3132507', '0x097cf40fd3132505'])
+    >>> pystare.int2hex(spatial_clear_to_resolution(sids))
+    ['0x097ce00000000007', '0x097c000000000005']
     """
-    if (lat > 90):
-        return ((lat + 90.0) % 180.0) - 90.0
-    else:
-        return lat
+    resolution = spatial_resolution(sids)
+    mask = spatial_terminator_mask(resolution)
+    return (sids & ~mask) + resolution
+
+
+def lon_wrap_180(lon):
+    """ Wrap angle in degrees to [-180 180]
+
+    Wraps angles (in degrees) to the interval [–180, 180] such that
+
+    - 90 maps to 90
+    - –90 maps to –90
+    - 360 maps to 0
+    - 270 maps to -90
+
+    Notes
+    --------
+    - 180 wraps to -180 but -180 to -180
+    - lon_wrap_180() casts to floats
+    - This method is not intended to correct illformated longitudes outside the interval [-180, 360]
+
+    Examples
+    -----------
+    >>> lon_wrap_180(90.0)
+    90.0
+    >>> lon_wrap_180(-90.0)
+    -90.0
+    >>> lon_wrap_180(360.0)
+    0.0
+    >>> lon_wrap_180(270.0)
+    -90.0
+    >>> lon_wrap_180(180.0)
+    -180.0
+    >>> lon_wrap_180(-180.0)
+    -180.0
+    """
+    return ((lon + 180.0) % 360.0) - 180.0
 
 
 def spatial_resolution_from_km(km, return_int=True):
@@ -766,7 +946,7 @@ def triangulate(lats, lons):
         intmat.append([k, k + 1, k + 2])
         k = k + 3
     for i in range(len(lons)):
-        lons[i] = shiftarg_lon(lons[i])
+        lons[i] = lon_wrap_180(lons[i])
     return lons, lats, intmat
 
 
@@ -774,10 +954,10 @@ def triangulate_indices(indices):
     """
     Prepare data for matplotlib.tri.Triangulate.
 
-    Usage
-    ----------
-    >>> lons, lats, intmat = triangulate_indices(indices) # doctest: +SKIP
-    >>> triang = tri.Triangulation(lons,lats,intmat)     # doctest: +SKIP
+    Examples
+    --------
+    >>> lons, lats, intmat = triangulate_indices(indices)   # doctest: +SKIP
+    >>> triang = tri.Triangulation(lons,lats,intmat)        # doctest: +SKIP
     >>> plt.triplot(triang,'r-',transform=transform,lw=1,markersize=3) # doctest: +SKIP
     """
 
@@ -786,3 +966,72 @@ def triangulate_indices(indices):
     return lons, lats, intmat
 
 
+def speedy_subset(sids_left, sids_right, values_left=None):
+    """ Fast subsetting of data
+
+    We make use of multi-level nature of STARE with the following steps:
+
+    - clamp the left_sids by the upper and lower bounds of sids_right.
+    - determine the intersection level as the lower one of the highest level of left and right.
+    - coerce the resolution of the left sids to the intersection level
+    - get the unique sids of the coerced left sids
+    - perform stare-based intersects pf the unique values and the right
+    - map the intersects back to the original array indices.
+
+
+
+
+    Parameters
+    ------------
+    sids_left: 1D numpy.array
+        The sids of the left which we are subsetting
+    sids_right: 1D numpy.array
+        The sids we are subseting sids_left with
+    values_left: ndarray
+        optional. If set, we return the subsetted values rather than the left indices
+        values left must have same length as sids_left. I.e. the fastest changing index must be of the same
+        length as sids_left.
+
+    Examples
+    ---------
+    >>> import numpy
+    >>> left_sids = numpy.array([3330891586388099091, 3330891586390196243, 3330891586392293395,\
+                                 3330891586394390547, 3330891586396487699, 3330891586398584851])
+    >>> right_sids = numpy.array([3330891586396487699, 3330891586398584851])
+    >>> left_values = numpy.array([1,2,3,4,5,6,])
+    >>> res = speedy_subset(sids_left=sids_left, sids_right=sids_right, values_left=values_left)
+    """
+
+    if values_left is not None:
+        if not len(sids_left) == len(values_left):
+            print('sids_left must have same length as values_left')
+            return
+
+    # Filter by top / bottom bounds
+    top_bound = pystare.spatial_clear_to_resolution(sids_right.max())
+    level = pystare.spatial_resolution(top_bound)
+    top_bound += pystare.spatial_increment_from_level(level)
+    bottom_bound = sids_right.min()
+    candidate_sids = sids_left[(sids_left >= bottom_bound) * (sids_left <= top_bound)]
+    if values_left is not None:
+        values = values_left[(sids_left >= bottom_bound) * (sids_left <= top_bound)]
+
+    # Find intersection level
+    left_min_level = pystare.spatial_resolution(candidate_sids).max()
+    right_min_level = pystare.spatial_resolution(sids_right).max()
+    intersecting_level = min(right_min_level, left_min_level)
+
+    # Extract unique SIDs
+    coerced_sids = pystare.spatial_coerce_resolution(candidate_sids, intersecting_level)
+    cleared_sids = pystare.spatial_clear_to_resolution(coerced_sids)
+    distinct_sids = numpy.unique(cleared_sids)
+
+    # Subset by STARE
+    intersects = pystare.intersects(sids_right, distinct_sids)
+    intersecting_sids = distinct_sids[intersects]
+    intersecting_idx = numpy.isin(cleared_sids, intersecting_sids)
+    if values_left is not None:
+        return values[intersecting_idx]
+    else:
+        original_sids = candidate_sids[intersecting_idx]
+        return numpy.isin(sids_left, original_sids)

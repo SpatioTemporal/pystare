@@ -87,8 +87,7 @@ class MainTest(unittest.TestCase):
         tiv0    = pystare.from_temporal_triple(triple0)
         print_(('tiv0:    ',tiv0,type(tiv0),tiv0.shape))
         print_(('    :    ',pystare.to_stare_timestring(tiv0)))
-        try: del tmp
-        except: pass
+
         tmp = np.array(pystare.to_temporal_triple_tai(tiv0),dtype=np.int64).flatten()
         print_(('    :     ',tmp))
         print_(('    :    ',pystare.to_stare_timestring(tmp)))
