@@ -86,7 +86,7 @@ pip install sphinx-markdown-tables
             numpydoc 
             pydata-sphinx-theme
 ```
-    
+
 
 ## Usage
 
