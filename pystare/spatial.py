@@ -951,3 +951,74 @@ def triangulate_indices(indices):
     latv, lonv, lat_center, lon_center = to_vertices_latlon(indices)
     lons, lats, intmat = triangulate(latv, lonv)
     return lons, lats, intmat
+
+
+def speedy_subset(sids_left, sids_right, values_left=None):
+    """ Fast subsetting of data
+
+    We make use of multi-level nature of STARE with the following steps:
+
+    - clamp the left_sids by the upper and lower bounds of sids_right.
+    - determine the intersection level as the lower one of the highest level of left and right.
+    - coerce the resolution of the left sids to the intersection level
+    - get the unique sids of the coerced left sids
+    - perform stare-based intersects pf the unique values and the right
+    - map the intersects back to the original array indices.
+
+
+
+
+    Parameters
+    ------------
+    sids_left: 1D numpy.array
+        The sids of the left which we are subsetting
+    sids_right: 1D numpy.array
+        The sids we are subseting sids_left with
+    values_left: ndarray
+        optional. If set, we return the subsetted values rather than the left indices
+        values left must have same length as sids_left. I.e. the fastest changing index must be of the same
+        length as sids_left.
+
+    Examples
+    ---------
+    >>> import numpy
+    >>> left_sids = numpy.array([3330891586388099091, 3330891586390196243, 3330891586392293395,\
+                                 3330891586394390547, 3330891586396487699, 3330891586398584851])
+    >>> right_sids = numpy.array([3330891586396487699, 3330891586398584851])
+    >>> left_values = numpy.array([1,2,3,4,5,6,])
+    >>> res = speedy_subset(sids_left=sids_left, sids_right=sids_right, values_left=values_left)
+    """
+
+    if values_left is not None:
+        if not len(sids_left) == len(values_left):
+            print('sids_left must have same length as values_left')
+            return
+
+    # Filter by top / bottom bounds
+    top_bound = pystare.spatial_clear_to_resolution(sids_right.max())
+    level = pystare.spatial_resolution(top_bound)
+    top_bound += pystare.spatial_increment_from_level(level)
+    bottom_bound = sids_right.min()
+    candidate_sids = sids_left[(sids_left >= bottom_bound) * (sids_left <= top_bound)]
+    if values_left is not None:
+        values = values_left[(sids_left >= bottom_bound) * (sids_left <= top_bound)]
+
+    # Find intersection level
+    left_min_level = pystare.spatial_resolution(candidate_sids).max()
+    right_min_level = pystare.spatial_resolution(sids_right).max()
+    intersecting_level = min(right_min_level, left_min_level)
+
+    # Extract unique SIDs
+    coerced_sids = pystare.spatial_coerce_resolution(candidate_sids, intersecting_level)
+    cleared_sids = pystare.spatial_clear_to_resolution(coerced_sids)
+    distinct_sids = numpy.unique(cleared_sids)
+
+    # Subset by STARE
+    intersects = pystare.intersects(sids_right, distinct_sids)
+    intersecting_sids = distinct_sids[intersects]
+    intersecting_idx = numpy.isin(cleared_sids, intersecting_sids)
+    if values_left is not None:
+        return values[intersecting_idx]
+    else:
+        original_sids = candidate_sids[intersecting_idx]
+        return numpy.isin(sids_left, original_sids)
