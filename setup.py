@@ -1,59 +1,47 @@
 #!/usr/bin/env/python
-"""Installation script
-"""
 
 import os
 import numpy
 from setuptools import setup, Extension
 from setuptools.command.build_py import build_py as _build_py
+from setuptools.command.build_ext import build_ext as build_ext
+import versioneer
 
-LONG_DESCRIPTION = """ """
+STARE_LIB_DIRS = [os.path.expanduser(os.environ.get('STARE_LIB_DIR', '/usr/local/lib/'))]
+STARE_INCLUDE_DIRS = [os.path.expanduser(os.environ.get('STARE_INCLUDE_DIR', '/usr/local/include/STARE/'))]
 
-if os.environ.get("READTHEDOCS", False) == "True":
-    INSTALL_REQUIRES = []
-else:
-    INSTALL_REQUIRES = ['numpy>=1.16.2', 'shapely>=1.6', 'geopandas>=0.5']
+INCLUDE_DIRS = STARE_INCLUDE_DIRS + [numpy.get_include()]
 
-STARE_LIB_DIRS     = [os.environ.get('STARE_LIB_DIR','/usr/local/lib')]
-STARE_INCLUDE_DIRS = [os.environ.get('STARE_INCLUDE_DIR','/usr/local/include')]
-
-if os.environ.get('PYTHON_INCLUDE_DIRS') is None:
-    PYTHON_INCLUDE_DIRS = []
-else:
-    PYTHON_INCLUDE_DIRS = os.environ.get('PYTHON_INCLUDE_DIRS').split(':')
-
-INCLUDE_DIRS = STARE_INCLUDE_DIRS + PYTHON_INCLUDE_DIRS + [numpy.get_include()]
-
-class build_py(_build_py):   
-    def run(self):
-        self.run_command("build_ext")
-        return super().run()
-
-pystare = Extension(name='_pystare', 
-                    sources=['PySTARE.i', 'PySTARE.cpp'], 
-                    depends=['PySTARE.h'],
-                    swig_opts=['-modern', '-c++'],
+pystare = Extension(name='pystare._core',
+                    sources=['pystare/PySTARE.i', 'pystare/PySTARE.cpp'],
+                    swig_opts=['-c++'],
                     extra_compile_args=['-std=c++11'],
                     libraries=['STARE'],
-                    library_dirs=STARE_LIB_DIRS,       # Location of libSTARE.a
-                    include_dirs=INCLUDE_DIRS,   # Location of STARE.h
+                    library_dirs=STARE_LIB_DIRS,    # Location of libSTARE.a
+                    include_dirs=INCLUDE_DIRS,      # Location of STARE.h
                     language='c++')
 
 
-# get all data dirs in the datasets module
-data_files = []
+class build_py(_build_py):
+
+    def run(self):
+        """ 
+        We need to overwrite run to make sure extension is built before getting copied
+        """
+        self.run_command("build_ext")
+        return super().run()
+
+
+version = versioneer.get_version()
+cmdclass = versioneer.get_cmdclass()
+#cmdclass['build_py'] = build_py
+#cmdclass['build_ext'] = build_ext
+
 
 setup(
-    name='pystare',
-    version='0.5.5',
-    description="",
-    cmdclass={'build_py': build_py},
-    long_description=LONG_DESCRIPTION,         
-    py_modules = ['pystare'],
-    ext_modules=[pystare],    
-    python_requires=">=3.5",
-    test_suite='tests',
-    install_requires=INSTALL_REQUIRES
+    version=version,
+    cmdclass=cmdclass,    
+    ext_modules=[pystare],
 ) 
 
 

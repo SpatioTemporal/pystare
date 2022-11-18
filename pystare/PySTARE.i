@@ -1,13 +1,36 @@
 
-%module pystare
+%module core
 
 %{
   #define SWIG_FILE_WITH_INIT  /* To import_array() below */
   #include "PySTARE.h"
+  #include <vector>
+  #include <string>
 %}
 
 %include "numpy.i"
 
+%include "std_vector.i"
+%include "std_string.i"
+
+namespace std {
+%template(VectorString) vector< string >;    
+};
+
+/*
+%template(StringVector) std::vector< std::string >;
+*/
+
+/* %include "stl.i" */
+
+/*
+%template(StringVector) vector< string >;
+%template(StringVector) std::vector< std::string >;
+namespace std {
+%template(StringVector) std::vector<std::string>;
+%template(ConstCharVector) std::vector<const char*>;
+}
+*/
 
 %init %{
     import_array();
@@ -32,9 +55,6 @@
   $2 = (int) array_size(array,0);    
   $3 = (int64_t*) array_data((PyArrayObject*)out);
 }
-
-
-
 
 %typemap(in, numinputs=1)
   (double* in_array, int length, int64_t* out_array)
@@ -262,6 +282,88 @@
   $6 = (int64_t*) array_data((PyArrayObject*)out4);
 }
 
+/*
+ * char** 
+ * From http://www.swig.org/Doc1.3/Python.html#Python_nn59
+ */
+/* %module argv */
+
+// This tells SWIG to treat char ** as a special case
+
+%typemap(in) char ** {
+  /* Check if is a list  */
+  if (PyList_Check($input)) {
+    int size = PyList_Size($input);
+    int i = 0;
+    $1 = (char **) malloc((size+1) * sizeof(char*));
+    for (i = 0; i < size; i++) {
+      PyObject *o = PyList_GetItem($input,i);
+      if (PyUnicode_Check(o)) {
+	// printf("100\n");
+	Py_ssize_t size_ = 0;
+	// printf("110\n");
+	const char *pc = PyUnicode_AsUTF8AndSize(o,&size_);
+	// $1[i] = PyUnicode_AsUTF8AndSize(o,&size_);
+	// printf("120\n");
+	string s(pc,size_);
+	// printf("130\n");
+	// It would be great to be able to just pass in the const char*.
+	$1[i] = (char*) malloc((size_+1) * sizeof(char)); // Hello memory leak...
+	// printf("135\n");
+	size_t len = s.copy($1[i],size_);
+	// printf("140\n");
+      } else {
+        PyErr_SetString(PyExc_TypeError,"list must contain strings");
+        free($1);
+        return NULL;
+      }
+    }
+    $1[i] = 0;
+  } else if ($input == Py_None) {
+    $1 =  NULL;
+  } else {
+    PyErr_SetString(PyExc_TypeError,"not a list");
+    return NULL;
+  }
+}
+
+%typemap(freearg) char** {
+  // printf("freearg char**\n");
+  free((char *) $1);
+}
+
+%typemap(out) char** {
+    // printf("c**-000\n");
+  int len;
+  int i;
+  len = 0;
+  while ($1[len]) len++;
+    // printf("c**-100 len = %d\n",len);
+  $result = PyList_New(len);
+    // printf("c**-200\n");
+  for (i = 0; i < len; i++) {
+    // printf("out %d -> %s\n",i,$1[i]);
+    PyList_SetItem($result, i, PyString_FromString($1[i]));
+    // printf("c**-399\n");
+  }
+    // printf("c**-999\n");
+}
+
+
+// Now a test function
+%inline %{
+  int print_args(char **argv) {
+    int i = 0;
+    while (argv[i]) {
+         printf("argv[%d] = %s\n", i,argv[i]);
+	 free(argv[i]); // Good bye, memory leak!
+         i++;
+    }
+    return i;
+}
+%}
+
+
 
 /****************/
 /* OUT typemaps */
@@ -372,20 +474,26 @@
     (double* lon, int lolen1, int lolen2)
 }
 
+
 %apply (int64_t * INPLACE_ARRAY2, int DIM1, int DIM2) {
     (int64_t* indices, int len1, int len2)
 }
 
 %apply (double * IN_ARRAY1, int DIM1) {
     (double* lat, int len_lat),
-    (double* lon, int len_lon)
+    (double* lon, int len_lon),
+    (double* d1, int nd1),
+    (double* d2, int nd2)
 }
+
 
 %apply (int64_t * IN_ARRAY1, int DIM1) {
     (int64_t* datetime, int len),
     (int64_t* indices1, int len1),
     (int64_t* indices2, int len2),
-    (int64_t* indices, int len)
+    (int64_t* indices, int len),
+    (int64_t* reverse_increment, int lenr),
+    (int64_t* forward_increment, int lenf)
 }
 
 %apply (int64_t * INPLACE_ARRAY1, int DIM1) {
@@ -393,13 +501,15 @@
     (int64_t* range_indices, int len_ri),
     (int64_t* result_size, int len_rs),
     (int64_t* out_array, int out_length),
-    (int64_t* cmp, int len12)
+    (int64_t* cmp, int len12),
+    (int64_t* forward_resolution, int lenf),
+    (int64_t* reverse_resolution, int lenr),
+    (int64_t* indices_inplace, int len)
 }
 
-
 %apply (double * INPLACE_ARRAY1, int DIM1) {
-	(double* triangle_info_lats, int dmy1),
-	(double* triangle_info_lons, int dmy2)
+  (double* triangle_info_lats, int dmy1),
+  (double* triangle_info_lons, int dmy2)
 }
 
 # %apply (int64_t * ARGOUT_ARRAY1, int DIM1 ) {
@@ -408,8 +518,12 @@
 # }
 
 %apply (double* in_array, int length, int64_t* out_array) {
-    (double* lon, int len_lon, int64_t* indices)
+  (double* lon, int len_lon, int64_t* indices),
+  (double* d2, int nd2, int64_t* indices),
+  (double* milliseconds, int len, int64_t* out_array)
 }
+
+
 
 %apply (int64_t* in_array, int length, int* out_array) {
   (int64_t* indices, int len,  int* levels), 
@@ -418,15 +532,18 @@
 
 %apply (int64_t* in_array, int length, int64_t* out_array) {
   (int64_t* datetime, int len,  int64_t* indices_out),
-  (int64_t* indices, int len,  int64_t* datetime_out)
+  (int64_t* indices, int len,  int64_t* datetime_out),
+  (int64_t* indices, int len,  int64_t* new_indices)
 }
 
 %apply (int64_t* in_array, int length, double* out_array) {
-    (int64_t* indices, int len,  double* areas)
+    (int64_t* indices, int len,  double* areas),
+    (int64_t* resolutions, int len, double* millisecond)
 }
 
 %apply (int64_t* in_array, int length, double* out_array1, double* out_array2) {
-    (int64_t* indices, int len, double* lat, double* lon)
+    (int64_t* indices, int len, double* lat, double* lon),
+    (int64_t* indices, int len, double* d1, double* d2)
 }
 
 %apply (int64_t* in_array, int length, double* out_array1, double* out_array2, int* out_array3) {
@@ -452,257 +569,6 @@
 %}
 */
 
-%pythoncode %{
-import numpy
-from pkg_resources import get_distribution
-  
-__version__ = get_distribution('pystare').version
+%pythoncode %{%}
 
-class PyStareError(Exception):
-    pass
-
-class PyStareArrayBoundsExceeded(Exception):
-    pass
-
-def to_neighbors(indices):
-    result = _to_neighbors(indices)
-    range_indices = numpy.full([result.get_size_as_values()],-1,dtype=numpy.int64)
-    result.copy_as_values(range_indices)
-    return range_indices
-
-def to_compressed_range(indices):
-    out_length = len(indices)
-    range_indices = numpy.full([out_length],-1,dtype=numpy.int64)
-    len_ri = 0
-    _to_compressed_range(indices,range_indices)
-    endarg = 0
-    while (endarg < out_length) and (range_indices[endarg] > 0):
-      endarg = endarg + 1
-    # endarg = numpy.argmax(range_indices < 0)
-    range_indices = range_indices[:endarg]
-    return range_indices
-    
-def expand_intervals(intervals, resolution):
-    result = _expand_intervals(intervals,resolution)
-    expanded_intervals = numpy.zeros([result.get_size_as_intervals()],dtype=numpy.int64)
-    result.copy_as_values(expanded_intervals)
-    return expanded_intervals
-
-#    result      = numpy.full([result_size_limit],-1,dtype=numpy.int64)
-#    result_size = numpy.full([1],-1,dtype=numpy.int64)
-#    _expand_intervals(intervals,resolution,result,result_size)
-#    result = result[:result_size[0]]
-#    return result
-
-def adapt_resolution_to_proximity(indices):
-    result = numpy.copy(indices)
-    _adapt_resolution_to_proximity(indices,result)
-    return result
-    
-def to_hull_range(indices, resolution):
-    result = _to_hull_range(indices, resolution)
-    range_indices = numpy.full([result.get_size_as_intervals()], -1, dtype=numpy.int64)
-    result.copy_as_intervals(range_indices)
-    return range_indices
-    
-def from_latlon2D(lat, lon, resolution=27, adapt_resolution=False):
-    if adapt_resolution:
-        resolution = 27
-    indices = numpy.full(lon.shape, -1, dtype=numpy.int64)
-    _from_latlon2D(lat, lon, indices, 27, adapt_resolution)
-    return indices    
-
-def to_hull_range_from_latlon(lat, lon, resolution):
-    result = _to_hull_range_from_latlon(lat, lon, resolution)
-    range_indices = numpy.full([result.get_size_as_intervals()], -1, dtype=numpy.int64)
-    result.copy_as_intervals(range_indices)
-    return range_indices
-
-def to_nonconvex_hull_range_from_latlon(lat, lon, resolution):
-    result        = _to_nonconvex_hull_range_from_latlon(lat,lon,resolution);
-    out_length    = result.get_size_as_intervals()
-    range_indices = numpy.zeros([out_length],dtype=numpy.int64)
-    result.copy_as_intervals(range_indices)
-    return range_indices
-
-def to_circular_cover(lat, lon, radius, resolution):
-    result = _to_circular_cover(lat, lon, radius, resolution)
-    out_length = result.get_size_as_intervals()
-    range_indices = numpy.zeros([out_length],dtype=numpy.int64)
-    result.copy_as_intervals(range_indices);
-    return range_indices
-
-def circular_cover_from(index,radius,resolution):
-    latsv,lonsv,lat_center,lon_center = to_vertices_latlon([index])
-    return to_circular_cover(lat_center[0],lon_center[0],radius,resolution)
-
-def to_box_cover_from_latlon(lat, lon, resolution):
-    "Construct numpy array of intervals covering a 4-corner box specified using lat and lon."
-    result = _to_box_cover_from_latlon(lat, lon, resolution)
-    range_indices = numpy.zeros([result.get_size_as_intervals()],dtype=numpy.int64)
-    result.copy_as_intervals(range_indices)
-    return range_indices
-      
-def to_vertices_latlon(indices):
-	out_length = len(indices)
-	lats = numpy.zeros([4*out_length],dtype=numpy.double)
-	lons = numpy.zeros([4*out_length],dtype=numpy.double)
-	# _to_vertices_latlon(indices,lats,lons,0)
-	lats, lons = _to_vertices_latlon(indices)
-	latsv = numpy.zeros([3*out_length],dtype=numpy.double)
-	lonsv = numpy.zeros([3*out_length],dtype=numpy.double)
-	lat_center = numpy.zeros([out_length],dtype=numpy.double)
-	lon_center = numpy.zeros([out_length],dtype=numpy.double)
-	
-	k=0
-	l=0
-	for i in range(out_length):
-		latsv[l]   = lats[ k   ]
-		lonsv[l]   = lons[ k   ]
-		
-		latsv[l+1] = lats[ k+1 ]
-		lonsv[l+1] = lons[ k+1 ]
-				
-		latsv[l+2] = lats[ k+2 ]
-		lonsv[l+2] = lons[ k+2 ]
-				
-		lat_center [i]   = lats[ k+3 ]
-		lon_center [i]   = lons[ k+3 ]
-		k = k + 4
-		l = l + 3
-	return latsv,lonsv,lat_center,lon_center
-    
-def cmp_spatial(indices1, indices2):
-    """
-        calls cmp_spatial returning an element of {-1,0,1} depending on which, if either, element contains the other. Returns an array of x in {-1,0,1}, but cmp_spatial calculates all pairs (like an exterior product).
-    """
-    out_length = len(indices1)*len(indices2)
-    cmp = numpy.zeros([out_length],dtype=numpy.int64)
-    _cmp_spatial(indices1,indices2,cmp)
-    return cmp
-	    
-def cmp_temporal(indices1, indices2):
-	out_length = len(indices1)*len(indices2)
-	cmp = numpy.zeros([out_length],dtype=numpy.int64)
-	_cmp_temporal(indices1,indices2,cmp)
-	return cmp   
-
-def intersects(indices1, indices2, method=0):
-    # method = {'skiplist': 0, 'binsearch': 1, 'nn': 2}[method]
-    return _intersects(indices1, indices2, method).astype(numpy.bool)
-	
-def intersect(indices1, indices2, multiresolution=True):
-    """
-     constructs SpatialRange objects from its arguments and then returns the intersection of those. Returns an array of spatial index values.
-    """
-    out_length = 2*max(len(indices1), len(indices2))
-    intersected = numpy.full([out_length], -1, dtype=numpy.int64)
-    leni = 0
-    if(multiresolution):
-      _intersect_multiresolution(indices1, indices2, intersected)
-    else:
-      _intersect(indices1, indices2, intersected)
-    endarg = numpy.argmax(intersected < 0)
-    intersected = intersected[:endarg]
-    return intersected
-
-def shiftarg_lon(lon):
-    "If lon is outside +/-180, then correct back."
-    if(lon>180):
-        return ((lon + 180.0) % 360.0)-180.0
-    else:
-        return lon
-
-def shiftarg_lat(lat):
-    "If lat is outside +/-90, then correct back."
-    if(lat>90):
-        return ((lat + 90.0) % 180.0)-90.0
-    else:
-        return lat
-        
-def spatial_resolution_from_km(km,return_int=True):
-    if return_int:
-        return 10-numpy.log2(km/10)
-    else:
-        return int(10-numpy.log2(km/10))
-
-def spatial_scale_km(resolution):
-    "A rough estimate for the length scale at level."
-    return 10*(2.0**(10-resolution))
-	  
-def triangulate(lats,lons):
-    "Help prepare data for matplotlib.tri.Triangulate."
-    intmat=[]
-    npts=int(len(lats)/3)
-    k=0
-    for i in range(npts):
-        intmat.append([k,k+1,k+2])
-        k=k+3
-    for i in range(len(lons)):
-        lons[i] = shiftarg_lon(lons[i])
-    # print('triangulating1 done.')      
-    return lons,lats,intmat 
-
-def triangulate_indices(indices):
-    """
-    Prepare data for matplotlib.tri.Triangulate.
-    
-    Usage: 
-     lons,lats,intmat = triangulate_indices(indices)
-     triang = tri.Triangulation(lons,lats,intmat)
-     plt.triplot(triang,'r-',transform=transform,lw=1,markersize=3)    
-    """
-    latv,lonv,lat_center,lon_center = to_vertices_latlon(indices)
-    lons,lats,intmat = triangulate(latv,lonv)
-    return lons,lats,intmat
-
-    
-def parent(sid):
-    """ 
-        given an SID, return its immediate parent
-    """
-    return None
-    
-def children(sid):
-    """ 
-        given an SID, return the 4 children 
-    """
-    return None
-    
-
-def is_ancestor(sid1, sid2):
-    """ 
-        given an SID, evaluate if one is the ancesotr of the other
-    """
-    return None
-
-spatial_resolution_mask =  31
-spatial_location_mask   = ~31
-
-# TODO Replace hardcoded below with the variables above.
-	  
-def spatial_increment_from_level(level):
-    if level < 0 or level > 27:
-        raise PyStareError()
-    return 1 << (59-2*level)
-
-def spatial_resolution(sid):
-    return sid & 31 # levelMaskSciDB
-
-def spatial_terminator_mask(level):
-    return ((1 << (1+ 58-2*level))-1)
-
-def spatial_terminator(sid):
-    return sid | ((1 << (1+ 58-2*(sid & 31)))-1)
-
-def spatial_coerce_resolution(sid,resolution):
-    return (sid & ~31) | resolution
-
-def spatial_clear_to_resolution(sid):
-    resolution = sid & 31
-    mask =  spatial_terminator_mask(spatial_resolution(sid))
-    return (sid & ~mask) + resolution
-	 
-%}   
-   
 %include "PySTARE.h"
