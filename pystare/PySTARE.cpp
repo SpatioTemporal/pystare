@@ -628,12 +628,30 @@ void _scidbNewTemporalValue(int64_t* indices, int len, int64_t* new_indices, boo
 
 void _scidbTemporalValueIntersectionIfOverlap (int64_t* indices1, int len1, int64_t* indices2, int len2, int64_t* cmp, int len12){
   for( int i = 0; i < len1; ++i ) {
-    cmp[i] = scidbTemporalValueIntersectionIfOverlap(indices1[i],indices2[i]);
+    try {
+      cmp[i] = scidbTemporalValueIntersectionIfOverlap(indices1[i],indices2[i]);
+    } catch ( SpatialFailure& failure) {
+      if( failure.what() == "scidbTemporalValueIntersectionIfOverlap:NoOverlap" ) {
+	cmp[i] = -1;
+      } else {
+	// Fake an error. Maybe look at https://stackoverflow.com/questions/1394484/how-do-i-propagate-c-exceptions-to-python-in-a-swig-wrapper-library later.
+	cmp[i] = -999;
+      }
+    }
   }
 }
 void _scidbTemporalValueUnionIfOverlap        (int64_t* indices1, int len1, int64_t* indices2, int len2, int64_t* cmp, int len12){
   for( int i = 0; i < len1; ++i ) {
-    cmp[i] = scidbTemporalValueUnionIfOverlap(indices1[i],indices2[i]);
+    try {
+      cmp[i] = scidbTemporalValueUnionIfOverlap(indices1[i],indices2[i]);
+    } catch ( SpatialFailure& failure ) {
+      if( failure.what() == "scidbTemporalValueUnionIfOverlap:NoOverlap" ) {
+	cmp[i] = -1;
+      } else {
+	// Fake an error. Maybe look at https://stackoverflow.com/questions/1394484/how-do-i-propagate-c-exceptions-to-python-in-a-swig-wrapper-library later.
+	cmp[i] = -999;
+      }
+    }
   }
 }
 void _scidbOverlapTAI                         (int64_t* indices1, int len1, int64_t* indices2, int len2, int64_t* cmp, int len12){
