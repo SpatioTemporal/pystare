@@ -631,7 +631,7 @@ void _scidbTemporalValueIntersectionIfOverlap (int64_t* indices1, int len1, int6
     try {
       cmp[i] = scidbTemporalValueIntersectionIfOverlap(indices1[i],indices2[i]);
     } catch ( SpatialFailure& failure) {
-      if( failure.what() == "scidbTemporalValueIntersectionIfOverlap:NoOverlap" ) {
+      if( strcmp(failure.what(),"scidbTemporalValueIntersectionIfOverlap:NoOverlap") == 0 ) {
 	cmp[i] = -1;
       } else {
 	// Fake an error. Maybe look at https://stackoverflow.com/questions/1394484/how-do-i-propagate-c-exceptions-to-python-in-a-swig-wrapper-library later.
@@ -645,7 +645,7 @@ void _scidbTemporalValueUnionIfOverlap        (int64_t* indices1, int len1, int6
     try {
       cmp[i] = scidbTemporalValueUnionIfOverlap(indices1[i],indices2[i]);
     } catch ( SpatialFailure& failure ) {
-      if( failure.what() == "scidbTemporalValueUnionIfOverlap:NoOverlap" ) {
+      if( strcmp(failure.what(),"scidbTemporalValueUnionIfOverlap:NoOverlap") == 0 ) {
 	cmp[i] = -1;
       } else {
 	// Fake an error. Maybe look at https://stackoverflow.com/questions/1394484/how-do-i-propagate-c-exceptions-to-python-in-a-swig-wrapper-library later.
