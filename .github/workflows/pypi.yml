@@ -8,19 +8,26 @@ on:
     branches: [ master ]
     tags:
       - v*
+    inputs:
+      debug_enabled:
+        type: boolean
+        description: 'Run the build with tmate debugging enabled (https://github.com/marketplace/actions/debugging-with-tmate)'     
+        required: false
+        default: false
     
 jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      CPPFLAGS: "-I/usr/include -I/usr/local/include -I/home/runner/stare/include"
-      LDFLAGS: "-L/home/runner/stare/lib"
+      #CPPFLAGS: "-I/usr/include -I/usr/local/include -I/home/runner/stare/include/STARE/"
+      #LDFLAGS: "-L/home/runner/stare/lib"
       TWINE_USERNAME: ${{ secrets.TWINE_USERNAME }}
       TWINE_PASSWORD: ${{ secrets.TWINE_PASSWORD }}       
     steps:    
     - uses: actions/checkout@v2
     - name: Setup tmate session
       uses: mxschmitt/action-tmate@v3
+      #if: ${{ github.event_name == 'pull_request' && inputs.debug_enabled }}
       if: ${{ failure() }}
       timeout-minutes: 15
     - name: Set up Python 3.9
