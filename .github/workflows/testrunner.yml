@@ -37,7 +37,7 @@ jobs:
           path: STARE/ # need to specify path, otherwise it would overwrite pystare
     - name: Install STARE
       shell: bash
-      run: sh .github/workflows/prebuild.sh
+      run: sh .github/workflows/build_stare.sh
     - name: build pystare
       run: | 
          # Setting the location where we just installed STARE
