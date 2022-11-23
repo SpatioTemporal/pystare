@@ -1,5 +1,6 @@
 # This script clones, builds and installs STARE
-git clone https://github.com/SpatioTemporal/STARE
+
+#git clone https://github.com/SpatioTemporal/STARE
 cd STARE
 
 # Print commands and their arguments as they are executed.

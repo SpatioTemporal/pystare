@@ -971,15 +971,12 @@ def speedy_subset(sids_left, sids_right, values_left=None):
 
     We make use of multi-level nature of STARE with the following steps:
 
-    - clamp the left_sids by the upper and lower bounds of sids_right.
+    - clamp the sids_left by the upper and lower bounds of sids_right.
     - determine the intersection level as the lower one of the highest level of left and right.
     - coerce the resolution of the left sids to the intersection level
     - get the unique sids of the coerced left sids
     - perform stare-based intersects pf the unique values and the right
     - map the intersects back to the original array indices.
-
-
-
 
     Parameters
     ------------
@@ -995,9 +992,9 @@ def speedy_subset(sids_left, sids_right, values_left=None):
     Examples
     ---------
     >>> import numpy
-    >>> left_sids = numpy.array([3330891586388099091, 3330891586390196243, 3330891586392293395,\
+    >>> sids_left = numpy.array([3330891586388099091, 3330891586390196243, 3330891586392293395,\
                                  3330891586394390547, 3330891586396487699, 3330891586398584851])
-    >>> right_sids = numpy.array([3330891586396487699, 3330891586398584851])
+    >>> sids_right = numpy.array([3330891586396487699, 3330891586398584851])
     >>> left_values = numpy.array([1,2,3,4,5,6,])
     >>> res = speedy_subset(sids_left=sids_left, sids_right=sids_right, values_left=values_left)
     """
