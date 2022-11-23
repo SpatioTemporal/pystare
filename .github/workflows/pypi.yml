@@ -17,8 +17,10 @@ jobs:
       LDFLAGS: "-L/home/runner/stare/lib"
       TWINE_USERNAME: ${{ secrets.TWINE_USERNAME }}
       TWINE_PASSWORD: ${{ secrets.TWINE_PASSWORD }}       
-    steps:
+    steps:    
     - uses: actions/checkout@v2
+    - name: Setup tmate session
+      uses: mxschmitt/action-tmate@v3
     - name: Set up Python 3.9
       uses: actions/setup-python@v2
       with:
