@@ -8,7 +8,6 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
     env:
       #PWD_DIR: /home/runner
@@ -43,7 +42,7 @@ jobs:
         set -x
         mkdir build
         cd build
-        cmake -DCMAKE_INSTALL_PREFIX=~/g -DSTARE_INSTALL_LIBDIR=lib -DBUILD_SHARED_LIBS=NO ..
+        cmake -DCMAKE_INSTALL_PREFIX=~/stare -DSTARE_INSTALL_LIBDIR=lib -DBUILD_SHARED_LIBS=NO ..
         make -j4
         make install        
     - name: build pystare
