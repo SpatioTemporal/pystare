@@ -44,7 +44,7 @@ jobs:
       run: | 
          # Setting the location where we just installed STARE
          export STARE_LIB_DIR=/home/runner/stare/lib/
-         export STARE_INCLUDE_DIR=/home/runner/stare/include/
+         export STARE_INCLUDE_DIR=/home/runner/stare/include/STARE/
          python3 setup.py build_ext --inplace
          pip3 install .
     - name: Test with pytest
