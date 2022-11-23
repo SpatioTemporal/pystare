@@ -13,7 +13,7 @@ cd build
 cmake -DSTARE_INSTALL_LIBDIR=lib -DBUILD_SHARED_LIBS=NO ..
 #cmake -DCMAKE_INSTALL_PREFIX=~/stare -DSTARE_INSTALL_LIBDIR=lib -DBUILD_SHARED_LIBS=NO ..
 make -j4
-sudo make install
+make install
 
 cd
 
@@ -21,9 +21,6 @@ cd
 # https://github.blog/2022-04-12-git-security-vulnerability-announced/
 # https://github.com/multi-build/multibuild/issues/470
 git config --global --add safe.directory "*"
-
-#export STARE_LIB_DIR=~/stare/lib/
-#export STARE_INCLUDE_DIR=~/stare/include/STARE/
         
         
         
