@@ -5,6 +5,7 @@ on:
     tags: 
       - v*
   pull_request:
+    branches: [ master ]
     tags:
       - v*
     
@@ -42,6 +43,6 @@ jobs:
         build-requirements: 'cython numpy'
     - name: Publish wheels to PyPI
       run: |
-        twine upload  dist/*-manylinux*.whl
-        # twine upload --repository testpypi dist/*-manylinux*.whl
+        #twine upload  dist/*-manylinux*.whl
+        #twine upload --repository testpypi dist/*-manylinux*.whl
     

@@ -985,18 +985,19 @@ def speedy_subset(sids_left, sids_right, values_left=None):
     sids_right: 1D numpy.array
         The sids we are subseting sids_left with
     values_left: ndarray
-        optional. If set, we return the subsetted values rather than the left indices
-        values left must have same length as sids_left. I.e. the fastest changing index must be of the same
-        length as sids_left.
+        optional. If set, we return the subsetted values rather than the left indices. `values_left` must have same length as sids_left. I.e. the fastest changing index must be of the same length as sids_left.
 
     Examples
     ---------
     >>> import numpy
+    >>> values_left = numpy.array([1,2,3,4,5,6])
     >>> sids_left = numpy.array([3330891586388099091, 3330891586390196243, 3330891586392293395,\
                                  3330891586394390547, 3330891586396487699, 3330891586398584851])
     >>> sids_right = numpy.array([3330891586396487699, 3330891586398584851])
     >>> left_values = numpy.array([1,2,3,4,5,6,])
     >>> res = speedy_subset(sids_left=sids_left, sids_right=sids_right, values_left=values_left)
+    >>> res
+    array([5, 6])
     """
 
     if values_left is not None:
