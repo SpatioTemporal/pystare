@@ -5,7 +5,13 @@ on:
     branches: [ master ]
   pull_request:
     branches: [ master ]
-
+    inputs:
+      debug_enabled:
+        type: boolean
+        description: 'Run the build with tmate debugging enabled (https://github.com/marketplace/actions/debugging-with-tmate)'     
+        required: false
+        default: false
+    
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -17,6 +23,9 @@ jobs:
     - uses: actions/checkout@v2
     - name: Setup tmate session
       uses: mxschmitt/action-tmate@v3
+      #if: ${{ github.event_name == 'pull_request' && inputs.debug_enabled }}
+      if: ${{ failure() }}
+      timeout-minutes: 15
     - name: Set up Python 3.9
       uses: actions/setup-python@v2
       with:
@@ -31,15 +40,10 @@ jobs:
         # stop the build if there are Python syntax errors or undefined names
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-        # flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-    - name: Pull STARE
-      uses: actions/checkout@master
-      with:
-          repository: SpatioTemporal/STARE
-          path: STARE/ # need to specify path, otherwise it would overwrite pystare
-    - name: Install STARE
+        # flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics    
+    - name: Clone, build, and install STARE
       shell: bash
-      run: sh .github/workflows/build_stare.sh
+      run: sh .github/workflows/prebuild.sh # Clone, build, install STARE
     - name: build pystare
       run: | 
          # Setting the location where we just installed STARE
