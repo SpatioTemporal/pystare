@@ -10,7 +10,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      #PWD_DIR: /home/runner
+      PWD_DIR: /home/runner
       CPPFLAGS: "-I/usr/include -I/usr/local/include -I/home/runner/stare/include"
       LDFLAGS: "-L/home/runner/stare/lib"
     steps:
