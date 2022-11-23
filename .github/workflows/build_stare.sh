@@ -1,7 +1,6 @@
-# This is a prebuild script for the manylinux container
-# It clones, builds and installs STARE
+# This script clones, builds and installs STARE
 
-git clone https://github.com/SpatioTemporal/STARE
+#git clone https://github.com/SpatioTemporal/STARE
 cd STARE
 
 # Print commands and their arguments as they are executed.
@@ -11,7 +10,8 @@ mkdir build
 cd build
 
 # We install STARE to /usr/local/include/STARE/ and /usr/local/lib/ .. seems easist.
-cmake -DSTARE_INSTALL_LIBDIR=lib -DBUILD_SHARED_LIBS=NO ..
+#cmake -DSTARE_INSTALL_LIBDIR=lib -DBUILD_SHARED_LIBS=NO ..
+cmake -DCMAKE_INSTALL_PREFIX=/home/runner/stare -DSTARE_INSTALL_LIBDIR=lib -DBUILD_SHARED_LIBS=NO ..
 make -j4
 make install
 
@@ -21,3 +21,4 @@ cd
 # https://github.blog/2022-04-12-git-security-vulnerability-announced/
 # https://github.com/multi-build/multibuild/issues/470
 git config --global --add safe.directory "*"
+
