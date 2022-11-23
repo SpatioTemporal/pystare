@@ -9,7 +9,8 @@ mkdir build
 cd build
 
 # We install STARE to /usr/local/include/STARE/ and /usr/local/lib/ .. seems easist.
-cmake -DSTARE_INSTALL_LIBDIR=lib -DBUILD_SHARED_LIBS=NO ..
+#cmake -DSTARE_INSTALL_LIBDIR=lib -DBUILD_SHARED_LIBS=NO ..
+cmake -DCMAKE_INSTALL_PREFIX=~/stare -DSTARE_INSTALL_LIBDIR=lib -DBUILD_SHARED_LIBS=NO ..
 make -j4
 make install
 

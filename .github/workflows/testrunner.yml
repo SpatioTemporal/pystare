@@ -37,14 +37,7 @@ jobs:
           path: STARE/ # need to specify path, otherwise it would overwrite pystare
     - name: Install STARE
       shell: bash
-      run: |
-        cd STARE/
-        set -x
-        mkdir build
-        cd build
-        cmake -DCMAKE_INSTALL_PREFIX=~/stare -DSTARE_INSTALL_LIBDIR=lib -DBUILD_SHARED_LIBS=NO ..
-        make -j4
-        make install        
+      run: sh .github/workflows/prebuild.sh
     - name: build pystare
       run: | 
          # Setting the location where we just installed STARE
