@@ -13,10 +13,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      CPPFLAGS: "-I/usr/include -I/usr/local/include -I/github/home/runner/stare/include"
-      LDFLAGS: "-L/github/home/runner/stare/lib"
+      CPPFLAGS: "-I/usr/include -I/usr/local/include -I/home/runner/stare/include"
+      LDFLAGS: "-L/home/runner/stare/lib"
       TWINE_USERNAME: ${{ secrets.TWINE_USERNAME }}
-      TWINE_PASSWORD: ${{ secrets.TWINE_PASSWORD}}       
+      TWINE_PASSWORD: ${{ secrets.TWINE_PASSWORD }}       
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python 3.9
@@ -36,7 +36,7 @@ jobs:
       shell: bash
       run: sh .github/workflows/build_stare.sh
     - name: Build manylinux Python wheels
-      uses: RalfG/python-wheels-manylinux-build@v0.4.2
+      uses: RalfG/python-wheels-manylinux-build@v0.5.0
       with:
         python-versions: 'cp37-cp37m cp38-cp38 cp39-cp39 cp310-cp310'
         pre-build-command: 'sh .github/workflows/prebuild.sh' # This sets the environments
