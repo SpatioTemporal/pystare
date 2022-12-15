@@ -903,4 +903,338 @@ def temporal_contains_instant(indices1, indices2):
     pystare.core._scidbContainsInstant(indices1, indices2, cmp)
     return cmp
 
+# Temporal Helpers
+
+def hex16(i):
+    return "0x%016x"%i
+
+def tiv_utc_to_string(tivs):
+    return numpy.datetime_as_string(pystare.to_ms_since_epoch_utc(tivs).astype('datetime64[ms]'))
+
+def tiv_from_datetime(now,forward_res=48,reverse_res=48):
+#    now = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
+    now = now.strftime("%Y-%m-%dT%H:%M:%S")
+    now = numpy.array([now], dtype='datetime64[ms]')
+    now = now.astype(numpy.int64)
+    tiv = pystare.from_ms_since_epoch_utc(now, forward_res, reverse_res)[0]
+    return tiv
+
+def tiv_from_datetime2(dts):
+    """
+    Return a tiv spanning 2 datetimes in dts.
+    """
+    return tiv_from_string2([dts[0].strftime("%Y-%m-%dT%H:%M:%S"),dts[1].strftime("%Y-%m-%dT%H:%M:%S")])
+
+def tiv_from_tiv2(tivs):
+    dts = pystare.to_ms_since_epoch_utc(tivs)
+    dtc = numpy.int64(sum(dts)/2)
+    tc  = pystare.from_ms_since_epoch_utc([dtc])
+    tivs3 = [tivs[0],tc[0],tivs[1]]
+    tiv = pystare.from_temporal_triple(tivs3)[0]
+    return tiv
+
+def tiv_from_string(s,forward_resolution=48,reverse_resolution=48):
+    """
+    Example: tiv_from_string('1999-05-05T12:00:00.999')
+    """
+    t_ = numpy.array([s], dtype='datetime64[ms]')
+    tiv_ = pystare.from_ms_since_epoch_utc(t_.astype(numpy.int64),forward_res=forward_resolution,reverse_res=reverse_resolution)[0]
+    return tiv_
+
+def tiv_from_string2(slist):
+    """
+    Example: tiv_from_string(['1999-05-05T12:00:00.999','1999-05-06T12:00:00.999'])
+    """
+    forward_resolution=48
+    reverse_resolution=48
+    t_ = numpy.array(slist, dtype='datetime64[ms]').astype(numpy.int64)
+    t0 = t_[0]
+    t2 = t_[1]
+    t1 = 0.5*(t0+t2)
+    t_ = numpy.array([t0,t1,t2])
+    tivs = pystare.from_ms_since_epoch_utc(t_.astype(numpy.int64),forward_res=forward_resolution,reverse_res=reverse_resolution)
+    tiv_ = pystare.from_temporal_triple(tivs)[0]
+    return tiv_
+
+def format_tiv(tiv):
+    return hex16(tiv),tiv_utc_to_string(numpy.array([numpy.int64(tiv)]))
+
+def bitmask(start_stop):
+    start = start_stop[0]
+    stop  = start_stop[1]
+    mask = 1
+    for i in range(stop,0,-1):
+        if i > start:
+            mask = mask * 2 + 1
+        else:
+            mask = mask * 2
+    return numpy.uint64(mask)
+
+# Hierarchical Calendrical Partitioning Tools
+
+import numbers
+
+class hcp_:
+    def __init__(self):
+        self.field_definitions_raw = \
+          [
+              (False,(0,13),'temporal location mask', 2**14 - 1) # The max value of the mask has no meaning for the tiv, just a convienent place...
+          ,(True,(50,62),'year',2**13 - 1)
+          ,(True,(46,49),'month',13)
+          ,(True,(44,45),'week',3)
+          ,(True,(41,43),'day',6)
+          ,(True,(36,40),'hour',23)
+          ,(True,(30,35),'minute',59)
+          ,(True,(24,29),'second',59)
+          ,(True,(14,23),'millisecond',999)
+          ,(True,(0,13), 'support mask',2**14 - 1)
+          ,(True,(8,13), 'forward resolution',48) # max legal is 63, but 49-63 aren't meaningful.
+          ,(True,(2,7),  'reverse resolution',48)
+          ,(True,(0,1),  'scale indicator',3) # max value is 3, only type=2 is implemented
+          ]
+        # Temporal field key names in increasing order of fineness.
+        self.temporal_fields = ['year','month','week','day','hour','minute','second','millisecond']
+        self.support_fields  = ['support mask','forward resolution','reverse resolution','scale indicator']
+        self.masks = {}
+        self.field_definitions = {}
+        self.max_valid = {}
+        self.offsets = {}
+        self.ranges  = {}
+        self.extractors = {}
+        for k in self.field_definitions_raw:
+            self.field_definitions[k[2]] = k
+            self.masks[k[2]] = bitmask(k[1]) if k[0] else ~bitmask(k[1])
+            self.max_valid[k[2]] = numpy.uint64(k[3])
+            self.offsets[k[2]] = numpy.uint64(k[1][0])
+            self.ranges[k[2]]  = numpy.uint64(k[1][:])
+            self.extractors[k[2]] = self.make_extractor(k[2])
+        self.boy_tivs_c = {}
+        self.eoy_tivs_c = {}
+        self.boy_tivs_n = {}
+        self.eoy_tivs_n = {}
+        self.setfields = {}
+        self.setsupportfields = {}
+        for k in self.temporal_fields:
+            self.setfields[k] = self.make_setfield(k)
+        for k in self.support_fields:
+            self.setsupportfields[k] = self.make_setfield(k) # here's where the convience comes in
+        return
+    def boy_tiv_c(self,year):
+        try:
+            return self.boy_tivs_c[year]
+        except KeyError:
+            t_ = numpy.array(['%s-01-01T00:00:00.000'%year], dtype='datetime64[ms]')
+            tiv_ = pystare.from_ms_since_epoch_utc(t_.astype(numpy.int64))[0]
+            self.boy_tivs_c[year] = tiv_
+        return self.boy_tivs_c[year]
+    def eoy_tiv_c(self,year):
+        try:
+            return self.eoy_tivs_c[year]
+        except KeyError:
+            t_ = numpy.array(['%s-12-31T23:59:59.999'%year], dtype='datetime64[ms]')
+            tiv_ = pystare.from_ms_since_epoch_utc(t_.astype(numpy.int64))[0]
+            self.eoy_tivs_c[year] = tiv_
+        return self.eoy_tivs_c[year]
+    def boy_tiv_n(self,year):
+        try:
+            return self.boy_tivs_n[year]
+        except KeyError:
+            tiv_ = hcp.make_native({'year':year,'month':0,'week':0,'day':0,'hour':0,'minute':0,'second':0,'millisecond':0})
+            self.boy_tivs_n[year] = tiv_
+        return self.boy_tivs_n[year]
+    def eoy_tiv_n(self,year):
+        try:
+            return self.eoy_tivs_n[year]
+        except KeyError:
+            tiv1 = hcp.make_native({'year':year+1,'month':0,'week':0,'day':0,'hour':0,'minute':0,'second':0,'millisecond':0})
+            t_   = pystare.to_ms_since_epoch_utc(numpy.array([tiv1],dtype=numpy.int64)) - 1
+            tiv_ = pystare.from_ms_since_epoch_utc(t_)[0]
+            self.eoy_tivs_n[year] = tiv_
+        return self.eoy_tivs_n[year]
+    def make_native(self,fields=None,terminator=None):
+        """fields is a dictionary of form fields[fieldname] = fieldvalue.
+        terminator is either True or a resolution value 0-48, coarse to fine.
+        terminator==True=>maxvalue is set for all fields finer than the finest specified.
+        """
+        tiv = numpy.uint64(0)
+        for k,v in fields.items():
+            if v > self.max_valid[k]:
+                raise ValueError("Value %d for field %s exceeds maximum %d."%(v,k,self.max_valid[k]))
+            tiv = self.setfields[k](tiv,v)
+        if terminator is not None:
+            if terminator is True:
+                finest_field_index = -1
+                for k in fields.keys():
+                    finest_field_index = max(finest_field_index,self.temporal_fields.index(k))
+                try:
+                    resolution = 62-self.range[finest_field_index+1][1] # Max bit position of the next finer field
+                except IndexError:
+                    resolution = None # Oops...
+            else:
+                resolution = terminator
+            if resolution is not None:
+                tiv = self.make_terminator(tiv,terminator=resolution)
+        return tiv
+    def make_terminator(self,tiv,terminator=None):
+        if terminator is None:
+            raise ValueError("terminator parameter must be a resolution value 0..48.")
+        # assume we're given a bit value and set all finer bits
+        # Terminator is in resolution units, so 0-48 coarse to fine
+        # to convert to offset, use 62-terminator for a numeric terminator
+        if terminator == 48:
+            # 48 is a special case as it is at the finest level
+            # put on a hacky terminator stamp
+            tiv = self.setsupportfields['support mask'](tiv,self.max_valid['support mask'])
+            return tiv
+        finest_field_index = None
+        if terminator < 0 or 48 < terminator:
+            raise ValueError("terminator = %d offset (62-resolution = %d) out of bounds [62-0..62-48]"%(terminator,offset))
+        offset = 62 - terminator
+        fieldname  = None # containing the terminator resolution
+        for k,v in self.ranges.items():
+            if v[0] <= offset and offset <= v[1]:
+                fieldname = k
+                break
+        if fieldname is not None:
+            # Take care of the field in which the terminated resolution lies
+            # Note this approach will occasionally leave some "bubbles" in a terminator, which are not strictly needed.
+            # As valid tivs would still be smaller than an invalid bubble-less tiv terminator.
+            finest_field_index  = self.temporal_fields.index(fieldname)
+            field_range    = self.ranges[fieldname]
+            field_range[1] = offset 
+            one = numpy.uint64(1)
+            d = field_range[1] - field_range[0] + 1
+            mask = min(numpy.uint64(2)**d - 1,self.max_valid[fieldname])
+            # print(fieldname,d,mask,numpy.uint64(2)**d - 1,self.max_valid[fieldname])
+            field = hcp.extractors[fieldname](tiv)
+            tiv = self.setfields[fieldname](tiv,max(numpy.uint64(mask),field))
+            # max out the rest of the fields
+            for k in self.temporal_fields[finest_field_index+1:]:
+                # print('maxing ',k)
+                tiv = self.setfields[k](tiv,self.max_valid[k])
+        # put on a hacky terminator stamp
+        tiv = self.setsupportfields['support mask'](tiv,self.max_valid['support mask'])
+        return tiv
+    def clear_resolution_and_finer(self,tiv,resolution):
+        finest_field_index = None
+        offset = 62 - resolution
+        fieldname = None
+        for k,v in self.ranges.items():
+            if v[0] <= offset and offset <= v[1]:
+                fieldname = k
+                break       
+        if fieldname is not None:
+            finest_field_index  = self.temporal_fields.index(fieldname)
+            field_range    = self.ranges[fieldname]
+            field_range[1] = offset 
+            one = numpy.uint64(1)
+            d = field_range[1] - field_range[0] + 1
+            mask = min(numpy.uint64(2)**d - 1,self.max_valid[fieldname])
+            field = hcp.extractors[fieldname](tiv)
+            tiv = self.setfields[fieldname](tiv,~numpy.uint64(mask) & field)
+            # zero out the rest of the fields
+            for k in self.temporal_fields[finest_field_index+1:]:
+                tiv = self.setfields[k](tiv,0)
+        tiv = self.setsupportfields['support mask'](tiv,0)
+        return tiv
+    def tiv_from_terminator(self,tiv):
+        return self.setsupportfields['support mask'](tiv,1)
+    def make_mask(self,strs):
+        mask = numpy.uint64(0)
+        for s in strs:
+            mask = mask | self.masks[s]
+        return mask
+    def make_extractor(self,fieldname):
+        return lambda tiv: (numpy.uint64(tiv) & self.masks[fieldname]) >> numpy.uint64(self.field_definitions[fieldname][1][0])
+    def year_extractor(self,tiv):
+        fieldname = 'year'
+        return (numpy.uint64(tiv) & self.masks[fieldname]) >> numpy.uint64(self.field_definitions[fieldname][1][0])
+    def make_incrementor(self,fieldname,n=1):
+        one = numpy.uint64(1)
+        if n > 2^(self.field_definitions[fieldname][1][1] - self.field_definitions[fieldname][1][0]):
+            print('warning increment may be too large for the field: ',fieldname,n,'>2^',self.field_definitions[fieldname])
+        return lambda tiv: (numpy.uint64(tiv) & self.masks[fieldname]) + (one << numpy.uint64(self.field_definitions[fieldname][1][0]))
+    # def make_decrementor(self,fieldname,n=1): is tedious to implement
+    def make_setfield(self,fieldname):
+        return lambda tiv,n: (numpy.uint64(tiv) & ~self.masks[fieldname]) | (numpy.uint64(n) << numpy.uint64(self.field_definitions[fieldname][1][0]))
+    def get_temporal_native_fields(self,tiv):
+        fields = {'type':'hcp native fields'}
+        for f in self.temporal_fields:
+            fields[f] = self.extractors[f](tiv)
+        return fields
+    def ceil_fields(self,tiv):
+        for f in self.temporal_fields:
+#            print(type(tiv),type(self.masks[f]),type(numpy.uint64(numpy.uint64(tiv) & numpy.uint64(self.masks[f]))),type(int(self.offsets[f])))
+            f_value = (tiv & self.masks[f]) >> self.offsets[f]
+            f_value = min(f_value,self.max_valid[f])
+            f_value = f_value << self.offsets[f]
+            tiv = (numpy.uint64(tiv) & ~self.masks[f]) | f_value
+        return tiv
+    def alias_check(self,tiv):
+        "Checks to see if tiv.year might be aliased to another calendar year (due to non-carried date arithmetic). Mostly this occurs in month 13."
+        t_ = pystare.to_ms_since_epoch_utc([tiv])[0].astype('datetime64[ms]')
+        tiv1_ = pystare.from_ms_since_epoch_utc([t_.astype(numpy.int64)])[0]
+        return self.year_extractor(tiv) != self.year_extractor(tiv1_),tiv1_
+    def dealias_eoy(self,tiv):
+        "Return tiv from next year if this one is aliased. Use utc[ms] approximation."
+        if self.alias_check1(tiv):
+            t_ = pystare.to_ms_since_epoch_utc([tiv])[0].astype('datetime64[ms]')
+            tiv1_ = pystare.from_ms_since_epoch_utc([t_.astype(numpy.int64)])[0]
+            return tiv1_
+        return tiv
+    
+# Make one
+hcp = hcp_()
+
+
+# Temporal Pod Tools
+
+def make_tpod_tuple(tiv,resolution):
+    "Make a tpod tuple of form (tiv_start,resolution). tiv_start lacks the support info of a true tiv."
+    return hcp.clear_resolution_and_finer(tiv,resolution+1),resolution
+
+def tpod_terminator(tpod):
+    "Return a terminator for a tpod tuple."
+    return hcp.make_terminator(tpod[0],terminator=tpod[1]+1)
+
+def format_tpod(tivres,s=None):
+    "Return a formatted tpod string from a tpod tuple."
+    s = '_' if s is None else s
+    return hex16(tivres[0])+s+str(tivres[1])
+
+def parse_formatted_tpod(str,s=None):
+    "Parse a formatted tpod string and return a tpod tuple."
+    s = '_' if s is None else s
+    i_ = str.split(s)
+    return (int(i_[0],16),int(i_[1]))
+
+def expanded_tiv(tiv):
+    "Construct the three tivs associated with a tiv neighborhood."
+    return numpy.concatenate(pystare.temporal.to_temporal_triple_ms(numpy.array([tiv])))
+
+def expanded_tiv_to_string(tiv):
+    "Format the three tivs associated with a tiv neighborhood."
+    return tiv_utc_to_string(expanded_tiv(tiv))
+
+def format_expanded_tiv(tiv):
+    "Format the triple-tivs associated with a tiv neighborhood."
+    return list(map(hex16,expanded_tiv(tiv)))
+
+def pods_in_query(tiv,pod_resolution):
+    "Return a list of pod-tuples contained in the query."
+    tiv3 = expanded_tiv(tiv)
+    pod0 = make_tpod_tuple(tiv3[0],pod_resolution)
+    pod2 = make_tpod_tuple(tiv3[2],pod_resolution)
+    if pod0[0] == pod2[0]:
+        return [pod0]
+    offset    = 62 - (pod_resolution)
+    increment = numpy.uint64( 1 << offset )
+    pods = [pod0]
+    tiv_ = pod0[0]
+    tiv_ += increment
+    while tiv_ < pod2[0]:
+        pods.append((tiv_,pod_resolution))
+        tiv_ += increment
+    pods.append(pod2)
+    return pods
 
