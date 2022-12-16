@@ -975,6 +975,9 @@ def bitmask(start_stop):
 import numbers
 
 class hcp_:
+    """
+    A scaffold of helper functions and information about the temporal encoding to aid TIV manipulations.
+    """
     def __init__(self):
         self.field_definitions_raw = \
           [
@@ -1020,6 +1023,7 @@ class hcp_:
             self.setsupportfields[k] = self.make_setfield(k) # here's where the convience comes in
         return
     def boy_tiv_c(self,year):
+        """TIV for the calendrical beginning of year."""
         try:
             return self.boy_tivs_c[year]
         except KeyError:
@@ -1028,6 +1032,7 @@ class hcp_:
             self.boy_tivs_c[year] = tiv_
         return self.boy_tivs_c[year]
     def eoy_tiv_c(self,year):
+        """TIV for the calendrical end of the year."""
         try:
             return self.eoy_tivs_c[year]
         except KeyError:
@@ -1036,6 +1041,7 @@ class hcp_:
             self.eoy_tivs_c[year] = tiv_
         return self.eoy_tivs_c[year]
     def boy_tiv_n(self,year):
+        """TIV for the native beginning of year."""
         try:
             return self.boy_tivs_n[year]
         except KeyError:
@@ -1043,6 +1049,7 @@ class hcp_:
             self.boy_tivs_n[year] = tiv_
         return self.boy_tivs_n[year]
     def eoy_tiv_n(self,year):
+        """TIV for the native end of year."""
         try:
             return self.eoy_tivs_n[year]
         except KeyError:
@@ -1052,9 +1059,20 @@ class hcp_:
             self.eoy_tivs_n[year] = tiv_
         return self.eoy_tivs_n[year]
     def make_native(self,fields=None,terminator=None):
-        """fields is a dictionary of form fields[fieldname] = fieldvalue.
+        """Construct a TIV from direct specification of bit-field values in native format.
+
+        The native hierarchical representation is to be contrasted with the traditional representation. 
+        The native representation is based on 28-day months to regularize the tree structure and ease
+        some TIV arithmetic.
+
+        fields is a dictionary of form fields[fieldname] = fieldvalue.
         terminator is either True or a resolution value 0-48, coarse to fine.
         terminator==True=>maxvalue is set for all fields finer than the finest specified.
+
+        Example:
+        tiv_ = hcp.make_native({'year':2022,'month':0,'week':0,'day':0,'hour':0,'minute':0,'second':0,'millisecond':0})
+        is the native beginning of 2022, which is actually in late December of 2021.
+
         """
         tiv = numpy.uint64(0)
         for k,v in fields.items():
