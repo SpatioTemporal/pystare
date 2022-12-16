@@ -1105,9 +1105,9 @@ class hcp_:
             tiv = self.setsupportfields['support mask'](tiv,self.max_valid['support mask'])
             return tiv
         finest_field_index = None
+        offset = 62 - terminator
         if terminator < 0 or 48 < terminator:
             raise ValueError("terminator = %d offset (62-resolution = %d) out of bounds [62-0..62-48]"%(terminator,offset))
-        offset = 62 - terminator
         fieldname  = None # containing the terminator resolution
         for k,v in self.ranges.items():
             if v[0] <= offset and offset <= v[1]:
