@@ -261,6 +261,7 @@ def to_neighbors(sids):
 
     Returns
     --------
+    first 3 across edges, next 9 across vertices
 
     Examples
     --------
@@ -1009,7 +1010,7 @@ def speedy_subset(sids_left, sids_right, values_left=None):
     top_bound = pystare.spatial_clear_to_resolution(sids_right.max())
     level = pystare.spatial_resolution(top_bound)
     top_bound += pystare.spatial_increment_from_level(level)
-    bottom_bound = sids_right.min()
+    bottom_bound = pystare.spatial_clear_to_resolution(sids_right.min())
     candidate_sids = sids_left[(sids_left >= bottom_bound) * (sids_left <= top_bound)]
     if values_left is not None:
         values = values_left[(sids_left >= bottom_bound) * (sids_left <= top_bound)]

@@ -62,9 +62,11 @@ class MainTest(unittest.TestCase):
             print_((res))
     
         print_(())
-        tiv    = 2256562898056779093
+        tiv = 2256562898056779093
         tiv_lb_ms = pystare.lower_bound_ms(np.array([tiv], dtype=np.int64))
         tiv_lb_tai = pystare.lower_bound_tai(np.array([tiv], dtype=np.int64))
+
+
         print_(('tiv type: ',type(tiv)))
         print_(('lb type ms:  ',type(tiv_lb_ms)))
 
