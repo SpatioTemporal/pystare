@@ -95,15 +95,18 @@ def now(forward_resolution=48, reverse_resolution=48):
     tiv = pystare.from_ms_since_epoch_utc(now, forward_resolution, reverse_resolution)[0]
     return tiv
 
+def coarsest_resolution_finer_or_equal_timedelta(timedelta):
+    ms = timedelta.total_seconds() * 1000
+    return coarsest_resolution_finer_or_equal_ms(ms)
 
-def coarsest_resolution_finer_or_equal_ms(ms):
+def coarsest_resolution_finer_or_equal_ms(milliseconds):
     """ Converts milliseconds to finer or equal STARE temporal resolution.
 
     Resolutions go from 0 being coarsest to 48 being the finest.
     Bits are numbered in the opposite direction.
     The biggest year bit is bit 62. The smallest millisecond bit is at bit 14. So we have:
 
-    .. tabularcolumns:: |R|R|R|R|R|R|
+    .. tabularcolumns:: |r|r|r|r|r|r|
     +----------+-------------+-------+-----+------+----------------------------+
     |Field     | Resolutions | Start | End | Size | Unit                       |
     +==========+=============+=======+=====+======+============================+
@@ -134,7 +137,7 @@ def coarsest_resolution_finer_or_equal_ms(ms):
 
     Parameters
     ----------
-    ms: 1D array of ints
+    milliseconds: 1D array of ints
         resolution in milliseconds
 
     Returns
@@ -156,7 +159,11 @@ def coarsest_resolution_finer_or_equal_ms(ms):
     array([48, 38, 32, 26, 21, 12])
 
     """
-    resolutions = pystare.core._coarsest_resolution_finer_or_equal_milliseconds(ms)
+    milliseconds = numpy.array(milliseconds)
+    if milliseconds.size==1:
+        resolutions = pystare.core._coarsest_resolution_finer_or_equal_milliseconds(numpy.array([milliseconds]))[0]
+    else:
+        resolutions = pystare.core._coarsest_resolution_finer_or_equal_milliseconds(milliseconds)
     return resolutions
 
 
@@ -816,8 +823,12 @@ def lower_bound_ms(tiv):
     """
     TODO
     """
+    if tiv.size==1:
+        tiv = numpy.array([tiv])
     tret = tiv.copy()
     pystare.core._scidbLowerBoundMS(tiv, tret)
+    if tiv.size == 1:
+        tret=tret[0]
     return tret
 
 
@@ -849,7 +860,6 @@ def from_temporal_triple(triple, include_bounds=True):
     tiv = numpy.zeros([1], dtype=numpy.int64)
     tiv[0] = pystare.core._scidbNewTemporalValue(numpy.array(triple, dtype=numpy.int64), include_bounds)[0]
     return tiv
-
 
 def temporal_value_intersection_if_overlap(indices1, indices2):
     """Calculate intersection temporal index value element-by-element if they overlap.
@@ -906,18 +916,71 @@ def temporal_contains_instant(indices1, indices2):
 def hex16(i):
     return "0x%016x"%i
 
-
 def tiv_utc_to_string(tivs):
+    if tivs.size==1:
+        tivs = numpy.array([tivs])
     return numpy.datetime_as_string(pystare.to_ms_since_epoch_utc(tivs).astype('datetime64[ms]'))
 
-
 def tiv_from_datetime(datetime_object, forward_resolution=48, reverse_resolution=48):
-#    now = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
-    datetime_object = datetime_object.strftime("%Y-%m-%dT%H:%M:%S")
-    datetime_object = numpy.array([datetime_object], dtype='datetime64[ms]')
-    datetime_object = datetime_object.astype(numpy.int64)
-    tiv = pystare.from_ms_since_epoch_utc(datetime_object, forward_resolution, reverse_resolution)[0]
-    return tiv
+    """
+    Converts datetimes to TIVs.
+
+    Accepts datetime.datetime or numpy.datetime64 and lists and arrays thereof
+
+    Examples:
+    ------------
+    >>> import numpy, datetime
+    >>> dt = datetime.datetime(1985,9,3)
+    >>> pystare.tiv_from_datetime(dt)
+    2235527041980051649
+
+    >>> dt64 = numpy.datetime64(dt)
+    >>> pystare.tiv_from_datetime(dt64)
+    2235527041980051649
+
+    >>> dts = [datetime.datetime(1985,9,3), datetime.datetime(1985,9,3, 11,30)]
+    >>> pystare.tiv_from_datetime(dts)
+    array([2235527041980051649, 2235527830106550465])
+    """
+    ms_since_epoch = numpy.array(datetime_object, dtype='datetime64[ms]').astype(numpy.int64)
+    if ms_since_epoch.size == 1:
+        tivs = pystare.from_ms_since_epoch_utc([ms_since_epoch], forward_resolution, reverse_resolution)[0]
+    else:
+        tivs = pystare.from_ms_since_epoch_utc(ms_since_epoch, forward_resolution, reverse_resolution)
+    return tivs
+
+
+def tiv_from_datetimes(start, end):
+    """
+    Creates TIVs covering starts and ends
+
+    Accepts datetime.datetime or numpy.datetime64 and lists and arrays thereof
+
+    Examples:
+    -----------
+    >>> import pystare
+    >>> start = datetime.datetime(1985,9,3)
+    >>> end = datetime.datetime(1985,12,24)
+    >>> tiv = pystare.tiv_from_datetimes(start, end)
+    >>> lower_bound_tiv = pystare.lower_bound_ms(tiv)
+    >>> pystare.tiv_utc_to_string(lower_bound_tiv)
+    array(['1985-09-03T00:00:00.000'], dtype='<U42')
+    """
+
+    start = numpy.array(start).astype('datetime64[ms]').astype(numpy.int64)
+    end = numpy.array(end).astype('datetime64[ms]').astype(numpy.int64)
+    duration = (end - start)
+    midpoint = start + duration / 2
+
+    tiv_start = tiv_from_datetime(start)
+    tiv_mid = tiv_from_datetime(midpoint)
+    tiv_end = tiv_from_datetime(end)
+    if tiv_start.size == 1:
+        tivs = numpy.array([tiv_start, tiv_mid, tiv_end])
+        return pystare.from_temporal_triple(tivs)[0]
+    else:
+        tivs = numpy.stack((tiv_start, tiv_mid, tiv_end), axis=1)
+        return numpy.array(list(map(pystare.from_temporal_triple, tivs)))
 
 def tiv_from_datetime2(dts):
     """
@@ -925,7 +988,16 @@ def tiv_from_datetime2(dts):
     """
     return tiv_from_string2([dts[0].strftime("%Y-%m-%dT%H:%M:%S"),dts[1].strftime("%Y-%m-%dT%H:%M:%S")])
 
+def tiv_from_tivs(tiv1, tiv2):
+    """
+    Creates a TIV that covers tiv1 and tiv2
+    """
+    return tiv_from_tiv2([tiv1, tiv2])
+
 def tiv_from_tiv2(tivs):
+    """
+    Creates a TIV that covers element 0 and element 1 of tivs
+    """
     dts = pystare.to_ms_since_epoch_utc(tivs)
     dtc = numpy.int64(sum(dts)/2)
     tc  = pystare.from_ms_since_epoch_utc([dtc])
@@ -950,10 +1022,10 @@ def tiv_from_string2(slist):
     forward_resolution = 48
     reverse_resolution = 48
     t_ = numpy.array(slist, dtype='datetime64[ms]').astype(numpy.int64)
-    t0 = t_[0]
-    t2 = t_[1]
-    t1 = 0.5*(t0+t2)
-    t_ = numpy.array([t0,t1,t2])
+    start = t_[0]
+    end = t_[1]
+    midpoint = 0.5*(start+end)
+    t_ = numpy.array([start, midpoint, end])
     tivs = pystare.from_ms_since_epoch_utc(t_.astype(numpy.int64),
                                            forward_resolution=forward_resolution,
                                            reverse_resolution=reverse_resolution)
