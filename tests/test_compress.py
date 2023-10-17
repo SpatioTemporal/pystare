@@ -52,5 +52,5 @@ expanded_stare_test = numpy.array([0x22ff8a000000000b, 0x22ff8a200000000b,
 def test_bug27():
     compressed = pystare.to_compressed_range(sids)
     expanded = pystare.expand_intervals(compressed, -1, False)
-    numpy.testing.assert_array_equal(expanded, expanded_stare_test)
+    assert numpy.testing.assert_array_equal(expanded, expanded_stare_test)
 
