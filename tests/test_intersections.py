@@ -8,8 +8,7 @@ lon = numpy.array([45, 60, 10], dtype=numpy.double)
 
 def triangulate(i0, i1, i2):
     "Prepare data structures for tri.Triangulate."
-    # print('triangulating...')
-    # i0,i1,i2,ic = ps.to_vertices(indices)
+
     i0lat, i0lon = pystare.to_latlon(i0)
     i1lat, i1lon = pystare.to_latlon(i1)
     i2lat, i2lon = pystare.to_latlon(i2)
@@ -34,7 +33,7 @@ def triangulate(i0, i1, i2):
 
 def triangulate1(lats,lons):
     "Prepare data for tri.Triangulate."
-    # print('triangulating1...')
+
     intmat = []
     npts = int(len(lats)/3)
     k = 0
