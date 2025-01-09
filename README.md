@@ -128,10 +128,10 @@ datetime = numpy.array(['1970-01-01T00:00:00',
 print(datetime)
 print(datetime.astype(numpy.int64))
     
-index = pystare.from_utc(datetime.astype(numpy.int64), 6)
+index = pystare.from_ms_since_epoch_utc(datetime.astype(numpy.int64), 6, 6)
 print([hex(i) for i in index])
 
-index = pystare.from_utc(datetime.astype(numpy.int64), 27)
+index = pystare.from_ms_since_epoch_utc(datetime.astype(numpy.int64), 27, 27)
 print([hex(i) for i in index])
 
 ```
