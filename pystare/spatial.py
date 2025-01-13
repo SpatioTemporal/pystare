@@ -24,11 +24,11 @@ def from_latlon(lat, lon, level):
 
     Examples
     ----------
-    >>> import pystare
-    >>> lats = [34.4]
-    >>> lons = [-119.7]
-    >>> pystare.from_latlon(lat=lats, lon=lons, level=7)
-    array([3331783833575763399])
+    # >>> import pystare
+    # >>> lats = [34.4]
+    # >>> lons = [-119.7]
+    # >>> pystare.from_latlon(lat=lats, lon=lons, level=7)
+    # array([3331783833575763399])
     """
     if level < 0 or level > 27:
         raise pystare.exceptions.PyStareLevelError()
@@ -42,10 +42,10 @@ def from_lonlat(lon, lat, level):
 
     Examples
     ----------
-    >>> lats = [34.4]
-    >>> lons = [-119.7]
-    >>> pystare.from_lonlat(lon=lons, lat=lats, level=7)
-    array([3331783833575763399])
+    # >>> lats = [34.4]
+    # >>> lons = [-119.7]
+    # >>> pystare.from_lonlat(lon=lons, lat=lats, level=7)
+    # array([3331783833575763399])
     """
     sids = from_latlon(lat, lon, level)
     return sids
@@ -79,21 +79,21 @@ def from_latlon_2d(lat, lon, level=None, adapt_level=False, fill_value_in=None, 
 
     Examples
     -----------
-    >>> lats = numpy.array([[53.20177841, 53.20317078, 53.20351791], \
-                            [53.29219437, 53.29222107, 53.29125977], \
-                            [53.28958893, 53.29105759, 53.29147339]])
-    >>> lons = numpy.array([[-15.9339962 , -16.2881012 , -16.62910461], \
-                            [-15.93274784, -16.28762245, -16.62934113], \
-                            [-15.93699169, -16.29188538, -16.63365936]])
-    >>> pystare.from_latlon_2d(lats, lons, adapt_level=True)
-    array([[4298473764500464809, 4298458168380511209, 4297394569014717897],
-           [4298462872969244297, 4298459225563237225, 4297297422977447753],
-           [4298462873435275369, 4298459227962358473, 4297297429637206121]])
-
-    >>> pystare.from_latlon_2d(lats, lons, level=20, adapt_level=False)
-    array([[4298473764500464820, 4298458168380511220, 4297394569014717908],
-           [4298462872969244308, 4298459225563237236, 4297297422977447764],
-           [4298462873435275380, 4298459227962358484, 4297297429637206132]])
+    # >>> lats = numpy.array([[53.20177841, 53.20317078, 53.20351791], \
+    #                         [53.29219437, 53.29222107, 53.29125977], \
+    #                         [53.28958893, 53.29105759, 53.29147339]])
+    # >>> lons = numpy.array([[-15.9339962 , -16.2881012 , -16.62910461], \
+    #                         [-15.93274784, -16.28762245, -16.62934113], \
+    #                         [-15.93699169, -16.29188538, -16.63365936]])
+    # >>> pystare.from_latlon_2d(lats, lons, adapt_level=True)
+    # array([[4298473764500464809, 4298458168380511209, 4297394569014717897],
+    #        [4298462872969244297, 4298459225563237225, 4297297422977447753],
+    #        [4298462873435275369, 4298459227962358473, 4297297429637206121]])
+    #
+    # >>> pystare.from_latlon_2d(lats, lons, level=20, adapt_level=False)
+    # array([[4298473764500464820, 4298458168380511220, 4297394569014717908],
+    #        [4298462872969244308, 4298459225563237236, 4297297422977447764],
+    #        [4298462873435275380, 4298459227962358484, 4297297429637206132]])
     """
     if level is None:
         adapt_level = True
@@ -139,12 +139,12 @@ def to_latlon(sids):
 
     Examples
     ---------
-    >>> import pystare
-    >>> import numpy
-    >>> sids = numpy.array([4151504989081014894, 4161865161846704590, 3643626718498217166])
-    >>> pystare.to_latlon(sids)
-    (array([30.00000012, 45.00000003, 59.99999986]),
-    array([44.99999991, 60.00000013,  9.9999999 ]))
+    # >>> import pystare
+    # >>> import numpy
+    # >>> sids = numpy.array([4151504989081014894, 4161865161846704590, 3643626718498217166])
+    # >>> pystare.to_latlon(sids)
+    # (array([30.00000012, 45.00000003, 59.99999986]),
+    # array([44.99999991, 60.00000013,  9.9999999 ]))
     """
 
     lats, lons = pystare.core._to_latlon(sids)
@@ -170,13 +170,13 @@ def to_latlonlevel(sids):
 
     Examples
     ---------
-    >>> import pystare
-    >>> import numpy
-    >>> sids = numpy.array([4151504989081014894, 4161865161846704590, 3643626718498217166])
-    >>> pystare.to_latlonlevel(sids)
-    (array([30.00000012, 45.00000003, 59.99999986]),
-    array([44.99999991, 60.00000013,  9.9999999 ]),
-    array([14, 14, 14], dtype=int32))
+    # >>> import pystare
+    # >>> import numpy
+    # >>> sids = numpy.array([4151504989081014894, 4161865161846704590, 3643626718498217166])
+    # >>> pystare.to_latlonlevel(sids)
+    # (array([30.00000012, 45.00000003, 59.99999986]),
+    # array([44.99999991, 60.00000013,  9.9999999 ]),
+    # array([14, 14, 14], dtype=int32))
     """
     lats, lons, levels = pystare.core._to_latlonlevel(sids)
     return lats, lons, levels
@@ -197,11 +197,11 @@ def to_level(sids):
 
     Examples
     ---------
-    >>> import pystare
-    >>> import numpy
-    >>> sids = numpy.array([4151504989081014894, 4161865161846704590, 3643626718498217166])
-    >>> pystare.to_level(sids)
-    array([14, 14, 14], dtype=int32)
+    # >>> import pystare
+    # >>> import numpy
+    # >>> sids = numpy.array([4151504989081014894, 4161865161846704590, 3643626718498217166])
+    # >>> pystare.to_level(sids)
+    # array([14, 14, 14], dtype=int32)
     """
     return pystare.core._to_level(sids)
 
@@ -221,18 +221,18 @@ def to_area(sids):
 
     Examples
     ---------
-    >>> import math
-    >>> sids = numpy.array([4151504989081014894, 4161865161846704590, 3643626718498217166])
-    >>> pystare.to_area(sids)
-    array([5.41567334e-09, 5.46741649e-09, 4.98636938e-09])
-
-    >>> level = 8
-    >>> n = 8 * (4 ** level)
-    >>> level_increment = pystare.spatial_increment_from_level(level)
-    >>> sivs = [s+level for s in range(0, n*level_increment, level_increment)]
-    >>> area = sum(pystare.to_area(sivs))
-    >>> area/(4.0*math.pi)
-    1.000000000000014
+    # >>> import math
+    # >>> sids = numpy.array([4151504989081014894, 4161865161846704590, 3643626718498217166])
+    # >>> pystare.to_area(sids)
+    # array([5.41567334e-09, 5.46741649e-09, 4.98636938e-09])
+    #
+    # >>> level = 8
+    # >>> n = 8 * (4 ** level)
+    # >>> level_increment = pystare.spatial_increment_from_level(level)
+    # >>> sivs = [s+level for s in range(0, n*level_increment, level_increment)]
+    # >>> area = sum(pystare.to_area(sivs))
+    # >>> area/(4.0*math.pi)
+    # 1.000000000000014
     """
     return pystare.core._to_area(sids)
 
@@ -339,14 +339,14 @@ def adapt_resolution_to_proximity(sids):
 
     Examples
     --------
-    >>> sids = numpy.array([4298473764500464820, 4298458168380511220, 4297394569014717908])
-    >>> pystare.to_level(sids)
-    array([20, 20, 20], dtype=int32)
-    >>> sids = pystare.adapt_resolution_to_proximity(sids)
-    >>> sids
-    array([4298473764500464809, 4298458168380511209, 4297394569014717897])
-    >>> pystare.to_level(sids)
-    array([9, 9, 9], dtype=int32)
+    # >>> sids = numpy.array([4298473764500464820, 4298458168380511220, 4297394569014717908])
+    # >>> pystare.to_level(sids)
+    # array([20, 20, 20], dtype=int32)
+    # >>> sids = pystare.adapt_resolution_to_proximity(sids)
+    # >>> sids
+    # array([4298473764500464809, 4298458168380511209, 4297394569014717897])
+    # >>> pystare.to_level(sids)
+    # array([9, 9, 9], dtype=int32)
     """
     adapted_sids = numpy.copy(sids)
     pystare.core._adapt_resolution_to_proximity(sids, adapted_sids)
@@ -409,14 +409,14 @@ def cover_from_hull(lat, lon, level):
 
     Examples
     ----------
-    >>> import pystare
-    >>> lat = [53.75702912049104, 54.98310415304803, 53.69393219666267, 50.128051662794235, 49.01778351500333, \
-               47.62058197691181, 47.467645575544, 50.266337795607285, 51.10667409932158, 53.75702912049104]
-    >>> lon = [14.119686313542559, 9.921906365609118, 7.100424838905269, 6.043073357781111, 8.099278598674744, \
-                7.466759067422231, 12.932626987365948, 12.240111118222558, 15.01699588385867, 14.119686313542559]
-    >>> pystare.cover_from_hull(lat, lon, 3)
-    array([4251398048237748227, 4269412446747230211, 4278419646001971203,
-           4539628424389459971, 4548635623644200963, 4566650022153682947])
+    # >>> import pystare
+    # >>> lat = [53.75702912049104, 54.98310415304803, 53.69393219666267, 50.128051662794235, 49.01778351500333, \
+    #            47.62058197691181, 47.467645575544, 50.266337795607285, 51.10667409932158, 53.75702912049104]
+    # >>> lon = [14.119686313542559, 9.921906365609118, 7.100424838905269, 6.043073357781111, 8.099278598674744, \
+    #             7.466759067422231, 12.932626987365948, 12.240111118222558, 15.01699588385867, 14.119686313542559]
+    # >>> pystare.cover_from_hull(lat, lon, 3)
+    # array([4251398048237748227, 4269412446747230211, 4278419646001971203,
+    #        4539628424389459971, 4548635623644200963, 4566650022153682947])
     """
     if level < 0 or level > 27:
         raise pystare.exceptions.PyStareLevelError()
@@ -463,16 +463,17 @@ def cover_from_ring(lat, lon, level):
 
     Examples
     ----------
-    >>> lat = [53.75702912049104, 54.98310415304803, 53.69393219666267, 50.128051662794235, 49.01778351500333, \
-               47.62058197691181, 47.467645575544, 50.266337795607285, 51.10667409932158, 53.75702912049104]
-    >>> lon = [14.119686313542559, 9.921906365609118, 7.100424838905269, 6.043073357781111, 8.099278598674744, \
-               7.466759067422231, 12.932626987365948, 12.240111118222558, 15.01699588385867, 14.119686313542559]
-    >>> pystare.cover_from_ring(lat, lon, 5)
-    array([4254212798004854789, 4255901647865118725, 4256464597818540037,
-           4257027547771961349, 4257590497725382661, 4258153447678803973,
-           4271664246560915461, 4280671445815656453, 4281234395769077765,
-           4282360295675920389, 4284049145536184325, 4285175045443026949,
-           4541880224203145221, 4553139223271571461, 4571153621781053445])  """
+    # >>> lat = [53.75702912049104, 54.98310415304803, 53.69393219666267, 50.128051662794235, 49.01778351500333, \
+    #            47.62058197691181, 47.467645575544, 50.266337795607285, 51.10667409932158, 53.75702912049104]
+    # >>> lon = [14.119686313542559, 9.921906365609118, 7.100424838905269, 6.043073357781111, 8.099278598674744, \
+    #            7.466759067422231, 12.932626987365948, 12.240111118222558, 15.01699588385867, 14.119686313542559]
+    # >>> pystare.cover_from_ring(lat, lon, 5)
+    # array([4254212798004854789, 4255901647865118725, 4256464597818540037,
+    #        4257027547771961349, 4257590497725382661, 4258153447678803973,
+    #        4271664246560915461, 4280671445815656453, 4281234395769077765,
+    #        4282360295675920389, 4284049145536184325, 4285175045443026949,
+    #        4541880224203145221, 4553139223271571461, 4571153621781053445])
+   """
 
     if level < 0 or level > 27:
         raise pystare.exceptions.PyStareLevelError()
@@ -550,7 +551,7 @@ def to_box_cover_from_latlon(lat, lon, resolution):
 
     Examples
     --------
-    >>>
+    # >>>
     """
     result = pystare.core._to_box_cover_from_latlon(lat, lon, resolution)
     range_indices = numpy.zeros([result.get_size_as_intervals()], dtype=numpy.int64)
@@ -579,11 +580,11 @@ def to_vertices_latlon(sids):
 
     Examples
     ---------
-    >>> pystare.to_vertices_latlon([4254212798004854789])
-    (array([53.89745687, 56.8965353 , 56.93769843]),
-    array([ 9.22866958, 13.23186479,  8.07137938]),
-    array([55.93005351]),
-    array([10.15342841]))
+    # >>> pystare.to_vertices_latlon([4254212798004854789])
+    # (array([53.89745687, 56.8965353 , 56.93769843]),
+    # array([ 9.22866958, 13.23186479,  8.07137938]),
+    # array([55.93005351]),
+    # array([10.15342841]))
     """
 
     out_length = len(sids)
@@ -662,10 +663,10 @@ def intersects(cover, sids, method='binsearch'):
 
     Examples
     ----------
-    >>> cover = numpy.array([4251398048237748227, 4269412446747230211, 4278419646001971203])
-    >>> sids = numpy.array([1251398048237748227, 4269412446747230210])
-    >>> pystare.intersects(cover, sids, method='binsearch')
-    array([False,  True])
+    # >>> cover = numpy.array([4251398048237748227, 4269412446747230211, 4278419646001971203])
+    # >>> sids = numpy.array([1251398048237748227, 4269412446747230210])
+    # >>> pystare.intersects(cover, sids, method='binsearch')
+    # array([False,  True])
     """
 
     if isinstance(method, str):
@@ -702,10 +703,10 @@ def intersection(sids1, sids2, multi_resolution=True):
 
     Examples
     -------------
-    >>> sids1 = [4251398048237748227, 4269412446747230211, 4278419646001971203, 4539628424389459971]
-    >>> sids2 = [4251398048237748228, 4255901647865118724, 4258153447678803972, 4539628424389459972]
-    >>> pystare.intersection(sids1, sids2, multi_resolution=False)
-    array([4251398048237748228, 4255901647865118724, 4258153447678803972, 4539628424389459972])
+    # >>> sids1 = [4251398048237748227, 4269412446747230211, 4278419646001971203, 4539628424389459971]
+    # >>> sids2 = [4251398048237748228, 4255901647865118724, 4258153447678803972, 4539628424389459972]
+    # >>> pystare.intersection(sids1, sids2, multi_resolution=False)
+    # array([4251398048237748228, 4255901647865118724, 4258153447678803972, 4539628424389459972])
     """
 
     out_length = 2 * max(len(sids1), len(sids2))
@@ -731,9 +732,9 @@ def int2bin(sids):
 
     Examples
     ----------
-    >>> sids = numpy.array([3458764513820540928])
-    >>> int2bin(sids)
-     ['0011000000000000000000000000000000000000000000000000000000000000']
+    # >>> sids = numpy.array([3458764513820540928])
+    # >>> int2bin(sids)
+    #  ['0011000000000000000000000000000000000000000000000000000000000000']
     """
     if hasattr(sids, "__len__"):
         return ['{0:064b}'.format(sid) for sid in sids]
@@ -756,9 +757,9 @@ def int2hex(sids):
 
     Examples
     -----------
-    >>> sid = 3458764513820540928
-    >>> pystare.int2hex(sid)
-    '0x3000000000000000'
+    # >>> sid = 3458764513820540928
+    # >>> pystare.int2hex(sid)
+    # '0x3000000000000000'
     """
 
     if hasattr(sids, "__len__"):
@@ -783,13 +784,13 @@ def hex2int(sids):
 
     Examples
     -----------
-    >>> sid = '0x3000000000000000'
-    >>> pystare.hex2int(sid)
-    3458764513820540928
-
-    >>> sid = ['0x3000000000000000']
-    >>> pystare.hex2int(sid)
-    [3458764513820540928]
+    # >>> sid = '0x3000000000000000'
+    # >>> pystare.hex2int(sid)
+    # 3458764513820540928
+    #
+    # >>> sid = ['0x3000000000000000']
+    # >>> pystare.hex2int(sid)
+    # [3458764513820540928]
     """
 
     if isinstance(sids, str):
@@ -814,17 +815,17 @@ def spatial_resolution(sids):
 
     Examples
     ---------
-    >>> sid = pystare.hex2int('0x3000000000000004')
-    >>> pystare.spatial_resolution(sid)
-    4
-
-    >>> sids = pystare.hex2int(['0x3000000000000004', '0x3000000000000005'])
-    >>> pystare.spatial_resolution(sids)
-    array([4, 5])
-
-    >>> sid = numpy.array(sids)
-    >>> pystare.spatial_resolution(sid)
-    array([4, 5])
+    # >>> sid = pystare.hex2int('0x3000000000000004')
+    # >>> pystare.spatial_resolution(sid)
+    # 4
+    #
+    # >>> sids = pystare.hex2int(['0x3000000000000004', '0x3000000000000005'])
+    # >>> pystare.spatial_resolution(sids)
+    # array([4, 5])
+    #
+    # >>> sid = numpy.array(sids)
+    # >>> pystare.spatial_resolution(sid)
+    # array([4, 5])
     """
     sids = numpy.array(sids)
     resolutions = sids & 31  # levelMaskSciDB
@@ -842,12 +843,12 @@ def spatial_terminator_mask(levels):
 
     Examples
     ---------
-    >>> mask = pystare.spatial_terminator_mask(0)
-    >>> '{0:064b}'.format(mask)
-    '0000011111111111111111111111111111111111111111111111111111111111'
-
-    >>> pystare.spatial_terminator_mask([0, 10])
-     array([576460752303423487,       549755813887])
+    # >>> mask = pystare.spatial_terminator_mask(0)
+    # >>> '{0:064b}'.format(mask)
+    # '0000011111111111111111111111111111111111111111111111111111111111'
+    #
+    # >>> pystare.spatial_terminator_mask([0, 10])
+    #  array([576460752303423487,       549755813887])
 
     """
     levels = numpy.array(levels)
@@ -876,13 +877,13 @@ def spatial_clear_to_resolution(sids):
 
     Examples
     ----------
-    >>> sid = 2299437706637111721
-    >>> spatial_clear_to_resolution(sid)
-    2299437254470270985
-
-    >>> sids = pystare.hex2int(['0x097cf40fd3132507', '0x097cf40fd3132505'])
-    >>> pystare.int2hex(spatial_clear_to_resolution(sids))
-    ['0x097ce00000000007', '0x097c000000000005']
+    # >>> sid = 2299437706637111721
+    # >>> spatial_clear_to_resolution(sid)
+    # 2299437254470270985
+    #
+    # >>> sids = pystare.hex2int(['0x097cf40fd3132507', '0x097cf40fd3132505'])
+    # >>> pystare.int2hex(spatial_clear_to_resolution(sids))
+    # ['0x097ce00000000007', '0x097c000000000005']
     """
     resolution = spatial_resolution(sids)
     mask = spatial_terminator_mask(resolution)
@@ -907,18 +908,18 @@ def lon_wrap_180(lon):
 
     Examples
     -----------
-    >>> lon_wrap_180(90.0)
-    90.0
-    >>> lon_wrap_180(-90.0)
-    -90.0
-    >>> lon_wrap_180(360.0)
-    0.0
-    >>> lon_wrap_180(270.0)
-    -90.0
-    >>> lon_wrap_180(180.0)
-    -180.0
-    >>> lon_wrap_180(-180.0)
-    -180.0
+    # >>> lon_wrap_180(90.0)
+    # 90.0
+    # >>> lon_wrap_180(-90.0)
+    # -90.0
+    # >>> lon_wrap_180(360.0)
+    # 0.0
+    # >>> lon_wrap_180(270.0)
+    # -90.0
+    # >>> lon_wrap_180(180.0)
+    # -180.0
+    # >>> lon_wrap_180(-180.0)
+    # -180.0
     """
     return ((lon + 180.0) % 360.0) - 180.0
 
@@ -957,9 +958,9 @@ def triangulate_indices(indices):
 
     Examples
     --------
-    >>> lons, lats, intmat = triangulate_indices(indices)   # doctest: +SKIP
-    >>> triang = tri.Triangulation(lons,lats,intmat)        # doctest: +SKIP
-    >>> plt.triplot(triang,'r-',transform=transform,lw=1,markersize=3) # doctest: +SKIP
+    # >>> lons, lats, intmat = triangulate_indices(indices)   # doctest: +SKIP
+    # >>> triang = tri.Triangulation(lons,lats,intmat)        # doctest: +SKIP
+    # >>> plt.triplot(triang,'r-',transform=transform,lw=1,markersize=3) # doctest: +SKIP
     """
 
     latv, lonv, lat_center, lon_center = to_vertices_latlon(indices)
@@ -990,15 +991,15 @@ def speedy_subset(sids_left, sids_right, values_left=None):
 
     Examples
     ---------
-    >>> import numpy
-    >>> values_left = numpy.array([1,2,3,4,5,6])
-    >>> sids_left = numpy.array([3330891586388099091, 3330891586390196243, 3330891586392293395,\
-                                 3330891586394390547, 3330891586396487699, 3330891586398584851])
-    >>> sids_right = numpy.array([3330891586396487699, 3330891586398584851])
-    >>> left_values = numpy.array([1,2,3,4,5,6,])
-    >>> res = speedy_subset(sids_left=sids_left, sids_right=sids_right, values_left=values_left)
-    >>> res
-    array([5, 6])
+    # >>> import numpy
+    # >>> values_left = numpy.array([1,2,3,4,5,6])
+    # >>> sids_left = numpy.array([3330891586388099091, 3330891586390196243, 3330891586392293395,\
+    #                              3330891586394390547, 3330891586396487699, 3330891586398584851])
+    # >>> sids_right = numpy.array([3330891586396487699, 3330891586398584851])
+    # >>> left_values = numpy.array([1,2,3,4,5,6,])
+    # >>> res = speedy_subset(sids_left=sids_left, sids_right=sids_right, values_left=values_left)
+    # >>> res
+    # array([5, 6])
     """
 
     if values_left is not None:

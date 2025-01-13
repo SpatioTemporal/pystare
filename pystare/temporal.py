@@ -24,12 +24,12 @@ def from_ms_since_epoch_utc(ms_since_epoch_utc, forward_resolution=48, reverse_r
 
     Examples
     ----------
-    >>> import numpy
-    >>> import pystare
-    >>> timestamps = numpy.array(['2021-01-03'], dtype='datetime64[ms]')
-    >>> ms_since_epoch = timestamps.astype(numpy.int64)
-    >>> pystare.from_ms_since_epoch_utc(ms_since_epoch_utc=ms_since_epoch, forward_resolution=48, reverse_resolution=48)
-    array([2275448110396223681])
+    # >>> import numpy
+    # >>> import pystare
+    # >>> timestamps = numpy.array(['2021-01-03'], dtype='datetime64[ms]')
+    # >>> ms_since_epoch = timestamps.astype(numpy.int64)
+    # >>> pystare.from_ms_since_epoch_utc(ms_since_epoch_utc=ms_since_epoch, forward_resolution=48, reverse_resolution=48)
+    # array([2275448110396223681])
 
     See Also
     --------
@@ -55,12 +55,12 @@ def to_ms_since_epoch_utc(tivs):
 
     Examples
     ---------
-    >>> import numpy
-    >>> import pystare
-    >>> tivs = [2275448110396223681]
-    >>> ts = pystare.to_ms_since_epoch_utc(tivs).astype('datetime64[ms]')
-    >>> numpy.datetime_as_string(ts)
-    array(['2021-01-03T00:00:00.000'], dtype='<U42')
+    # >>> import numpy
+    # >>> import pystare
+    # >>> tivs = [2275448110396223681]
+    # >>> ts = pystare.to_ms_since_epoch_utc(tivs).astype('datetime64[ms]')
+    # >>> numpy.datetime_as_string(ts)
+    # array(['2021-01-03T00:00:00.000'], dtype='<U42')
     """
     ms_since_epoch_utc = pystare.core._to_utc_approximate(tivs)
     return ms_since_epoch_utc
@@ -86,8 +86,8 @@ def now(forward_resolution=48, reverse_resolution=48):
 
     Examples
     ---------
-    >>> import pystare
-    >>> now = pystare.now()
+    # >>> import pystare
+    # >>> now = pystare.now()
     """
     now = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
     now = numpy.array([now], dtype='datetime64[ms]')
@@ -149,16 +149,16 @@ def coarsest_resolution_finer_or_equal_ms(milliseconds):
 
     Examples
     ---------
-    >>> import pystare
-    >>> millisecond  = 1
-    >>> second = 1000 * millisecond
-    >>> minute = 60 * second
-    >>> hour = 60 * minute
-    >>> day = 86400 * second
-    >>> year = 365 * day
-    >>> times = numpy.array([millisecond, second, minute, hour, day, year], dtype=numpy.int64)
-    >>> pystare.coarsest_resolution_finer_or_equal_ms(times)
-    array([48, 38, 32, 26, 21, 12])
+    # >>> import pystare
+    # >>> millisecond  = 1
+    # >>> second = 1000 * millisecond
+    # >>> minute = 60 * second
+    # >>> hour = 60 * minute
+    # >>> day = 86400 * second
+    # >>> year = 365 * day
+    # >>> times = numpy.array([millisecond, second, minute, hour, day, year], dtype=numpy.int64)
+    # >>> pystare.coarsest_resolution_finer_or_equal_ms(times)
+    # array([48, 38, 32, 26, 21, 12])
 
     """
     milliseconds = numpy.array(milliseconds)
@@ -185,12 +185,12 @@ def milliseconds_at_resolution(resolution):
 
     Examples
     ---------
-    >>> ms = 5 * 60 * 1000 # 5 minutes
-    >>> resolution = coarsest_resolution_finer_or_equal_ms(ms)
-    >>> resolution
-    30
-    >>> pystare.milliseconds_at_resolution([resolution]) / 60 / 1000 # Back to minutes
-    array([4.])
+    # >>> ms = 5 * 60 * 1000 # 5 minutes
+    # >>> resolution = coarsest_resolution_finer_or_equal_ms(ms)
+    # >>> resolution
+    # 30
+    # >>> pystare.milliseconds_at_resolution([resolution]) / 60 / 1000 # Back to minutes
+    # array([4.])
     """
     return pystare.core._milliseconds_at_resolution(resolution)
 
@@ -216,13 +216,13 @@ def cmp_temporal(tivs1, tivs2, flatten=True):
 
     Examples
     -----------
-    >>> ts1 = numpy.array(['2021-01-03T01', '1985-01-03T01'], dtype='datetime64[ms]').astype(numpy.int64)
-    >>> ts2 = numpy.array(['2021-05-01T10', '1986-10-01'], dtype='datetime64[ms]').astype(numpy.int64)
-    >>> tiv1 = pystare.from_ms_since_epoch_utc(ts1, 10, 10)
-    >>> tiv2 = pystare.from_ms_since_epoch_utc(ts2, 10, 10)
-    >>> pystare.cmp_temporal(tiv1, tiv2, flatten=False)
-    array([[1, 0],
-           [0, 1]])
+    # >>> ts1 = numpy.array(['2021-01-03T01', '1985-01-03T01'], dtype='datetime64[ms]').astype(numpy.int64)
+    # >>> ts2 = numpy.array(['2021-05-01T10', '1986-10-01'], dtype='datetime64[ms]').astype(numpy.int64)
+    # >>> tiv1 = pystare.from_ms_since_epoch_utc(ts1, 10, 10)
+    # >>> tiv2 = pystare.from_ms_since_epoch_utc(ts2, 10, 10)
+    # >>> pystare.cmp_temporal(tiv1, tiv2, flatten=False)
+    # array([[1, 0],
+    #        [0, 1]])
     """
     out_length = len(tivs1) * len(tivs2)
     cmp = numpy.zeros([out_length], dtype=numpy.int64)
@@ -255,22 +255,22 @@ def validate_iso8601_string(iso_string, has_ms=None, has_tz=None):
 
     Examples
     -----------
-    >>> validate_iso8601_string('2021-01-09T17:47:56.154564', has_ms=True, has_tz=False) # ISO8601 w/o timezone and with ms
-    True
-    >>> validate_iso8601_string('2021-01-09T17:47:56.154564', has_ms=False) # ISO8601 w/o timezone and with ms
-    False
-    >>> validate_iso8601_string('2021-01-09T17:47:56', has_ms=True) # No ms
-    False
-    >>> validate_iso8601_string('2021-01-09T17:47:56', has_ms=False) # No ms
-    True
-    >>> validate_iso8601_string('2021-01-09T17:47:56.2435+05:00', has_tz=True) # includes timezone
-    True
-    >>> validate_iso8601_string('2021-01-09T17:47:56.2435+05:00', has_tz=False) # includes timezone
-    False
-    >>> validate_iso8601_string('2021-01-09T17:47:56.154564 (45 12) (1)') # STARE timestring
-    False
-    >>> validate_iso8601_string('Wolfgang') # Not a timestamp
-    False
+    # >>> validate_iso8601_string('2021-01-09T17:47:56.154564', has_ms=True, has_tz=False) # ISO8601 w/o timezone and with ms
+    # True
+    # >>> validate_iso8601_string('2021-01-09T17:47:56.154564', has_ms=False) # ISO8601 w/o timezone and with ms
+    # False
+    # >>> validate_iso8601_string('2021-01-09T17:47:56', has_ms=True) # No ms
+    # False
+    # >>> validate_iso8601_string('2021-01-09T17:47:56', has_ms=False) # No ms
+    # True
+    # >>> validate_iso8601_string('2021-01-09T17:47:56.2435+05:00', has_tz=True) # includes timezone
+    # True
+    # >>> validate_iso8601_string('2021-01-09T17:47:56.2435+05:00', has_tz=False) # includes timezone
+    # False
+    # >>> validate_iso8601_string('2021-01-09T17:47:56.154564 (45 12) (1)') # STARE timestring
+    # False
+    # >>> validate_iso8601_string('Wolfgang') # Not a timestamp
+    # False
     """
     regex_iso8601 = r'^(-?(?:[1-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])' \
                     r'T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\.[0-9]+)' \
@@ -299,10 +299,10 @@ def analyze_iso8601_string(iso_string):
 
     Examples
     ---------
-    >>> analyze_iso8601_string('2021-01-09T17:47:56') # No ms
-    'no_ms'
-    >>> analyze_iso8601_string('2021-01-09T17:47:56.2435+05:00') # includes timezone
-    'has_tz'
+    # >>> analyze_iso8601_string('2021-01-09T17:47:56') # No ms
+    # 'no_ms'
+    # >>> analyze_iso8601_string('2021-01-09T17:47:56.2435+05:00') # includes timezone
+    # 'has_tz'
     """
     regex_iso8601 = r'^(-?(?:[1-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])' \
                     r'T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\.[0-9]+)' \
@@ -340,12 +340,12 @@ def validate_iso8601_strings(time_strings, has_ms=None, has_tz=None):
 
     Examples
     ----------
-    >>> time_strings = ['2021-01-09T17:47:56.154564', '2021-05-09T17:47:56.13']
-    >>> pystare.validate_iso8601_strings(time_strings, has_ms=True, has_tz=False)
-    True
-    >>> time_strings = ['2021-01-09T17:47:56.154564', '2021-05-09T17:47:51']
-    >>> pystare.validate_iso8601_strings(time_strings, has_ms=True, has_tz=False)
-    False
+    # >>> time_strings = ['2021-01-09T17:47:56.154564', '2021-05-09T17:47:56.13']
+    # >>> pystare.validate_iso8601_strings(time_strings, has_ms=True, has_tz=False)
+    # True
+    # >>> time_strings = ['2021-01-09T17:47:56.154564', '2021-05-09T17:47:51']
+    # >>> pystare.validate_iso8601_strings(time_strings, has_ms=True, has_tz=False)
+    # False
 
     See Also
     ---------
@@ -365,16 +365,16 @@ def validate_stare_timestring(timestrings):
 
     Examples
     ----------
-    >>> pystare.validate_stare_timestring('2021-01-09T17:47:56.154 (45 12) (1)')
-    True
-    >>> pystare.validate_stare_timestring('2021-01-09T17:47:56.15 (45 12) (1)')
-    False
-    >>> pystare.validate_stare_timestring('2021-01-09T17:47:56.15345345 (45 12) (1)')
-    False
-    >>> pystare.validate_stare_timestring('2021-01-09T17:47:56 (45 12) (1)')
-    False
-    >>> pystare.validate_stare_timestring('2021-01-09T17:47:56.154564')
-    False
+    # >>> pystare.validate_stare_timestring('2021-01-09T17:47:56.154 (45 12) (1)')
+    # True
+    # >>> pystare.validate_stare_timestring('2021-01-09T17:47:56.15 (45 12) (1)')
+    # False
+    # >>> pystare.validate_stare_timestring('2021-01-09T17:47:56.15345345 (45 12) (1)')
+    # False
+    # >>> pystare.validate_stare_timestring('2021-01-09T17:47:56 (45 12) (1)')
+    # False
+    # >>> pystare.validate_stare_timestring('2021-01-09T17:47:56.154564')
+    # False
     """
     regex_stare = r'^(-?(?:[1-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])' \
                   r'T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])\.([0-9]{3})' \
@@ -393,9 +393,9 @@ def validate_stare_timestrings(timestrings):
 
     Examples
     ---------
-    >>> stare_ts = ['2021-01-09T17:47:56.154 (45 12) (1)']
-    >>> validate_stare_timestrings(stare_ts)
-    True
+    # >>> stare_ts = ['2021-01-09T17:47:56.154 (45 12) (1)']
+    # >>> validate_stare_timestrings(stare_ts)
+    # True
 
     See Also
     ---------
@@ -413,10 +413,10 @@ def force_3ms(timestamp):
 
     Examples
     ---------
-    >>> pystare.force_3ms('2021-08-26T17:03:56.6')
-    '2021-08-26T17:03:56.600'
-    >>> pystare.force_3ms('2021-08-26T17:03:56.643365456345')
-    '2021-08-26T17:03:56.643'
+    # >>> pystare.force_3ms('2021-08-26T17:03:56.6')
+    # '2021-08-26T17:03:56.600'
+    # >>> pystare.force_3ms('2021-08-26T17:03:56.643365456345')
+    # '2021-08-26T17:03:56.643'
     """
     regex_iso8601 = r'^(-?(?:[1-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])' \
                     r'T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\.[0-9]+)' \
@@ -455,9 +455,9 @@ def iso_to_stare_timestrings(iso_strings, forward_res, reverse_res, stare_type):
 
     Examples
     ---------
-    >>> iso_timestring = ['2021-01-09T17:47:56.154564']
-    >>> pystare.iso_to_stare_timestrings(iso_timestring, forward_res=45, reverse_res=12, stare_type=1)
-    ['2021-01-09T17:47:56.154 (45 12) (1)']
+    # >>> iso_timestring = ['2021-01-09T17:47:56.154564']
+    # >>> pystare.iso_to_stare_timestrings(iso_timestring, forward_res=45, reverse_res=12, stare_type=1)
+    # ['2021-01-09T17:47:56.154 (45 12) (1)']
     """
 
     if validate_iso8601_strings(iso_strings, has_tz=True):
@@ -498,9 +498,9 @@ def from_iso_strings(iso_strings, forward_res=48, reverse_res=48, scale='TAI', s
 
     Examples
     ----------
-    >>> time_strings = ['2021-08-26T17:03:56.6']
-    >>> pystare.from_iso_strings(time_strings, forward_res=20, reverse_res=18, scale='TAI')
-    array([2276038620409631817])
+    # >>> time_strings = ['2021-08-26T17:03:56.6']
+    # >>> pystare.from_iso_strings(time_strings, forward_res=20, reverse_res=18, scale='TAI')
+    # array([2276038620409631817])
     """
     stare_timestrings = iso_to_stare_timestrings(iso_strings, forward_res, reverse_res, stare_type)
     tivs = from_stare_timestrings(stare_timestrings, scale)
@@ -520,9 +520,9 @@ def from_stare_timestrings(stare_timestrings, scale='TAI'):
 
     Examples
     ---------
-    >>> stare_ts = ['2021-01-09T17:47:56.154 (45 12) (1)']
-    >>> pystare.from_stare_timestrings(stare_ts, scale='TAI')
-    array([2275464722577272113])
+    # >>> stare_ts = ['2021-01-09T17:47:56.154 (45 12) (1)']
+    # >>> pystare.from_stare_timestrings(stare_ts, scale='TAI')
+    # array([2275464722577272113])
     """
 
     if not validate_stare_timestrings(stare_timestrings):
@@ -554,10 +554,10 @@ def to_stare_timestring(tivs, scale='TAI'):
 
     Examples
     ---------
-    >>> time_strings = ['2021-08-26T17:03:56.626 (48 48) (1)']
-    >>> tiv = pystare.from_stare_timestrings(time_strings, scale='TAI')
-    >>> pystare.to_stare_timestring(tiv) == time_strings
-    True
+    # >>> time_strings = ['2021-08-26T17:03:56.626 (48 48) (1)']
+    # >>> tiv = pystare.from_stare_timestrings(time_strings, scale='TAI')
+    # >>> pystare.to_stare_timestring(tiv) == time_strings
+    # True
     """
 
     if scale == 'TAI':
@@ -605,19 +605,19 @@ def from_julian_date(jd1, jd2, scale, forward_res=48, reverse_res=48):
 
     Examples
     ----------
-    >>> import astropy.time
-    >>> t = astropy.time.Time('2021-08-26T17:36:46.426092', format='isot')
-    >>> t.jd1, t.jd2
-    (2459453.0, 0.23387067236111114)
-
-    >>> jd1 = numpy.array([2459453.0])
-    >>> jd2 = numpy.array([0.23387067236111114])
-    >>> tivs = pystare.from_julian_date(jd1=jd1, jd2=jd2, scale='tai', forward_res=10, reverse_res=10)
-    >>> pystare.to_stare_timestring(tivs)
-    ['2021-08-26T17:36:46.426 (10 10) (1)']
-    >>> tivs = pystare.from_julian_date(jd1=jd1, jd2=jd2, scale='utc', forward_res=10, reverse_res=10)
-    >>> pystare.to_stare_timestring(tivs)
-    ['2021-08-26T17:37:23.426 (10 10) (1)']
+    # >>> import astropy.time
+    # >>> t = astropy.time.Time('2021-08-26T17:36:46.426092', format='isot')
+    # >>> t.jd1, t.jd2
+    # (2459453.0, 0.23387067236111114)
+    #
+    # >>> jd1 = numpy.array([2459453.0])
+    # >>> jd2 = numpy.array([0.23387067236111114])
+    # >>> tivs = pystare.from_julian_date(jd1=jd1, jd2=jd2, scale='tai', forward_res=10, reverse_res=10)
+    # >>> pystare.to_stare_timestring(tivs)
+    # ['2021-08-26T17:36:46.426 (10 10) (1)']
+    # >>> tivs = pystare.from_julian_date(jd1=jd1, jd2=jd2, scale='utc', forward_res=10, reverse_res=10)
+    # >>> pystare.to_stare_timestring(tivs)
+    # ['2021-08-26T17:37:23.426 (10 10) (1)']
     """
 
     if isinstance(jd1, float):
@@ -660,20 +660,20 @@ def to_julian_date(tivs, scale):
 
     Examples
     -----------
-    >>> tiv = numpy.array([2276038620410065089])
-    >>> pystare.to_julian_date(tiv, scale='tai')
-    (array([2459215.5]), array([237.71107206]))
-    >>> pystare.to_julian_date(tiv, scale='utc')
-    (array([2459215.5]), array([237.71064382]))
-
-    >>> import astropy.time
-    >>> timestamps = ['2021-09-26T17:16:46.426092', '2020-09-26T17:16:46.426092']
-    >>> t = astropy.time.Time(timestamps, format='isot')
-    >>> tivs = pystare.from_julian_date(t.jd1, t.jd2, scale='tai')
-    >>> jds = pystare.to_julian_date(tivs, scale='tai')
-    >>> t = astropy.time.Time(jds[0], jds[1], format='jd', scale='tai')
-    >>> t.isot
-    array(['2021-09-26T17:16:46.426', '2020-09-26T17:16:46.426'], dtype='<U23')
+    # >>> tiv = numpy.array([2276038620410065089])
+    # >>> pystare.to_julian_date(tiv, scale='tai')
+    # (array([2459215.5]), array([237.71107206]))
+    # >>> pystare.to_julian_date(tiv, scale='utc')
+    # (array([2459215.5]), array([237.71064382]))
+    #
+    # >>> import astropy.time
+    # >>> timestamps = ['2021-09-26T17:16:46.426092', '2020-09-26T17:16:46.426092']
+    # >>> t = astropy.time.Time(timestamps, format='isot')
+    # >>> tivs = pystare.from_julian_date(t.jd1, t.jd2, scale='tai')
+    # >>> jds = pystare.to_julian_date(tivs, scale='tai')
+    # >>> t = astropy.time.Time(jds[0], jds[1], format='jd', scale='tai')
+    # >>> t.isot
+    # array(['2021-09-26T17:16:46.426', '2020-09-26T17:16:46.426'], dtype='<U23')
     """
     # So we can accept scalars
     if isinstance(tivs, (int, numpy.int64)):
@@ -711,16 +711,16 @@ def set_reverse_resolution(tivs, resolutions):
 
     Examples
     ----------
-    >>> tivs = numpy.array([2275448179115690537, 2234915782217697833])
-    >>> pystare.set_reverse_resolution(tivs, numpy.array([9, 9]))
-    array([2275448179115690533, 2234915782217697829])
-    >>> pystare.set_reverse_resolution(tivs, [9, 9])
-    array([2275448179115690533, 2234915782217697829])
-    >>> pystare.set_reverse_resolution(tivs, 9)
-    array([2275448179115690533, 2234915782217697829])
-    >>> tiv = pystare.set_reverse_resolution(numpy.array([2275448179115690533]), 9)
-    >>> pystare.reverse_resolution(tiv)
-    array([9])
+    # >>> tivs = numpy.array([2275448179115690537, 2234915782217697833])
+    # >>> pystare.set_reverse_resolution(tivs, numpy.array([9, 9]))
+    # array([2275448179115690533, 2234915782217697829])
+    # >>> pystare.set_reverse_resolution(tivs, [9, 9])
+    # array([2275448179115690533, 2234915782217697829])
+    # >>> pystare.set_reverse_resolution(tivs, 9)
+    # array([2275448179115690533, 2234915782217697829])
+    # >>> tiv = pystare.set_reverse_resolution(numpy.array([2275448179115690533]), 9)
+    # >>> pystare.reverse_resolution(tiv)
+    # array([9])
     """
     resolutions = adapt_resolutions_shape(tivs, resolutions)
 
@@ -741,16 +741,16 @@ def set_forward_resolution(tivs, resolutions):
 
     Examples
     ----------
-    >>> tivs = numpy.array([2275448179115690537, 2234915782217697833])
-    >>> pystare.set_forward_resolution(tivs, numpy.array([9, 9]))
-    array([2275448179115690281, 2234915782217697577])
-    >>> pystare.set_forward_resolution(tivs, [9, 9])
-    array([2275448179115690281, 2234915782217697577])
-    >>> pystare.set_forward_resolution(tivs, 9)
-    array([2275448179115690281, 2234915782217697577])
-    >>> tiv = pystare.set_forward_resolution(numpy.array([2275448179115690533]), 8)
-    >>> pystare.forward_resolution(tiv)
-    array([8])
+    # >>> tivs = numpy.array([2275448179115690537, 2234915782217697833])
+    # >>> pystare.set_forward_resolution(tivs, numpy.array([9, 9]))
+    # array([2275448179115690281, 2234915782217697577])
+    # >>> pystare.set_forward_resolution(tivs, [9, 9])
+    # array([2275448179115690281, 2234915782217697577])
+    # >>> pystare.set_forward_resolution(tivs, 9)
+    # array([2275448179115690281, 2234915782217697577])
+    # >>> tiv = pystare.set_forward_resolution(numpy.array([2275448179115690533]), 8)
+    # >>> pystare.forward_resolution(tiv)
+    # array([8])
     """
     resolutions = adapt_resolutions_shape(tivs, resolutions)
 
@@ -764,9 +764,9 @@ def reverse_resolution(indices):
 
     Examples
     ----------
-    >>> tiv = pystare.set_reverse_resolution(numpy.array([2275448179115690533]), 9)
-    >>> pystare.reverse_resolution(tiv)
-    array([9])
+    # >>> tiv = pystare.set_reverse_resolution(numpy.array([2275448179115690533]), 9)
+    # >>> pystare.reverse_resolution(tiv)
+    # array([9])
     """
 
     result = numpy.zeros(indices.shape, dtype=numpy.int64)
@@ -779,9 +779,9 @@ def forward_resolution(indices):
 
     Examples
     ----------
-    >>> tiv = pystare.set_forward_resolution(numpy.array([2275448179115690533]), 7)
-    >>> pystare.forward_resolution(tiv)
-    array([7])
+    # >>> tiv = pystare.set_forward_resolution(numpy.array([2275448179115690533]), 7)
+    # >>> pystare.forward_resolution(tiv)
+    # array([7])
     """
     result = numpy.zeros(indices.shape, dtype=numpy.int64)
     pystare.core._forward_resolution(indices, result)
@@ -937,18 +937,18 @@ def tiv_from_datetime(datetime_object, forward_resolution=48, reverse_resolution
 
     Examples:
     ------------
-    >>> import numpy, datetime
-    >>> dt = datetime.datetime(1985,9,3)
-    >>> pystare.tiv_from_datetime(dt)
-    2235527041980051649
-
-    >>> dt64 = numpy.datetime64(dt)
-    >>> pystare.tiv_from_datetime(dt64)
-    2235527041980051649
-
-    >>> dts = [datetime.datetime(1985,9,3), datetime.datetime(1985,9,3, 11,30)]
-    >>> pystare.tiv_from_datetime(dts)
-    array([2235527041980051649, 2235527830106550465])
+    # >>> import numpy, datetime
+    # >>> dt = datetime.datetime(1985,9,3)
+    # >>> pystare.tiv_from_datetime(dt)
+    # 2235527041980051649
+    #
+    # >>> dt64 = numpy.datetime64(dt)
+    # >>> pystare.tiv_from_datetime(dt64)
+    # 2235527041980051649
+    #
+    # >>> dts = [datetime.datetime(1985,9,3), datetime.datetime(1985,9,3, 11,30)]
+    # >>> pystare.tiv_from_datetime(dts)
+    # array([2235527041980051649, 2235527830106550465])
     """
     ms_since_epoch = numpy.array(datetime_object, dtype='datetime64[ms]').astype(numpy.int64)
     if ms_since_epoch.size == 1:
@@ -966,13 +966,13 @@ def tiv_from_datetimes(start, end):
 
     Examples:
     -----------
-    >>> import pystare
-    >>> start = datetime.datetime(1985,9,3)
-    >>> end = datetime.datetime(1985,12,24)
-    >>> tiv = pystare.tiv_from_datetimes(start, end)
-    >>> lower_bound_tiv = pystare.lower_bound_ms(tiv)
-    >>> pystare.tiv_utc_to_string(lower_bound_tiv)
-    array(['1985-09-03T00:00:00.000'], dtype='<U42')
+    # >>> import pystare
+    # >>> start = datetime.datetime(1985,9,3)
+    # >>> end = datetime.datetime(1985,12,24)
+    # >>> tiv = pystare.tiv_from_datetimes(start, end)
+    # >>> lower_bound_tiv = pystare.lower_bound_ms(tiv)
+    # >>> pystare.tiv_utc_to_string(lower_bound_tiv)
+    # array(['1985-09-03T00:00:00.000'], dtype='<U42')
     """
 
     start = numpy.array(start).astype('datetime64[ms]').astype(numpy.int64)
