@@ -10,7 +10,7 @@ import versioneer
 STARE_LIB_DIRS = [os.path.expanduser(os.environ.get('STARE_LIB_DIR', '/usr/local/lib/'))]
 STARE_INCLUDE_DIRS = [os.path.expanduser(os.environ.get('STARE_INCLUDE_DIR', '/usr/local/include/STARE/'))]
 
-INCLUDE_DIRS = STARE_INCLUDE_DIRS + [numpy.get_include()]
+INCLUDE_DIRS = STARE_INCLUDE_DIRS + [numpy.get_include()] + ['pystare/numpy.i', 'pystare/PySTARE.h']
 
 pystare = Extension(name='pystare._core',
                     sources=['pystare/PySTARE.i', 'pystare/PySTARE.cpp'],
