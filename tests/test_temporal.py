@@ -170,7 +170,4 @@ class MainTest(unittest.TestCase):
             for j in range(3):
                 self.assertEqual(expected[i][j],i_varres_str[i][j])
 
-if __name__ == "__main__":
-    unittest.main()
 
-    
