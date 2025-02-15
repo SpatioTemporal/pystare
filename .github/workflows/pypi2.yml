@@ -29,18 +29,21 @@ jobs:
           CIBW_BEFORE_BUILD: |
             pip install numpy
 
-          CIBW_BUILD: cp311-manylinux_x86_64
-          CIBW_PYTHON_VERSION: "3.11"  # Force cibuildwheel to target Python 3.11
+          CIBW_BUILD: |
+            cp38-manylinux*
+            cp39-manylinux*
+            cp310-manylinux*
+            cp311-manylinux*
+            cp312-manylinux*
+            cp313-manylinux*
 
         run: cibuildwheel --platform linux --output-dir wheelhouse
 
       - name: Publish wheels to PyPI
         if: github.event_name == 'push'
         env:
-          TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
-          TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+          TWINE_USERNAME: ${{ secrets.TWINE_USERNAME }}
+          TWINE_PASSWORD: ${{ secrets.TWINE_PASSWORD }}
         run: |
           pip install twine
           twine upload wheelhouse/*
-
-
