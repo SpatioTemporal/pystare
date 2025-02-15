@@ -2,9 +2,13 @@ name: Build Wheel Manylinux and upload to PyPi
 
 on:
   push:
+    branches-ignore:
+      - '**'
     tags: 
       - v*
   pull_request:    
+    branches-ignore:
+    - '**'
     tags:
       - v*
     inputs:
