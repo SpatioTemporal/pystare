@@ -30,11 +30,11 @@ jobs:
             pip install numpy
 
           CIBW_BUILD: |
-            cp39-manylinux*
-            cp310-manylinux*
-            cp311-manylinux*
-            cp312-manylinux*
-            cp313-manylinux*
+            cp39-manylinux_x86_64
+            cp310-manylinux_x86_64
+            cp311-manylinux_x86_64
+            cp312-manylinux_x86_64
+            cp313-manylinux_x86_64
 
         run: cibuildwheel --platform linux --output-dir wheelhouse
 
