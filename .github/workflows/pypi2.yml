@@ -30,7 +30,7 @@ jobs:
             pip install numpy
 
           CIBW_BUILD: cp311-manylinux_x86_64
-
+          CIBW_PYTHON_VERSION: "3.11"  # Force cibuildwheel to target Python 3.11
 
         run: cibuildwheel --platform linux --output-dir wheelhouse
 
