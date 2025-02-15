@@ -15,7 +15,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.8'
+          python-version: '3.11'
 
       - name: Install cibuildwheel
         run: pip install cibuildwheel==2.11.2
@@ -29,7 +29,7 @@ jobs:
           CIBW_BEFORE_BUILD: |
             pip install numpy
 
-          CIBW_BUILD: "cp38-manylinux cp39-manylinux cp310-manylinux cp311-manylinux cp312-manylinux cp313-manylinux"
+          CIBW_BUILD: "cp311-manylinux* cp312-manylinux* cp313-manylinux*"
 
 
         run: cibuildwheel --platform linux --output-dir wheelhouse
