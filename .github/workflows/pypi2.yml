@@ -29,7 +29,7 @@ jobs:
           CIBW_BEFORE_BUILD: |
             pip install numpy
 
-          CIBW_BUILD: "cp311-manylinux_x86_64"
+          CIBW_BUILD: cp311-manylinux_x86_64
 
 
         run: cibuildwheel --platform linux --output-dir wheelhouse
