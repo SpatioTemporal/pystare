@@ -1,1 +1,60 @@
- 
+name: pypa twine pypi
+
+on:
+  push:
+    tags:
+      - v*
+  pull_request:
+    tags:
+      - v*
+    inputs:
+      debug_enabled:
+        type: boolean
+        description: 'Run the build with tmate debugging enabled (https://github.com/marketplace/actions/debugging-with-tmate)'
+        required: false
+        default: false
+
+jobs:
+  build_wheels:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install cibuildwheel
+        run: pip install cibuildwheel==2.11.2
+
+      - name: Build wheels
+        env:
+          CIBW_BEFORE_ALL: |
+            sudo apt-get update && sudo apt-get install -y swig
+            chmod +x .github/workflows/prebuild.sh && .github/workflows/prebuild.sh
+
+          CIBW_BEFORE_BUILD: |
+            pip install numpy
+
+          CIBW_BUILD: >
+            cp38-manylinux*
+            cp39-manylinux*
+            cp310-manylinux*
+            cp311-manylinux*
+            cp312-manylinux*
+            cp313-manylinux*
+
+        run: cibuildwheel --platform linux --output-dir wheelhouse
+
+      - name: Publish wheels to PyPI
+        if: github.event_name == 'push'
+        env:
+          TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
+          TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+        run: |
+          pip install twine
+          twine upload wheelhouse/*
+
+
