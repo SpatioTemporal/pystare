@@ -15,10 +15,10 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
+          python-version: '3.12'
 
       - name: Install cibuildwheel
-        run: pip install cibuildwheel==2.11.2
+        run: pip install cibuildwheel==2.22.2
 
       - name: Build wheels
         env:
@@ -30,7 +30,6 @@ jobs:
             pip install numpy
 
           CIBW_BUILD: |
-            cp38-manylinux*
             cp39-manylinux*
             cp310-manylinux*
             cp311-manylinux*
