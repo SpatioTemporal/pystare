@@ -21,3 +21,4 @@ test_*.cpython-*
 docs/build/*
 docs/source/reference/api/*
 docs/source/reference/api2/*
+.idea/*
