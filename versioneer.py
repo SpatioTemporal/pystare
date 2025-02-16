@@ -1602,8 +1602,6 @@ def get_versions(verbose=False):
 
     Returns dict with two keys: 'version' and 'full'.
     """
-    return {"version": "0.8.15", "full-revisionid": None,
-            "dirty": None, "date": None}
     if "versioneer" in sys.modules:
         # see the discussion in cmdclass.py:get_cmdclass()
         del sys.modules["versioneer"]
@@ -1677,8 +1675,7 @@ def get_versions(verbose=False):
 
 def get_version():
     """Get the short version string for this project."""
-    #return get_versions()["version"]
-    return "0.8.15"
+    return get_versions()["version"]
 
 
 def get_cmdclass(cmdclass=None):

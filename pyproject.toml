@@ -6,6 +6,3 @@ requires = ["setuptools",
             "Cython>=0.29"]
 
 #build-backend = "setuptools.build_meta"
-
-[setuptools]
-version = "0.8.15"

@@ -39,11 +39,7 @@ cmdclass = versioneer.get_cmdclass()
 
 
 setup(
-    #version=version,
-    version='0.8.15',
+    version=version,
     cmdclass=cmdclass,    
     ext_modules=[pystare],
 ) 
-
-
-
