@@ -25,10 +25,10 @@ jobs:
           CIBW_BEFORE_ALL: |
             sudo apt-get update && sudo apt-get install -y swig
             bash .github/workflows/prebuild.sh
-            python3 setup.py build_ext --inplace # Build the bindings
 
           CIBW_BEFORE_BUILD: |
             pip install numpy
+            python3 setup.py build_ext --inplace # Build the bindings
 
           CIBW_BUILD: |
             cp39-manylinux_x86_64
