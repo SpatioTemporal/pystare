@@ -24,7 +24,7 @@ jobs:
         env:
           CIBW_BEFORE_ALL: |
             sudo apt-get update && sudo apt-get install -y swig
-            chmod +x .github/workflows/prebuild.sh && .github/workflows/prebuild.sh
+            bash .github/workflows/prebuild.sh
 
           CIBW_BEFORE_BUILD: |
             pip install numpy
