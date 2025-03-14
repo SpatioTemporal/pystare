@@ -33,14 +33,14 @@ sudo make install
 It may be necessary to set PYTHON_INCLUDE_DIRS, if, for example, numpy
 headers cannot be found.
 
-## Installation
+## Installation on Linux
 Wheels for manylinux exist on pypi
  
 ```bash
 pip install pystare
 ```
 
-### Or install from source:
+### Install from source:
 
 ```bash
 export STARE_INCLUDE_DIR=/path/to/directory-containing-stare.h/
@@ -50,14 +50,117 @@ git clone https://github.com/SpatioTemporal/pystare
 pip3 install pystare/
 ```
     
-### Manual build
+### (Optional) Manual build from source
 
 ```shell
 python3 setup.py build_ext --inplace 
 python3 setup.py bdist_wheel
 python3 setup.py sdist
 ```
-    
+
+## Manual Installation on MacOS M1
+
+#### I.Install STARE on MacOS M1
+1. Create new conda env with python 3.12:     
+
+`conda create -n <YOUR_CONDA_ENV> python=3.12`
+
+E.g: `conda create -n stare_3.12 python=3.12`
+
+3. Activate conda env:
+
+`conda activate <YOUR_CONDA_ENV>`  
+
+E.g: `conda activate stare_3.12`
+3. Install numpy: 
+
+`conda install -c conda-forge numpy`  
+
+5. Install cmake: 
+
+```
+sudo apt update  
+sudo apt install cmake
+```
+
+or: 
+
+`conda install -c conda-forge cmake`
+
+6. Install doxygen & x-code-select:
+
+```
+conda install -c conda-forge doxygen
+xcode-select --install
+```
+
+7. (Optional) May need to link librhash library
+```
+cd /Users/tonhai/miniconda3/envs/<YOUR_CONDA_ENV>/lib
+ln -s librhash.<VERSION>.dylib librhash.0.dylib
+```
+E.g:
+```
+cd /Users/tonhai/miniconda3/envs/stare_3.12/lib
+ln -s librhash.1.4.5.dylib librhash.0.dylib
+```
+
+8. Download & install STARE from source:
+
+```
+git clone https://github.com/SpatioTemporal/STARE  
+cd STARE
+mkdir build
+cd build
+cmake -DCMAKE_OSX_ARCHITECTURES=arm64 \
+      -DCMAKE_OSX_SYSROOT="$(xcode-select --print-path)/SDKs/MacOSX.sdk" \
+      -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 \
+      -DCMAKE_CXX_FLAGS="-isysroot $(xcode-select --print-path)/SDKs/MacOSX.sdk -I$(xcode-select --print-path)/SDKs/MacOSX.sdk/usr/include/c++/v1" \
+      -DSTARE_INSTALL_LIBDIR=lib \
+      -DBUILD_SHARED_LIBS=NO \
+      ../
+make -j4
+sudo make install
+```
+
+9. Check to see if libSTARE.a in /usr/local/lib/ and STARE.h in /usr/local/include/, if not: 
+```
+export STARE_INCLUDE_DIR=/path/to/directory-containing-stare.h/  
+export STARE_LIB_DIR=/path/to/directory-containing-stare.a/
+```
+       
+E.g.: 
+```
+export STARE_INCLUD_DIR=/Users/tonhai/miniconda3/envs/stare_3.12/include/STARE
+export STARE_LIB_DIR=/Users/tonhai/miniconda3/envs/stare_3.12/lib
+```
+
+```
+python3 setup.py build_ext --inplace 
+python3 setup.py bdist_wheel
+python3 setup.py sdist
+```
+
+#### II. Install pystare on MacOS M1
+1. Install setuptools, swig and wheel: 
+
+`conda install -c conda-forge setuptools swig wheel`
+
+2. Download pystare, rebuild and install:
+```
+git clone https://github.com/SpatioTemporal/pystare  
+cd pystare  
+export CXXFLAGS="-I$(xcode-select --print-path)/SDKs/MacOSX.sdk/usr/include/c++/v1"
+python3 setup.py build_ext --inplace  
+python3 setup.py bdist_wheel  
+python3 setup.py sdist  
+pip3 install .  
+```
+
+If there is any issue, try to export this and retry:
+
+`export CXXFLAGS="-I/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1"`
+
 ## Tests
 pystare uses [pytest](https://docs.pytest.org/en/6.2.x/). Pytest is configured in ```pytest.ini.```
 
