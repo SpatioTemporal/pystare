@@ -67,7 +67,7 @@ python3 setup.py sdist
 
 E.g: `conda create -n stare_3.12 python=3.12`
 
-3. Activate conda env:
+2. Activate conda env:
 
 `conda activate <YOUR_CONDA_ENV>`  
 
@@ -76,7 +76,7 @@ E.g: `conda activate stare_3.12`
 
 `conda install -c conda-forge numpy`  
 
-5. Install cmake: 
+4. Install cmake: 
 
 ```
 sudo apt update  
@@ -87,14 +87,14 @@ or:
 
 `conda install -c conda-forge cmake`
 
-6. Install doxygen & x-code-select:
+5. Install doxygen & x-code-select:
 
 ```
 conda install -c conda-forge doxygen
 xcode-select --install
 ```
 
-7. (Optional) May need to link librhash library
+6. (Optional) May need to link librhash library
 ```
 cd /Users/tonhai/miniconda3/envs/<YOUR_CONDA_ENV>/lib
 ln -s librhash.<VERSION>.dylib librhash.0.dylib
@@ -105,7 +105,7 @@ cd /Users/tonhai/miniconda3/envs/stare_3.12/lib
 ln -s librhash.1.4.5.dylib librhash.0.dylib
 ```
 
-8. Download & install STARE from source:
+7. Download & install STARE from source:
 
 ```
 git clone https://github.com/SpatioTemporal/STARE  
@@ -123,7 +123,7 @@ make -j4
 sudo make install
 ```
 
-9. Check to see if libSTARE.a in /usr/local/lib/ and STARE.h in /usr/local/include/, if not: 
+8. Check to see if libSTARE.a in /usr/local/lib/ and STARE.h in /usr/local/include/, if not: 
 ```
 export STARE_INCLUDE_DIR=/path/to/directory-containing-stare.h/  
 export STARE_LIB_DIR=/path/to/directory-containing-stare.a/
