@@ -11,11 +11,22 @@ It expects either:
 - ```libSTARE.a``` in /usr/local/lib/ and STARE.h in /usr/local/include/ or
 - the variables STARE_LIB_DIR and STARE_INCLUDE_DIR to be set e.g. with:
 
+For example, if you'd rather (or can't) write to /usr/local you can set up a hidden local directory for this purpose.  You can call this whatever you want (e.g., ~/.local) and it doesn't have to be a hidden dot-folder either (on MacOS use `/Users` rather than `/home` of course).
+```bash
+        $ mkdir /home/YOU/.local
+        $ mkdir /home/YOU/.local/bin
+        $ mkdir /home/YOU/.local/lib
+        $ mkdir /home/YOU/.local/m
+        $ mkdir /home/YOU/.local/share
+
+    # Also you might want to add this to to .bashrc
+    $ export PATH="/home/you/.local/bin:$PATH"
+```
+
 ```bash
 export STARE_INCLUDE_DIR=/path/to/directory-containing-stare.h/
 export STARE_LIB_DIR=/path/to/directory-containing-stare.a/
 ```
-
 
 Build and install STARE e.g. with:
 
@@ -96,12 +107,12 @@ xcode-select --install
 
 6. (Optional) May need to link librhash library
 ```
-cd /Users/tonhai/miniconda3/envs/<YOUR_CONDA_ENV>/lib
+cd /Users/YOU/miniconda3/envs/<YOUR_CONDA_ENV>/lib
 ln -s librhash.<VERSION>.dylib librhash.0.dylib
 ```
 E.g:
 ```
-cd /Users/tonhai/miniconda3/envs/stare_3.12/lib
+cd /Users/YOU/miniconda3/envs/stare_3.12/lib
 ln -s librhash.1.4.5.dylib librhash.0.dylib
 ```
 
@@ -131,8 +142,8 @@ export STARE_LIB_DIR=/path/to/directory-containing-stare.a/
        
 E.g.: 
 ```
-export STARE_INCLUD_DIR=/Users/tonhai/miniconda3/envs/stare_3.12/include/STARE
-export STARE_LIB_DIR=/Users/tonhai/miniconda3/envs/stare_3.12/lib
+export STARE_INCLUD_DIR=/Users/YOU/miniconda3/envs/stare_3.12/include/STARE
+export STARE_LIB_DIR=/Users/YOU/miniconda3/envs/stare_3.12/lib
 ```
 
 ```
