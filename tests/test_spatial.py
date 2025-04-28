@@ -1,6 +1,7 @@
 import numpy
 import pystare
 import unittest
+import tests.data.intervals
 
 
 class MainTest(unittest.TestCase):
@@ -120,9 +121,8 @@ class MainTest(unittest.TestCase):
         numpy.testing.assert_array_equal(compared, expected)
 
     def test__expand(self):
-        import tests.data.intervals as intervals
-        src = numpy.array(intervals.src, dtype=numpy.int64)
-        expected_expanded = numpy.array(intervals.expanded_src, dtype=numpy.int64)
+        src = numpy.array(tests.data.intervals.src, dtype=numpy.int64)
+        expected_expanded = numpy.array(tests.data.intervals.expanded_src, dtype=numpy.int64)
         expanded = numpy.zeros([len(expected_expanded)], dtype=numpy.int64)
         expanded_len = numpy.zeros([1], dtype=numpy.int64)
         intervals_len = len(src)
@@ -138,9 +138,8 @@ class MainTest(unittest.TestCase):
         self.assertFalse(error_found)
 
     def test_expand(self):
-        import tests.data.intervals as intervals
-        src = numpy.array(intervals.src, dtype=numpy.int64)
-        expected_expanded = numpy.array(intervals.expanded_src, dtype=numpy.int64)
+        src = numpy.array(tests.data.intervals.src, dtype=numpy.int64)
+        expected_expanded = numpy.array(tests.data.intervals.expanded_src, dtype=numpy.int64)
         resolution = -1
         expanded = pystare.expand_intervals(src, resolution, multi_resolution=False)
         error_found = False

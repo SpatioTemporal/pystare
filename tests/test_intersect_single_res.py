@@ -1,5 +1,3 @@
-# Visualize test_intersect_single_res seen in test_intersections.py
-
 import pystare
 import numpy
 
